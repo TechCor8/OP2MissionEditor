@@ -27,6 +27,7 @@ namespace OP2MissionEditor.Dialogs
 			CanvasScaler canvas = m_DraggableWindow.GetComponentInParent<CanvasScaler>();
 
 			Vector2 refResolution = canvas.referenceResolution / 2;
+			refResolution.x = refResolution.y * (Screen.width / (float)Screen.height);
 			Vector2 position = m_DraggableWindow.anchoredPosition;
 			Vector2 size = m_DraggableWindow.rect.size / 2;
 

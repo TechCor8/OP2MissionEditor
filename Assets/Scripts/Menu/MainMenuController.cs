@@ -172,6 +172,7 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_MissionProperties()
 		{
+			MissionPropertiesDialog.Create(UserData.current);
 		}
 
 		public void OnClick_PlayerProperties()

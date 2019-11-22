@@ -12,16 +12,14 @@ namespace OP2MissionEditor
 	{
 		public static UserData current		{ get; private set; }
 
-		private Map m_Map;
-		private MissionRoot m_MissionData;
-
 		/// <summary>
 		/// If true, there are no unsaved changes.
 		/// </summary>
 		public bool isSaved					{ get; private set; }
 		public void SetUnsaved()			{ isSaved = false;	}
 
-		public Map map						{ get { return m_Map; } }
+		public Map map						{ get; private set; }
+		public MissionRoot mission			{ get; private set; }
 
 
 		public static void CreateNew()
@@ -29,8 +27,8 @@ namespace OP2MissionEditor
 			current?.Dispose();
 
 			current = new UserData();
-			current.m_Map = new Map();
-			current.m_MissionData = new MissionRoot();
+			current.map = new Map();
+			current.mission = new MissionRoot();
 		}
 
 		public static bool LoadMission(string path)
@@ -38,43 +36,43 @@ namespace OP2MissionEditor
 			current?.Dispose();
 
 			current = new UserData();
-			current.m_Map = new Map();
-			current.m_MissionData = MissionReader.GetMissionData(path);
+			current.map = new Map();
+			current.mission = MissionReader.GetMissionData(path);
 
 			return true;
 		}
 
 		public static bool ImportMap(string path)
 		{
-			current.m_Map?.Dispose();
+			current.map?.Dispose();
 
-			current.m_Map = Map.ReadMap(path);
+			current.map = Map.ReadMap(path);
 
 			return true;
 		}
 
 		public static bool ImportMap(byte[] data)
 		{
-			current.m_Map?.Dispose();
+			current.map?.Dispose();
 
-			current.m_Map = Map.ReadMap(data);
+			current.map = Map.ReadMap(data);
 
 			return true;
 		}
 
 		public void SaveMission(string path)
 		{
-			MissionReader.WriteMissionData(path, current.m_MissionData);
+			MissionReader.WriteMissionData(path, current.mission);
 		}
 
 		public void ExportMap(string path)
 		{
-			m_Map.Write(path);
+			map.Write(path);
 		}
 
 		public void Dispose()
 		{
-			m_Map?.Dispose();
+			map?.Dispose();
 		}
 	}
 }
