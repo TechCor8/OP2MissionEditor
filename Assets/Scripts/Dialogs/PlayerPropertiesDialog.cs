@@ -92,6 +92,10 @@ namespace OP2MissionEditor.Dialogs
 			m_TechNames.Clear();
 			m_TechIds.Clear();
 
+			// Can't parse files in game directory if one hasn't been assigned yet.
+			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
+				return;
+
 			using (VolFile volFile = new VolFile(UserPrefs.GameDirectory + "/" + "tech.vol"))
 			{
 				if (!volFile.Contains(m_UserData.mission.levelDetails.techTreeName))
