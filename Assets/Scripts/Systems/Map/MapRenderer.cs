@@ -15,6 +15,12 @@ namespace OP2MissionEditor.Systems.Map
 
 		private Dictionary<string, Texture2D> m_TextureCache = new Dictionary<string, Texture2D>();		// Key = Filename
 
+		public Texture2D minimapTexture			{ get; private set; }
+
+		public delegate void OnMapCallback(MapRenderer mapRenderer);
+
+		public event OnMapCallback onMapRefreshedCB;
+
 
 		private void Awake()
 		{
@@ -48,6 +54,12 @@ namespace OP2MissionEditor.Systems.Map
 				uint mapWidth = UserData.current.map.GetWidthInTiles();
 				uint mapHeight = UserData.current.map.GetHeightInTiles();
 
+				minimapTexture = new Texture2D((int)mapWidth, (int)mapHeight, TextureFormat.ARGB32, false);
+
+				Vector3Int[] cellPositions = new Vector3Int[(int)(mapWidth*mapHeight)];
+				TileBase[] cellTiles = new TileBase[(int)(mapWidth*mapHeight)];
+				int index = 0;
+
 				for (uint x=0; x < mapWidth; ++x)
 				{
 					for (uint y=0; y < mapHeight; ++y)
@@ -58,7 +70,7 @@ namespace OP2MissionEditor.Systems.Map
 
 						string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
 						ulong tileSetNumTiles = UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
-
+						
 						// Get tile bitmap data
 						Texture2D texture;
 						if (!m_TextureCache.TryGetValue(tileSetPath, out texture))
@@ -72,29 +84,50 @@ namespace OP2MissionEditor.Systems.Map
 							texture = GetTextureFromBMP(tileImageData);
 							m_TextureCache.Add(tileSetPath, texture);
 						}
-
+						
 						// Get image offset
 						int tileSize = texture.height / (int)tileSetNumTiles;
 						int texOffset = (int)(tileSetNumTiles-tileImageIndex-1) * tileSize;
 
 						// Create sprite
-						Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1);
-
+						Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+						
 						// Load sprite into tile map
 						Tile tile = ScriptableObject.CreateInstance<Tile>();
 						tile.sprite = tileSprite;
 						tile.color = Color.white;
 
-						m_Tilemap.SetTile(new Vector3Int((int)x,(int)(mapHeight-y-1),0), tile);
-						m_GridOverlay.SetTile(new Vector3Int((int)x,(int)(mapHeight-y-1),0), gridOverlayTile);
+						Vector3Int cellPosition = new Vector3Int((int)x,(int)(mapHeight-y-1),0);
+
+						cellPositions[index] = cellPosition;
+						cellTiles[index] = tile;
+
+						// Set minimap pixel
+						Color color = GetTileColor(tileSprite, texOffset, tileSize);
+						minimapTexture.SetPixel(cellPosition.x, cellPosition.y, color);
+						
+						++index;
 					}
 				}
 
 				m_GridOverlay.color = UserPrefs.gridOverlayColor;
 
+				// Set tiles
+				m_Tilemap.SetTiles(cellPositions, cellTiles);
+
+				TileBase[] overlayTiles = new TileBase[cellPositions.Length];
+				for (int i = 0; i < overlayTiles.Length; ++i)
+					overlayTiles[i] = gridOverlayTile;
+
+				m_GridOverlay.SetTiles(cellPositions, overlayTiles);
+				
+				// Refresh tiles
 				m_Tilemap.RefreshAllTiles();
 				m_GridOverlay.RefreshAllTiles();
+				minimapTexture.Apply();
 			}
+
+			onMapRefreshedCB?.Invoke(this);
 		}
 
 		private Texture2D GetTextureFromBMP(byte[] bmpData)
@@ -102,6 +135,20 @@ namespace OP2MissionEditor.Systems.Map
 			BMPLoader bmpLoader = new BMPLoader();
 			BMPImage bmpImage = bmpLoader.LoadBMP(bmpData);
 			return bmpImage.ToTexture2D();
+		}
+
+		private Color GetTileColor(Sprite tileSprite, int tileOffset, int tileSize)
+		{
+			Color[] tilePixels = tileSprite.texture.GetPixels(0,tileOffset, tileSize, tileSize, 0);
+
+			Color avgColor = Color.black;
+
+			for (int i=0; i < tilePixels.Length; ++i)
+				avgColor += tilePixels[i];
+
+			avgColor /= tileSize*tileSize;
+
+			return avgColor;
 		}
 	}
 }

@@ -182,8 +182,9 @@ namespace OP2MissionEditor.Menu
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// View Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-		public void OnClick_ShowGridLines()
+		public void OnClick_ShowMinimap()
 		{
+			MinimapDialog.Create(m_MapRenderer);
 		}
 	}
 }

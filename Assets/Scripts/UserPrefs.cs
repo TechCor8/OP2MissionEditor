@@ -26,9 +26,9 @@ namespace OP2MissionEditor
 			get
 			{
 				return new Color32(	(byte)PlayerPrefs.GetInt("GridOverlay_Red", 0),
-									(byte)PlayerPrefs.GetInt("GridOverlay_Green", 0),
+									(byte)PlayerPrefs.GetInt("GridOverlay_Green", 174),
 									(byte)PlayerPrefs.GetInt("GridOverlay_Blue", 0),
-									(byte)PlayerPrefs.GetInt("GridOverlay_Alpha", 180));
+									(byte)PlayerPrefs.GetInt("GridOverlay_Alpha", 182));
 			}
 			set
 			{

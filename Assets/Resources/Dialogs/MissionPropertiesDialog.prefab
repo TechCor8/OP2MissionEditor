@@ -1365,6 +1365,7 @@ GameObject:
   - component: {fileID: 1469346310923588658}
   - component: {fileID: 1469346310923588657}
   - component: {fileID: 1953224791217169268}
+  - component: {fileID: 2198621554886584985}
   m_Layer: 5
   m_Name: MissionPropertiesDialog
   m_TagString: Untagged
@@ -1481,6 +1482,19 @@ MonoBehaviour:
   m_BtnMoveMusicTrackUp: {fileID: 6242013752438483744}
   m_BtnMoveMusicTrackDown: {fileID: 9050746627797400451}
   m_BtnRemoveMusicTrack: {fileID: 2707930101043821491}
+--- !u!114 &2198621554886584985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469346310923588656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f8a483994fd0d46acc3ee4f6347a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_WindowType: {fileID: 1953224791217169268}
 --- !u!1 &1469346311577893047
 GameObject:
   m_ObjectHideFlags: 0

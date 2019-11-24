@@ -25,7 +25,10 @@ namespace OP2MissionEditor.Systems.Map
 			if (Input.GetKey(KeyCode.DownArrow))	{ Camera.main.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);			}
 			if (Input.GetKey(KeyCode.LeftArrow))	{ Camera.main.transform.position -= new Vector3(speed * Time.deltaTime, 0, 0);			}
 			if (Input.GetKey(KeyCode.RightArrow))	{ Camera.main.transform.position += new Vector3(speed * Time.deltaTime, 0, 0);			}
+		}
 
+		private void LateUpdate()
+		{
 			// Keep camera in bounds
 			Vector2 mapCenter = new Vector2(m_Tilemap.cellBounds.center.x*m_Tilemap.cellSize.x, m_Tilemap.cellBounds.center.y*m_Tilemap.cellSize.y);
 			Vector2 mapSize = new Vector2(m_Tilemap.cellBounds.size.x*m_Tilemap.cellSize.x, m_Tilemap.cellBounds.size.y*m_Tilemap.cellSize.y);
