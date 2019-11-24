@@ -2,9 +2,11 @@
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
 using SimpleFileBrowser;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace OP2MissionEditor.Menu
 {
@@ -57,9 +59,6 @@ namespace OP2MissionEditor.Menu
 			// User needs to choose what map to import
 			FileBrowser.SetFilters(false, ".map", ".vol");
 			FileBrowser.ShowSaveDialog(OnImportMapPath, null, false, UserPrefs.GameDirectory, "Import Map", "Import");
-
-			//OP2UtilityDotNet.VolFile volFile = new OP2UtilityDotNet.VolFile("C:/Users/kevin/Desktop/Outpost2-1.3.0.7-OPU/art.vol");
-			//Debug.Log("Size = " + volFile.GetArchiveFileSize());
 		}
 
 		private void OnImportMapPath(string path)
@@ -177,6 +176,7 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_PlayerProperties()
 		{
+			PlayerPropertiesDialog.Create(UserData.current);
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
