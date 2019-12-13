@@ -15,9 +15,12 @@ namespace OP2MissionEditor.Menu
 	/// </summary>
 	public class MainMenuController : MonoBehaviour
 	{
+		[SerializeField] private CanvasGroup m_CanvasGroup		= default;
 		[SerializeField] private MapRenderer m_MapRenderer		= default;
 
 		private string m_SavePath;
+
+		public bool interactable { get { return m_CanvasGroup.interactable; } set { m_CanvasGroup.interactable = value; } }
 
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -25,17 +28,29 @@ namespace OP2MissionEditor.Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		public void OnClick_New()
 		{
+			CreateNew_NoRefresh();
+
+			interactable = false;
+
+			m_MapRenderer.Refresh(() =>
+			{
+				interactable = true;
+			});
+		}
+
+		private void CreateNew_NoRefresh()
+		{
 			m_SavePath = null;
 			UserData.CreateNew();
-
-			m_MapRenderer.Refresh();
 		}
 
 		public void OnClick_Open()
 		{
+			interactable = false;
+
 			// User needs to choose what mission to open
 			FileBrowser.SetFilters(false, ".opm");
-			FileBrowser.ShowLoadDialog(OnOpenPath, null, false, UserPrefs.GameDirectory, "Open Mission", "Open");
+			FileBrowser.ShowLoadDialog(OnOpenPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Open Mission", "Open");
 		}
 
 		private void OnOpenPath(string path)
@@ -49,16 +64,25 @@ namespace OP2MissionEditor.Menu
 				return;
 			}
 
-			m_MapRenderer.Refresh();
+			m_MapRenderer.Refresh(() =>
+			{
+				interactable = true;
+				Debug.Log("Opened mission \"" + Path.GetFileName(path) + "\".");
+			});
+		}
 
-			Debug.Log("Opened mission \"" + Path.GetFileName(path) + "\".");
+		private void OnCancelFileDialog()
+		{
+			interactable = true;
 		}
 
 		public void OnClick_ImportMap()
 		{
+			interactable = false;
+
 			// User needs to choose what map to import
 			FileBrowser.SetFilters(false, ".map", ".vol");
-			FileBrowser.ShowSaveDialog(OnImportMapPath, null, false, UserPrefs.GameDirectory, "Import Map", "Import");
+			FileBrowser.ShowSaveDialog(OnImportMapPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Import Map", "Import");
 		}
 
 		private void OnImportMapPath(string path)
@@ -80,17 +104,32 @@ namespace OP2MissionEditor.Menu
 					}
 
 					// Open list of map names for selection
-					ListSelectDialog.Create(fileNames, "Select Map", "Import", (string mapName) => OnImportMapSelected(vol, mapName), vol.Dispose);
+					ListSelectDialog.Create(fileNames, "Select Map", "Import", (string mapName) => OnImportMapSelected(vol, mapName), () =>
+					{
+						interactable = true;
+						vol.Dispose();
+					});
 
 					break;
 
 				default:
-					OnClick_New();
+					CreateNew_NoRefresh();
 
 					if (UserData.ImportMap(path))
 					{
-						m_MapRenderer.Refresh();
-						Debug.Log("Import Complete.");
+						m_MapRenderer.Refresh(() =>
+						{
+							interactable = true;
+							Debug.Log("Import Complete.");
+						});
+					}
+					else
+					{
+						// Import failed
+						m_MapRenderer.Refresh(() =>
+						{
+							interactable = true;
+						});
 					}
 					break;
 			}
@@ -98,16 +137,21 @@ namespace OP2MissionEditor.Menu
 
 		private void OnImportMapSelected(VolFile volFile, string mapName)
 		{
-			OnClick_New();
-
 			byte[] mapData = volFile.ReadFileByName(mapName);
 			volFile.Dispose();
 
-			if (UserData.ImportMap(mapData))
+			if (!UserData.ImportMap(mapData))
 			{
-				m_MapRenderer.Refresh();
-				Debug.Log("Import Complete.");
+				// If import fails, clear out data by creating new mission instead
+				OnClick_New();
+				return;
 			}
+
+			m_MapRenderer.Refresh(() =>
+			{
+				interactable = true;
+				Debug.Log("Import Complete.");
+			});
 		}
 
 		public void OnClick_Save()
@@ -124,13 +168,17 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_SaveAs()
 		{
+			interactable = false;
+
 			// User needs to choose where to save the mission
 			FileBrowser.SetFilters(false, ".opm");
-			FileBrowser.ShowSaveDialog(OnSavePath, null, false, UserPrefs.GameDirectory, "Save Mission", "Save");
+			FileBrowser.ShowSaveDialog(OnSavePath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Save Mission", "Save");
 		}
 
 		private void OnSavePath(string path)
 		{
+			interactable = true;
+
 			m_SavePath = path;
 
 			UserData.current.SaveMission(path);
@@ -140,13 +188,17 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_ExportMap()
 		{
+			interactable = false;
+
 			// User needs to choose where to save the map
 			FileBrowser.SetFilters(false, ".map");
-			FileBrowser.ShowSaveDialog(OnExportMapPath, null, false, UserPrefs.GameDirectory, "Export Map", "Export");
+			FileBrowser.ShowSaveDialog(OnExportMapPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Export Map", "Export");
 		}
 
 		private void OnExportMapPath(string path)
 		{
+			interactable = true;
+
 			UserData.current.ExportMap(path);
 
 			Debug.Log("Map exported to \"" + path + "\".");
@@ -171,12 +223,22 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_MissionProperties()
 		{
-			MissionPropertiesDialog.Create(UserData.current);
+			interactable = false;
+
+			MissionPropertiesDialog.Create(UserData.current, () =>
+			{
+				interactable = true;
+			});
 		}
 
 		public void OnClick_PlayerProperties()
 		{
-			PlayerPropertiesDialog.Create(UserData.current);
+			interactable = false;
+
+			PlayerPropertiesDialog.Create(UserData.current, () =>
+			{
+				interactable = true;
+			});
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

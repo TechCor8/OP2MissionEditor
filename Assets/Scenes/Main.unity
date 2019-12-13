@@ -5336,6 +5336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf5664e769cb494f9035ed0471b9da1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_MapRenderer: {fileID: 1633291501}
 --- !u!114 &1645941395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5651,6 +5652,7 @@ GameObject:
   - component: {fileID: 1835127154}
   - component: {fileID: 1835127153}
   - component: {fileID: 1835127152}
+  - component: {fileID: 1835127157}
   - component: {fileID: 1835127156}
   m_Layer: 5
   m_Name: CanvasMainMenu
@@ -5752,7 +5754,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 276c7f1dee9fc1a4b89d7a4ce36af810, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_CanvasGroup: {fileID: 1835127157}
   m_MapRenderer: {fileID: 1633291501}
+--- !u!225 &1835127157
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835127151}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1838769005
 GameObject:
   m_ObjectHideFlags: 0
