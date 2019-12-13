@@ -129,6 +129,7 @@ namespace OP2MissionEditor.Menu
 						m_MapRenderer.Refresh(() =>
 						{
 							interactable = true;
+							Debug.LogError("Failed to read map: " + path);
 						});
 					}
 					break;
@@ -142,6 +143,8 @@ namespace OP2MissionEditor.Menu
 
 			if (!UserData.ImportMap(mapData))
 			{
+				Debug.LogError("Failed to read map: " + mapName);
+
 				// If import fails, clear out data by creating new mission instead
 				OnClick_New();
 				return;

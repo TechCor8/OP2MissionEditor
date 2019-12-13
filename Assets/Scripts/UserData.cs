@@ -47,6 +47,11 @@ namespace OP2MissionEditor
 			current.map?.Dispose();
 
 			current.map = Map.ReadMap(path);
+			if (current.map == null)
+			{
+				current.map = new Map();
+				return false;
+			}
 
 			return true;
 		}
@@ -56,6 +61,11 @@ namespace OP2MissionEditor
 			current.map?.Dispose();
 
 			current.map = Map.ReadMap(data);
+			if (current.map == null)
+			{
+				current.map = new Map();
+				return false;
+			}
 
 			return true;
 		}
