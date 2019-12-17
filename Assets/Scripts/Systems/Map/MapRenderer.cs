@@ -2,6 +2,7 @@
 using OP2UtilityDotNet;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -57,8 +58,7 @@ namespace OP2MissionEditor.Systems.Map
 			m_Tilemap.ClearAllTiles();
 			m_GridOverlay.ClearAllTiles();
 
-			//using (ResourceManager resourceManager = new ResourceManager(UserPrefs.GameDirectory))
-			using (VolFile volFile = new VolFile(UserPrefs.GameDirectory + "/" + "art.vol"))
+			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.GameDirectory))
 			{
 				uint mapWidth = UserData.current.map.GetWidthInTiles();
 				uint mapHeight = UserData.current.map.GetHeightInTiles();
@@ -93,10 +93,13 @@ namespace OP2MissionEditor.Systems.Map
 						if (!m_TextureCache.TryGetValue(tileSetPath, out texture))
 						{
 							// Image not found in cache. Fetch from archive.
-							//ulong mysize = resourceManager.GetResourceSize(tileSetPath + ".bmp", true);
-							byte[] tileImageData = volFile.ReadFileByName(tileSetPath + ".bmp");//resourceManager.GetResource(tileSetPath + ".bmp", true);
+							byte[] tileImageData = resourceManager.GetResource(tileSetPath + ".bmp", true);
 							if (tileImageData == null)
+							{
+								onCompleteCB?.Invoke();
+								onMapRefreshedCB?.Invoke(this);
 								throw new System.Exception("Could not find resource: " + tileSetPath);
+							}
 
 							texture = GetTextureFromBMP(tileImageData);
 							m_TextureCache.Add(tileSetPath, texture);

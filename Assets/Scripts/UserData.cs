@@ -10,7 +10,7 @@ namespace OP2MissionEditor
 	/// </summary>
 	public class UserData
 	{
-		public static UserData current		{ get; private set; }
+		public static UserData current		{ get; private set; } = new UserData();
 
 		/// <summary>
 		/// If true, there are no unsaved changes.
@@ -26,7 +26,6 @@ namespace OP2MissionEditor
 		{
 			current?.Dispose();
 
-			current = new UserData();
 			current.map = new Map();
 			current.mission = new MissionRoot();
 		}
@@ -35,7 +34,6 @@ namespace OP2MissionEditor
 		{
 			current?.Dispose();
 
-			current = new UserData();
 			current.map = new Map();
 			current.mission = MissionReader.GetMissionData(path);
 

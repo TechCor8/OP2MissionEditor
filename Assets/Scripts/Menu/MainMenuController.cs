@@ -23,6 +23,13 @@ namespace OP2MissionEditor.Menu
 		public bool interactable { get { return m_CanvasGroup.interactable; } set { m_CanvasGroup.interactable = value; } }
 
 
+		private void Awake()
+		{
+			// Show these windows at startup
+			OnClick_ShowMinimap();
+			OnClick_ShowPaintWindow();
+		}
+
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// File Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -249,7 +256,45 @@ namespace OP2MissionEditor.Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		public void OnClick_ShowMinimap()
 		{
-			MinimapDialog.Create(m_MapRenderer);
+			MinimapDialog minimapDlg = MinimapDialog.Create(m_MapRenderer);
+
+			// Set minimap to top-right corner
+			RectTransform rTransform = minimapDlg.transform.GetChild(0).GetComponent<RectTransform>();
+			CanvasScaler canvas = rTransform.GetComponentInParent<CanvasScaler>();
+
+			Vector2 refResolution = canvas.referenceResolution / 2;
+			refResolution.x = refResolution.y * (Screen.width / (float)Screen.height);
+			Vector2 position = rTransform.anchoredPosition;
+			Vector2 size = rTransform.rect.size / 2;
+
+			position.x = refResolution.x - size.x;
+			position.y = 362 - size.y;
+
+			rTransform.anchoredPosition = position;
+		}
+
+		public void OnClick_ShowPaintWindow()
+		{
+			PaintDialog paintDialog = PaintDialog.Create(UserData.current);
+
+			// Set paint window to mid-right corner
+			RectTransform rTransform = paintDialog.transform.GetChild(0).GetComponent<RectTransform>();
+			CanvasScaler canvas = rTransform.GetComponentInParent<CanvasScaler>();
+
+			Vector2 refResolution = canvas.referenceResolution / 2;
+			refResolution.x = refResolution.y * (Screen.width / (float)Screen.height);
+			Vector2 position = rTransform.anchoredPosition;
+			Vector2 size = rTransform.rect.size / 2;
+
+			position.x = refResolution.x - size.x;
+			position.y = 362 - 256 - size.y;
+
+			rTransform.anchoredPosition = position;
+
+			//RectTransform rTransform = paintDialog.transform.GetChild(0).GetComponent<RectTransform>();
+			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(1.0f, 1.0f);
+			//rTransform.anchoredPosition = new Vector2(0, -277);
+			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(0.5f, 0.5f);
 		}
 	}
 }

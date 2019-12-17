@@ -96,12 +96,12 @@ namespace OP2MissionEditor.Dialogs
 			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
 				return;
 
-			using (VolFile volFile = new VolFile(UserPrefs.GameDirectory + "/" + "tech.vol"))
+			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.GameDirectory))
 			{
-				if (!volFile.Contains(m_UserData.mission.levelDetails.techTreeName))
+				byte[] techSheet = resourceManager.GetResource(m_UserData.mission.levelDetails.techTreeName, true);
+				if (techSheet == null)
 					return;
 
-				byte[] techSheet = volFile.ReadFileByName(m_UserData.mission.levelDetails.techTreeName);
 				using (MemoryStream stream = new MemoryStream(techSheet))
 				using (StreamReader reader = new StreamReader(stream))
 				{
