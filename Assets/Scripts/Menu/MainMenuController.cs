@@ -228,6 +228,13 @@ namespace OP2MissionEditor.Menu
 		{
 			interactable = true;
 
+			// OP2 does not support plugins with more than 7 characters.
+			if (Path.GetFileNameWithoutExtension(path).Length > 7)
+			{
+				Debug.Log("Plugin filename cannot be longer than 7 characters.");
+				return;
+			}
+
 			PluginExporter.ExportPlugin(path, UserData.current.mission.levelDetails);
 
 			Debug.Log("Plugin exported to \"" + path + "\".");
