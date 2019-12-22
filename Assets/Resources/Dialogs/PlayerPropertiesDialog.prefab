@@ -5582,7 +5582,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3875752177496962900}
   m_Direction: 0
   m_Value: 1
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12930,7 +12930,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: None
+  m_Text: Blue
 --- !u!1 &7398583296469923798
 GameObject:
   m_ObjectHideFlags: 0
@@ -14427,9 +14427,19 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: None
+    - m_Text: Blue
       m_Image: {fileID: 0}
-    - m_Text: Experimental
+    - m_Text: Red
+      m_Image: {fileID: 0}
+    - m_Text: Green
+      m_Image: {fileID: 0}
+    - m_Text: Yellow
+      m_Image: {fileID: 0}
+    - m_Text: Cyan
+      m_Image: {fileID: 0}
+    - m_Text: Magenta
+      m_Image: {fileID: 0}
+    - m_Text: Black
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

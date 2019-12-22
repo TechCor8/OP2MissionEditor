@@ -325,6 +325,8 @@ namespace OP2MissionEditor.Dialogs
 
 			m_UserData.mission.players				= m_Players.ToArray();
 
+			m_UserData.mission.levelDetails.numPlayers = m_Players.Count;
+
 			if (m_SelectedPlayer == null)
 				return;
 
