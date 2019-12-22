@@ -233,18 +233,6 @@ namespace OP2MissionEditor.Menu
 			Debug.Log("Plugin exported to \"" + path + "\".");
 		}
 
-		private int GetLengthOfSkipString(string str, int startIndex, char skipChar)
-		{
-			for (int i=startIndex; i < str.Length; ++i)
-			{
-				if (str[i] != skipChar)
-					return i-startIndex;
-			}
-
-			// Hit end of string before skip char ended
-			return str.Length - startIndex;
-		}
-
 		public void OnClick_Preferences()
 		{
 			PreferencesDialog.Create();
