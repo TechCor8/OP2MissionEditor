@@ -1,4 +1,5 @@
 ﻿using OP2MissionEditor.Dialogs;
+using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
 using SimpleFileBrowser;
@@ -212,6 +213,36 @@ namespace OP2MissionEditor.Menu
 			UserData.current.ExportMap(path);
 
 			Debug.Log("Map exported to \"" + path + "\".");
+		}
+
+		public void OnClick_ExportPlugin()
+		{
+			interactable = false;
+
+			// User needs to choose where to save the plugin
+			FileBrowser.SetFilters(false, ".dll");
+			FileBrowser.ShowSaveDialog(OnExportPluginPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Export Plugin", "Export");
+		}
+
+		private void OnExportPluginPath(string path)
+		{
+			interactable = true;
+
+			PluginExporter.ExportPlugin(path, UserData.current.mission.levelDetails);
+
+			Debug.Log("Plugin exported to \"" + path + "\".");
+		}
+
+		private int GetLengthOfSkipString(string str, int startIndex, char skipChar)
+		{
+			for (int i=startIndex; i < str.Length; ++i)
+			{
+				if (str[i] != skipChar)
+					return i-startIndex;
+			}
+
+			// Hit end of string before skip char ended
+			return str.Length - startIndex;
 		}
 
 		public void OnClick_Preferences()
