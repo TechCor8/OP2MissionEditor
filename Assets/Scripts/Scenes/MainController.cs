@@ -21,8 +21,12 @@ namespace OP2MissionEditor.Scenes
 
 			UserData.CreateNew();
 
+			// Set default tileset vol to art.vol
+			if (string.IsNullOrEmpty(UserPrefs.tilesetVolFileName))
+				UserPrefs.tilesetVolFileName = "art.vol";
+
 			// If game directory hasn't been set, Open "Locate Outpost2" dialog to force user to select one
-			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
+			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				PreferencesDialog.Create();
 		}
 

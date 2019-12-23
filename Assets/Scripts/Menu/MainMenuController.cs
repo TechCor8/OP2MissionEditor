@@ -58,7 +58,7 @@ namespace OP2MissionEditor.Menu
 
 			// User needs to choose what mission to open
 			FileBrowser.SetFilters(false, ".opm");
-			FileBrowser.ShowLoadDialog(OnOpenPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Open Mission", "Open");
+			FileBrowser.ShowLoadDialog(OnOpenPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Open Mission", "Open");
 		}
 
 		private void OnOpenPath(string path)
@@ -90,7 +90,7 @@ namespace OP2MissionEditor.Menu
 
 			// User needs to choose what map to import
 			FileBrowser.SetFilters(false, ".map", ".vol");
-			FileBrowser.ShowSaveDialog(OnImportMapPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Import Map", "Import");
+			FileBrowser.ShowSaveDialog(OnImportMapPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Import Map", "Import");
 		}
 
 		private void OnImportMapPath(string path)
@@ -183,7 +183,7 @@ namespace OP2MissionEditor.Menu
 
 			// User needs to choose where to save the mission
 			FileBrowser.SetFilters(false, ".opm");
-			FileBrowser.ShowSaveDialog(OnSavePath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Save Mission", "Save");
+			FileBrowser.ShowSaveDialog(OnSavePath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Save Mission", "Save");
 		}
 
 		private void OnSavePath(string path)
@@ -203,7 +203,7 @@ namespace OP2MissionEditor.Menu
 
 			// User needs to choose where to save the map
 			FileBrowser.SetFilters(false, ".map");
-			FileBrowser.ShowSaveDialog(OnExportMapPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Export Map", "Export");
+			FileBrowser.ShowSaveDialog(OnExportMapPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Export Map", "Export");
 		}
 
 		private void OnExportMapPath(string path)
@@ -221,7 +221,7 @@ namespace OP2MissionEditor.Menu
 
 			// User needs to choose where to save the plugin
 			FileBrowser.SetFilters(false, ".dll");
-			FileBrowser.ShowSaveDialog(OnExportPluginPath, OnCancelFileDialog, false, UserPrefs.GameDirectory, "Export Plugin", "Export");
+			FileBrowser.ShowSaveDialog(OnExportPluginPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Export Plugin", "Export");
 		}
 
 		private void OnExportPluginPath(string path)

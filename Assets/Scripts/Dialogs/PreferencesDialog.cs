@@ -1,4 +1,5 @@
 ﻿using SimpleFileBrowser;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ namespace OP2MissionEditor.Dialogs
 	public class PreferencesDialog : MonoBehaviour
 	{
 		[SerializeField] private Text m_txtGameDirectory			= default;
+		[SerializeField] private Text m_txtTilesetVol				= default;
 
 		[SerializeField] private Slider m_SliderGridRed				= default;
 		[SerializeField] private Slider m_SliderGridGreen			= default;
@@ -25,10 +27,11 @@ namespace OP2MissionEditor.Dialogs
 		{
 			m_OnCloseCB = onCloseCB;
 
-			m_txtGameDirectory.text = UserPrefs.GameDirectory;
+			m_txtGameDirectory.text = UserPrefs.gameDirectory;
+			m_txtTilesetVol.text = UserPrefs.tilesetVolFileName;
 
 			// If user does not have a game directory, force them to select one
-			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
+			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				OnClick_LocateGameDirectory();
 
 			// Initialize grid overlay sliders
@@ -42,20 +45,40 @@ namespace OP2MissionEditor.Dialogs
 
 		public void OnClick_LocateGameDirectory()
 		{
-			FileBrowser.ShowLoadDialog(OnSelect_GameDirectory, OnCancel_GameDirectory, true, UserPrefs.GameDirectory, "Locate Outpost 2 Directory", "Select");
+			FileBrowser.ShowLoadDialog(OnSelect_GameDirectory, OnCancel_GameDirectory, true, UserPrefs.gameDirectory, "Locate Outpost 2 Directory", "Select");
 		}
 
 		private void OnSelect_GameDirectory(string path)
 		{
-			UserPrefs.GameDirectory = path;
+			UserPrefs.gameDirectory = path;
 			m_txtGameDirectory.text = path;
 		}
 
 		private void OnCancel_GameDirectory()
 		{
 			// If user does not have a game directory and they try to cancel, force them to select one
-			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
+			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				OnClick_LocateGameDirectory();
+		}
+
+		public void OnClick_LocateTilesetVol()
+		{
+			FileBrowser.ShowLoadDialog(OnSelect_TilesetVol, null, false, UserPrefs.gameDirectory, "Locate Tileset Vol", "Select");
+		}
+
+		private void OnSelect_TilesetVol(string path)
+		{
+			string fileName = Path.GetFileName(path);
+			path = Path.Combine(UserPrefs.gameDirectory, fileName);
+
+			if (!File.Exists(path))
+			{
+				Debug.Log("Could not locate file '" + fileName + "' in the game directory.");
+				return;
+			}
+
+			UserPrefs.tilesetVolFileName = fileName;
+			m_txtGameDirectory.text = fileName;
 		}
 
 		public void OnValueChanged_GridColor()

@@ -93,10 +93,10 @@ namespace OP2MissionEditor.Dialogs
 			m_TechIds.Clear();
 
 			// Can't parse files in game directory if one hasn't been assigned yet.
-			if (string.IsNullOrEmpty(UserPrefs.GameDirectory))
+			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				return;
 
-			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.GameDirectory))
+			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
 			{
 				byte[] techSheet = resourceManager.GetResource(m_UserData.mission.levelDetails.techTreeName, true);
 				if (techSheet == null)

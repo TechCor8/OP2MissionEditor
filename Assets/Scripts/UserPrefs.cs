@@ -12,10 +12,19 @@ namespace OP2MissionEditor
 		/// <summary>
 		/// The Outpost 2 game directory that contains the .vol files for rendering.
 		/// </summary>
-		public static string GameDirectory
+		public static string gameDirectory
 		{
 			get { return PlayerPrefs.GetString("OP2Directory");														}
 			set { PlayerPrefs.SetString("OP2Directory", value); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();		}
+		}
+
+		/// <summary>
+		/// The vol file to use for painting terrain.
+		/// </summary>
+		public static string tilesetVolFileName
+		{
+			get { return PlayerPrefs.GetString("TilesetVol");														}
+			set { PlayerPrefs.SetString("TilesetVol", value); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();		}
 		}
 
 		/// <summary>

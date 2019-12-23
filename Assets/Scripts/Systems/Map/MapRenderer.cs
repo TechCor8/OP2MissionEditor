@@ -58,7 +58,7 @@ namespace OP2MissionEditor.Systems.Map
 			m_Tilemap.ClearAllTiles();
 			m_GridOverlay.ClearAllTiles();
 
-			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.GameDirectory))
+			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
 			{
 				uint mapWidth = UserData.current.map.GetWidthInTiles();
 				uint mapHeight = UserData.current.map.GetHeightInTiles();
