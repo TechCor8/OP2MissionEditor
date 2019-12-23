@@ -277,6 +277,12 @@ namespace OP2MissionEditor.Menu
 			});
 		}
 
+		public void OnClick_ClearTextureCache()
+		{
+			TextureManager.ClearCache();
+			Debug.Log("Texture cache cleared successfully.");
+		}
+
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// View Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -321,6 +327,184 @@ namespace OP2MissionEditor.Menu
 			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(1.0f, 1.0f);
 			//rTransform.anchoredPosition = new Vector2(0, -277);
 			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(0.5f, 0.5f);
+		}
+
+		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		// Archive Menu
+		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		public void OnClick_ExtractFile()
+		{
+			interactable = false;
+
+			// User needs to choose what archive to extract from
+			FileBrowser.SetFilters(false, ".clm", ".vol");
+			FileBrowser.ShowLoadDialog(OnExtractFileArchivePath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Extract From Archive", "Select");
+		}
+
+		private void OnExtractFileArchivePath(string path)
+		{
+			// Get the appropriate archive type
+			string extension = Path.GetExtension(path);
+			Archive archive;
+
+			switch (extension.ToLower())
+			{
+				case ".vol":	archive = new VolFile(path);	break;
+				case ".clm":	archive = new ClmFile(path);	break;
+				default:
+					interactable = true;
+					Debug.Log("Invalid archive selected.");
+					return;
+			}
+
+			// Get list of files from the archive
+			List<string> fileNames = new List<string>();
+
+			for (ulong i=0; i < archive.GetCount(); ++i)
+				fileNames.Add(archive.GetName(i));
+
+			// Open list of file names for selection
+			ListSelectDialog.Create(fileNames, "Extract File", "Select", (string fileName) => OnExtractFileSelected(archive, fileName), () => OnExtractFileCanceled(archive));
+		}
+
+		private void OnExtractFileSelected(Archive archive, string fileName)
+		{
+			// User needs to choose where to save the extracted file
+			FileBrowser.SetFilters(false, Path.GetExtension(fileName));
+			FileBrowser.ShowSaveDialog((string path) => OnExtractFileSavePathSelected(archive, fileName, path),
+				() => OnExtractFileCanceled(archive), false, UserPrefs.gameDirectory, "Destination File Path", "Extract");
+		}
+
+		private void OnExtractFileSavePathSelected(Archive archive, string fileName, string destPath)
+		{
+			interactable = true;
+			archive.ExtractFileByName(fileName, destPath);
+			archive.Dispose();
+
+			Debug.Log(Path.GetFileName(destPath) + " extracted successfully.");
+		}
+
+		private void OnExtractFileCanceled(Archive archive)
+		{
+			interactable = true;
+			archive.Dispose();
+		}
+
+		public void OnClick_ExtractAllFiles()
+		{
+			interactable = false;
+
+			// User needs to choose what archive to extract from
+			FileBrowser.SetFilters(false, ".clm", ".vol");
+			FileBrowser.ShowLoadDialog(OnExtractAllFilesArchivePath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Extract All From Archive", "Select");
+		}
+
+		private void OnExtractAllFilesArchivePath(string archivePath)
+		{
+			StartCoroutine(ExtractAllFiles_WaitForSaveDirectory(archivePath));
+		}
+
+		private IEnumerator ExtractAllFiles_WaitForSaveDirectory(string archivePath)
+		{
+			// Wait a frame to allow previous FileBrowser to clear.
+			yield return 1;
+
+			// User needs to choose where to save the extracted files
+			FileBrowser.ShowSaveDialog((string destDirectory) => OnExtractAllFilesSavePathSelected(archivePath, destDirectory),
+				OnCancelFileDialog, true, UserPrefs.gameDirectory, "Destination Directory", "Extract");
+		}
+
+		private void OnExtractAllFilesSavePathSelected(string archivePath, string destDirectory)
+		{
+			interactable = true;
+
+			// Get the appropriate archive type
+			string extension = Path.GetExtension(archivePath);
+			Archive archive;
+
+			switch (extension.ToLower())
+			{
+				case ".vol":	archive = new VolFile(archivePath);	break;
+				case ".clm":	archive = new ClmFile(archivePath);	break;
+				default:
+					Debug.Log("Invalid archive selected.");
+					return;
+			}
+
+			archive.ExtractAllFiles(destDirectory);
+			archive.Dispose();
+
+			Debug.Log("Files extracted successfully.");
+		}
+
+		public void OnClick_CreateArchive()
+		{
+			interactable = false;
+
+			// User needs to choose directory to archive
+			FileBrowser.ShowLoadDialog(OnCreateArchiveSourceDirectorySelected, OnCancelFileDialog, true, UserPrefs.gameDirectory, "Directory to Archive", "Select");
+		}
+
+		private void OnCreateArchiveSourceDirectorySelected(string srcDirectory)
+		{
+			StartCoroutine(CreateArchive_WaitForSaveArchive(srcDirectory));
+		}
+
+		private IEnumerator CreateArchive_WaitForSaveArchive(string srcDirectory)
+		{
+			// Wait a frame to allow previous FileBrowser to clear.
+			yield return 1;
+
+			// User needs to choose where to save the archive
+			FileBrowser.SetFilters(false, ".vol", ".clm");
+			FileBrowser.ShowSaveDialog((string path) => CreateArchive(srcDirectory, path), OnCancelFileDialog, false, UserPrefs.gameDirectory, "Save Archive", "Save");
+		}
+
+		private void CreateArchive(string srcDirectory, string archivePath)
+		{
+			interactable = true;
+
+			string[] files = Directory.GetFiles(srcDirectory, "*.*", SearchOption.TopDirectoryOnly);
+
+			// Cull file names that are too long
+			List<string> culledFiles = new List<string>(files.Length);
+			foreach (string name in files)
+			{
+				string noExt = Path.GetFileNameWithoutExtension(name);
+
+				if (noExt.Length <= 8)
+					culledFiles.Add(name);
+			}
+
+
+			string extension = Path.GetExtension(archivePath);
+
+			switch (extension)
+			{
+				case ".vol":	VolFile.WriteVolFile(archivePath, culledFiles.ToArray());	break;
+				case ".clm":	ClmFile.WriteClmFile(archivePath, culledFiles.ToArray());	break;
+				default:
+					Debug.Log("Invalid archive type selected.");
+					return;
+			}
+
+			if (files.Length == culledFiles.Count)
+				Debug.Log(Path.GetFileName(archivePath) + " created successfully.");
+			else
+			{
+				int filesRemoved = files.Length - culledFiles.Count;
+				Debug.Log(filesRemoved.ToString() + " files exceeded 8 character limit and were not archived.");
+			}
+		}
+
+		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		// Run Menu
+		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		public void OnClick_RunOutpost2()
+		{
+			string path = Path.Combine(UserPrefs.gameDirectory, "Outpost2.exe");
+
+			System.Diagnostics.Process.Start(path);
 		}
 	}
 }
