@@ -301,7 +301,7 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_ShowPaintWindow()
 		{
-			PaintDialog paintDialog = PaintDialog.Create(UserData.current);
+			PaintDialog paintDialog = PaintDialog.Create();
 
 			// Set paint window to mid-right corner
 			RectTransform rTransform = paintDialog.transform.GetChild(0).GetComponent<RectTransform>();

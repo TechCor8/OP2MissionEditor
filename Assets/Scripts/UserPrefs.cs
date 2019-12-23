@@ -19,15 +19,6 @@ namespace OP2MissionEditor
 		}
 
 		/// <summary>
-		/// The vol file to use for painting terrain.
-		/// </summary>
-		public static string tilesetVolFileName
-		{
-			get { return PlayerPrefs.GetString("TilesetVol");														}
-			set { PlayerPrefs.SetString("TilesetVol", value); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();		}
-		}
-
-		/// <summary>
 		/// The color of the grid overlay.
 		/// </summary>
 		public static Color32 gridOverlayColor

@@ -1,7 +1,6 @@
 ﻿using OP2MissionEditor.Dialogs;
+using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace OP2MissionEditor.Scenes
@@ -15,15 +14,13 @@ namespace OP2MissionEditor.Scenes
 
 		private void Awake()
 		{
+			TextureManager.Initialize();
+
 			// Register events
 			m_MapRenderer.onMapRefreshProgressCB += OnMapRefreshProgress;
 			m_MapRenderer.onMapRefreshedCB += OnMapRefreshed;
 
 			UserData.CreateNew();
-
-			// Set default tileset vol to art.vol
-			if (string.IsNullOrEmpty(UserPrefs.tilesetVolFileName))
-				UserPrefs.tilesetVolFileName = "art.vol";
 
 			// If game directory hasn't been set, Open "Locate Outpost2" dialog to force user to select one
 			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
@@ -54,6 +51,8 @@ namespace OP2MissionEditor.Scenes
 			m_MapRenderer.onMapRefreshedCB -= OnMapRefreshed;
 
 			UserData.current.Dispose();
+
+			TextureManager.Release();
 		}
 	}
 }

@@ -577,7 +577,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 520, y: 205}
+  m_SizeDelta: {x: 520, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1469346310271924740
 CanvasRenderer:
@@ -817,7 +817,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_txtGameDirectory: {fileID: 7024869971226253323}
-  m_txtTilesetVol: {fileID: 311670973689835593}
   m_SliderGridRed: {fileID: 1754038193940619985}
   m_SliderGridGreen: {fileID: 5432862748536179632}
   m_SliderGridBlue: {fileID: 2488499282958431009}
@@ -1498,7 +1497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5751990660690002167
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1517,10 +1516,10 @@ RectTransform:
   m_Father: {fileID: 409562332241320519}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 40}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -45}
+  m_SizeDelta: {x: 500, y: 40}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &3849851870107649491
 GameObject:

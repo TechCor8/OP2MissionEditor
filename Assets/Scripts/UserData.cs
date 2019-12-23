@@ -21,6 +21,10 @@ namespace OP2MissionEditor
 		public Map map						{ get; private set; }
 		public MissionRoot mission			{ get; private set; }
 
+		public delegate void OnUserDataCallback(UserData src);
+
+		public event OnUserDataCallback onChangedValuesCB;
+
 
 		public static void CreateNew()
 		{
@@ -28,6 +32,8 @@ namespace OP2MissionEditor
 
 			current.map = new Map();
 			current.mission = new MissionRoot();
+
+			current.onChangedValuesCB?.Invoke(current);
 		}
 
 		public static bool LoadMission(string path)
@@ -36,6 +42,8 @@ namespace OP2MissionEditor
 
 			current.map = new Map();
 			current.mission = MissionReader.GetMissionData(path);
+
+			current.onChangedValuesCB?.Invoke(current);
 
 			return true;
 		}
@@ -47,9 +55,14 @@ namespace OP2MissionEditor
 			current.map = Map.ReadMap(path);
 			if (current.map == null)
 			{
+				// Import failed. Create new map.
 				current.map = new Map();
+				current.onChangedValuesCB?.Invoke(current);
 				return false;
 			}
+
+			// Import successful. Inform listeners.
+			current.onChangedValuesCB?.Invoke(current);
 
 			return true;
 		}
@@ -61,11 +74,23 @@ namespace OP2MissionEditor
 			current.map = Map.ReadMap(data);
 			if (current.map == null)
 			{
+				// Import failed. Create new map.
 				current.map = new Map();
+				current.onChangedValuesCB?.Invoke(current);
 				return false;
 			}
 
+			// Import successful. Inform listeners.
+			current.onChangedValuesCB?.Invoke(current);
+
 			return true;
+		}
+
+		public void Dirty()
+		{
+			isSaved = false;
+
+			onChangedValuesCB?.Invoke(this);
 		}
 
 		public void SaveMission(string path)
