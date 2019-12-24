@@ -1,20 +1,29 @@
 ﻿using OP2MissionEditor.Systems;
+using OP2MissionEditor.Systems.Map;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace OP2MissionEditor.Dialogs.Paint
 {
-	public class TerrainPane : MonoBehaviour
+	/// <summary>
+	/// Paint pane for editing map terrain.
+	/// </summary>
+	public class TerrainPane : PaintPane
 	{
 		[SerializeField] private Dropdown	m_DropdownTileset			= default;
 
 		[SerializeField] private Transform m_TileButtonContainer		= default;
 		[SerializeField] private GameObject	m_TileButtonPrefab			= default;
 
+		private bool m_IsPainting;
+		private ulong m_SelectedMappingIndex;
+
 		
-		private void Awake()
+		protected override void Awake()
 		{
+			base.Awake();
+
 			UserData.current.onChangedValuesCB += OnChangedUserData;
 
 			RefreshTilesets();
@@ -59,6 +68,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 		/// </summary>
 		public void OnChanged_Tileset()
 		{
+			// Clear old tile mappings
+			foreach (Transform t in m_TileButtonContainer)
+				Destroy(t.gameObject);
+
 			if (m_DropdownTileset.options.Count == 0)
 				return;
 
@@ -67,10 +80,6 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void SetTileset(string tilesetName)
 		{
-			// Clear old tile mappings
-			foreach (Transform t in m_TileButtonContainer)
-				Destroy(t.gameObject);
-
 			// Get tileset index
 			ulong tilesetIndex = GetTilesetIndex(tilesetName);
 			if (tilesetIndex == UserData.current.map.GetTilesetSourceCount())
@@ -123,7 +132,20 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void OnClick_Button(object data)
 		{
-			ulong mappingIndex = (ulong)data;
+			m_SelectedMappingIndex = (ulong)data;
+			m_IsPainting = true;
+		}
+
+		protected override void OnPaintTile(MapRenderer mapRenderer, Vector3Int tileXY)
+		{
+			if (!m_IsPainting)
+				return;
+
+			// Paint tile with mapping index
+			UserData.current.map.SetTileMappingIndex((ulong)tileXY.x, (ulong)tileXY.y, m_SelectedMappingIndex);
+			UserData.current.SetUnsaved();
+
+			mapRenderer.RefreshTile(tileXY);
 		}
 
 		private void OnDestroy()

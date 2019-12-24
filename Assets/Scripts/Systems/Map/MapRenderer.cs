@@ -138,5 +138,46 @@ namespace OP2MissionEditor.Systems.Map
 			onCompleteCB?.Invoke();
 			onMapRefreshedCB?.Invoke(this);
 		}
+
+		public void RefreshTile(Vector3Int tileXY)
+		{
+			ulong x = (ulong)tileXY.x;
+			ulong y = (ulong)tileXY.y;
+			ulong tileSetIndex = UserData.current.map.GetTilesetIndex(x, y);
+			//ulong tileMappingIndex = UserData.current.map.GetTileMappingIndex(x, y);
+			int tileImageIndex = (int)UserData.current.map.GetImageIndex(x, y);
+
+			string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
+			int tileSetNumTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
+
+			// Get tile texture
+			Texture2D texture = TextureManager.LoadTileset(tileSetPath);
+			if (texture == null)
+				throw new System.Exception("Could not find resource: " + tileSetPath);
+			
+			// Get image offset
+			int tileSize = texture.height / tileSetNumTiles;
+			int inverseTileIndex = tileSetNumTiles-tileImageIndex-1;
+			int texOffset = inverseTileIndex * tileSize;
+
+			// Create sprite
+			Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+						
+			// Load sprite into tile map
+			Tile tile = ScriptableObject.CreateInstance<Tile>();
+			tile.sprite = tileSprite;
+			tile.color = Color.white;
+
+			Vector3Int cellPosition = new Vector3Int((int)x,m_Tilemap.size.y-(int)y-1,0);
+
+			// Set minimap pixel
+			Texture2D mTexture = TextureManager.LoadMinimapTileset(tileSetPath, tileSetNumTiles);
+			Color color = mTexture.GetPixel(0, inverseTileIndex);
+			minimapTexture.SetPixel(cellPosition.x, cellPosition.y, color);
+
+			// Set tiles
+			m_Tilemap.SetTile(cellPosition, tile);
+			minimapTexture.Apply();
+		}
 	}
 }

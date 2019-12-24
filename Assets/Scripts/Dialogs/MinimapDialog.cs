@@ -20,6 +20,7 @@ namespace OP2MissionEditor.Dialogs
 		private OnCloseCallback m_OnCloseCB;
 
 		private bool m_IsMouseOverMinimap;
+		private bool m_IsPainting;
 
 
 		private void Initialize(MapRenderer mapRenderer, OnCloseCallback onCloseCB)
@@ -50,12 +51,14 @@ namespace OP2MissionEditor.Dialogs
 
 		private void Update()
 		{
+			DetectPaintState();
+
 			// Don't do anything if there is no map loaded
 			if (m_MinimapImage.texture == null)
 				return;
 
 			// Update camera position if the user trying to move the minimap
-			if (m_IsMouseOverMinimap && Input.GetMouseButton(0))
+			if (m_IsMouseOverMinimap && !m_IsPainting && Input.GetMouseButton(0))
 			{
 				// Get the minimap rect in world space
 				Vector3[] minimapCorners = new Vector3[4];
@@ -94,6 +97,21 @@ namespace OP2MissionEditor.Dialogs
 			m_MinimapBounds.anchoredPosition = minimapCamPosition;
 			m_MinimapBounds.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, minimapCamSize.x);
 			m_MinimapBounds.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, minimapCamSize.y);
+		}
+
+		private void DetectPaintState()
+		{
+			// If mouse button is up, paint mode is off
+			if (Input.GetMouseButtonUp(0))
+				m_IsPainting = false;
+
+			// If mouse is over UI, we can't start painting
+			if (EventSystem.current.IsPointerOverGameObject())
+				return;
+
+			// If we mouse down, and we are not over the UI, paint mode is on
+			if (Input.GetMouseButtonDown(0))
+				m_IsPainting = true;
 		}
 
 		public void OnClick_Close()

@@ -13,7 +13,6 @@ namespace OP2MissionEditor.Dialogs
 		[SerializeField] private Dropdown		m_DropdownEditMode			= default;
 		[SerializeField] private GameObject[]	m_EditModePanes				= default;
 		
-		public delegate void OnChangedDataCallback();
 		public delegate void OnCloseCallback();
 
 		private OnCloseCallback m_OnCloseCB;

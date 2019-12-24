@@ -86,6 +86,9 @@ namespace OP2MissionEditor
 			return true;
 		}
 
+		/// <summary>
+		/// Marks the user data as unsaved and dispatches an event to refresh dependent UI.
+		/// </summary>
 		public void Dirty()
 		{
 			isSaved = false;
