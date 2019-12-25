@@ -1,4 +1,5 @@
 ﻿using SimpleFileBrowser;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,12 @@ namespace OP2MissionEditor.Dialogs
 		[SerializeField] private Slider m_SliderGridGreen			= default;
 		[SerializeField] private Slider m_SliderGridBlue			= default;
 		[SerializeField] private Slider m_SliderGridAlpha			= default;
-		
+
+		[SerializeField] private Dropdown m_DropdownResolution		= default;
+		[SerializeField] private Toggle m_ToggleIsWindowed			= default;
+
+		private bool m_IsInitialized;
+
 		public delegate void OnCloseCallback();
 
 		private OnCloseCallback m_OnCloseCB;
@@ -39,6 +45,28 @@ namespace OP2MissionEditor.Dialogs
 			m_SliderGridGreen.value = gridColor.g;
 			m_SliderGridBlue.value = gridColor.b;
 			m_SliderGridAlpha.value = gridColor.a;
+
+			// Initialize resolution options
+			m_DropdownResolution.ClearOptions();
+			List<string> resOptions = new List<string>();
+			for (int i=0; i < Screen.resolutions.Length; ++i)
+				resOptions.Add(Screen.resolutions[i].width.ToString() + "x" + Screen.resolutions[i].height + " @ " + Screen.resolutions[i].refreshRate + "hz");
+
+			m_DropdownResolution.AddOptions(resOptions);
+
+			// Set current resolution
+			for (int i=0; i < Screen.resolutions.Length; ++i)
+			{
+				if (Screen.resolutions[i].Equals(Screen.currentResolution))
+				{
+					m_DropdownResolution.value = i;
+					break;
+				}
+			}
+
+			m_ToggleIsWindowed.isOn = !Screen.fullScreen;
+
+			m_IsInitialized = true;
 		}
 
 		public void OnClick_LocateGameDirectory()
@@ -65,6 +93,16 @@ namespace OP2MissionEditor.Dialogs
 														(byte)m_SliderGridGreen.value,
 														(byte)m_SliderGridBlue.value,
 														(byte)m_SliderGridAlpha.value);
+		}
+
+		public void OnChanged_Resolution()
+		{
+			if (!m_IsInitialized)
+				return;
+
+			Resolution resolution = Screen.resolutions[m_DropdownResolution.value];
+			
+			Screen.SetResolution(resolution.width, resolution.height, !m_ToggleIsWindowed.isOn, resolution.refreshRate);
 		}
 
 		public void OnClick_Close()
