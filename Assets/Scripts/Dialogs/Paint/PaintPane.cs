@@ -1,5 +1,4 @@
 ﻿using OP2MissionEditor.Systems.Map;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,9 +13,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 	public class PaintPane : MonoBehaviour
 	{
 		private Tilemap m_Tilemap;
-		private MapRenderer m_MapRenderer;
+		protected MapRenderer m_MapRenderer { get; private set; }
 
-		private bool m_IsPainting;
+		[System.NonSerialized] private bool m_IsPainting;
 
 
 		protected virtual void Awake()
@@ -61,10 +60,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Invert Y to match data storage instead of render value
 			cell.y = m_Tilemap.size.y-(cell.y+1);
 
-			OnPaintTile(m_MapRenderer, cell);
+			OnPaintTile(cell);
 		}
 
-		protected virtual void OnPaintTile(MapRenderer mapRenderer, Vector3Int tileXY)
+		protected virtual void OnPaintTile(Vector3Int tileXY)
 		{
 		}
 	}

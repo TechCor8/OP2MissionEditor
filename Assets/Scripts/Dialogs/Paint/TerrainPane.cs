@@ -1,5 +1,4 @@
 ﻿using OP2MissionEditor.Systems;
-using OP2MissionEditor.Systems.Map;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -136,7 +135,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_IsPainting = true;
 		}
 
-		protected override void OnPaintTile(MapRenderer mapRenderer, Vector3Int tileXY)
+		protected override void OnPaintTile(Vector3Int tileXY)
 		{
 			if (!m_IsPainting)
 				return;
@@ -145,7 +144,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.map.SetTileMappingIndex((ulong)tileXY.x, (ulong)tileXY.y, m_SelectedMappingIndex);
 			UserData.current.SetUnsaved();
 
-			mapRenderer.RefreshTile(tileXY);
+			m_MapRenderer.RefreshTile(tileXY);
 		}
 
 		private void OnDestroy()
