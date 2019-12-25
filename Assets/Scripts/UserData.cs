@@ -1,6 +1,8 @@
 ﻿using DotNetMissionSDK;
 using DotNetMissionSDK.Json;
+using OP2MissionEditor.Systems;
 using OP2UtilityDotNet;
+using System.IO;
 using UnityEngine;
 
 namespace OP2MissionEditor
@@ -38,28 +40,57 @@ namespace OP2MissionEditor
 
 		public static bool LoadMission(string path)
 		{
-			current?.Dispose();
+			// Load mission
+			MissionRoot missionRoot = GetMissionData(path);
+			if (missionRoot == null)
+				return false;
 
-			current.map = new Map();
-			current.mission = MissionReader.GetMissionData(path);
+			// Load map
+			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
+			{
+				byte[] mapData = resourceManager.GetResource(current.mission.levelDetails.mapName, true);
+				if (mapData == null)
+					return false;
 
+				Map map = Map.ReadMap(mapData);
+				if (map == null)
+					return false;
+
+				// Replace current mission with the loaded mission
+				current?.Dispose();
+				current.mission = missionRoot;
+				current.map = map;
+			}
+
+			// Inform listeners
 			current.onChangedValuesCB?.Invoke(current);
 
 			return true;
 		}
 
+		private static MissionRoot GetMissionData(string path)
+		{
+			try
+			{
+				return MissionReader.GetMissionData(path);
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogException(ex);
+				return null;
+			}
+		}
+
 		public static bool ImportMap(string path)
 		{
-			current.map?.Dispose();
-
-			current.map = Map.ReadMap(path);
-			if (current.map == null)
-			{
-				// Import failed. Create new map.
-				current.map = new Map();
-				current.onChangedValuesCB?.Invoke(current);
+			// Read map
+			Map map = Map.ReadMap(path);
+			if (map == null)
 				return false;
-			}
+
+			// Replace current map with the imported map
+			current.map?.Dispose();
+			current.map = map;
 
 			// Import successful. Inform listeners.
 			current.onChangedValuesCB?.Invoke(current);
@@ -69,16 +100,29 @@ namespace OP2MissionEditor
 
 		public static bool ImportMap(byte[] data)
 		{
-			current.map?.Dispose();
-
-			current.map = Map.ReadMap(data);
-			if (current.map == null)
-			{
-				// Import failed. Create new map.
-				current.map = new Map();
-				current.onChangedValuesCB?.Invoke(current);
+			// Read map
+			Map map = Map.ReadMap(data);
+			if (map == null)
 				return false;
-			}
+
+			// Replace current map with the imported map
+			current.map?.Dispose();
+			current.map = map;
+
+			// Import successful. Inform listeners.
+			current.onChangedValuesCB?.Invoke(current);
+
+			return true;
+		}
+
+		public static bool ImportMission(string path)
+		{
+			MissionRoot root = GetMissionData(path);
+			if (root == null)
+				return false;
+
+			// Replace current mission with the imported mission
+			current.mission = root;
 
 			// Import successful. Inform listeners.
 			current.onChangedValuesCB?.Invoke(current);
@@ -98,7 +142,17 @@ namespace OP2MissionEditor
 
 		public void SaveMission(string path)
 		{
-			MissionReader.WriteMissionData(path, current.mission);
+			string dirPath = Path.GetDirectoryName(path);
+			string missionName = Path.GetFileNameWithoutExtension(path);
+
+			// Save mission file
+			MissionReader.WriteMissionData(path, mission);
+
+			// Save map file
+			map.Write(Path.Combine(dirPath, mission.levelDetails.mapName));
+
+			// Save plugin file
+			PluginExporter.ExportPlugin(Path.Combine(dirPath, missionName + ".dll"), mission.levelDetails);
 		}
 
 		public void ExportMap(string path)
@@ -106,9 +160,32 @@ namespace OP2MissionEditor
 			map.Write(path);
 		}
 
+		public void ExportMission(string path)
+		{
+			MissionReader.WriteMissionData(path, mission);
+		}
+
+		public string GetMissionTypePrefix()
+		{
+			switch (mission.levelDetails.missionType)
+			{
+				case MissionType.MultiLastOneStanding:	return "ml" + mission.levelDetails.numPlayers;
+				case MissionType.MultiMidas:			return "mm" + mission.levelDetails.numPlayers;
+				case MissionType.MultiResourceRace:		return "mr" + mission.levelDetails.numPlayers;
+				case MissionType.MultiSpaceRace:		return "mf" + mission.levelDetails.numPlayers;
+				case MissionType.MultiLandRush:			return "mu" + mission.levelDetails.numPlayers;
+				case MissionType.Tutorial:				return "t";
+				case MissionType.AutoDemo:				return "a";
+				case MissionType.Colony:				return "c";
+			}
+
+			return "";
+		}
+
 		public void Dispose()
 		{
 			map?.Dispose();
+			map = null;
 		}
 	}
 }

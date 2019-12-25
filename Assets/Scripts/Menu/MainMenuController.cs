@@ -152,17 +152,36 @@ namespace OP2MissionEditor.Menu
 			if (!UserData.ImportMap(mapData))
 			{
 				Debug.LogError("Failed to read map: " + mapName);
-
-				// If import fails, clear out data by creating new mission instead
-				OnClick_New();
 				return;
 			}
 
 			m_MapRenderer.Refresh(() =>
 			{
 				interactable = true;
-				Debug.Log("Import Complete.");
+				Debug.Log("Import map complete.");
 			});
+		}
+
+		public void OnClick_ImportMission()
+		{
+			interactable = false;
+
+			// User needs to choose what mission to import
+			FileBrowser.SetFilters(false, ".opm");
+			FileBrowser.ShowLoadDialog(OnImportMissionPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Import Mission", "Import");
+		}
+
+		private void OnImportMissionPath(string missionPath)
+		{
+			interactable = true;
+
+			if (!UserData.ImportMission(missionPath))
+			{
+				Debug.LogError("Failed to read mission: " + missionPath);
+				return;
+			}
+
+			Debug.Log("Import mission complete.");
 		}
 
 		public void OnClick_Save()
@@ -190,11 +209,25 @@ namespace OP2MissionEditor.Menu
 		{
 			interactable = true;
 
+			string missionName = Path.GetFileName(path);
+
+			// Check if the file name has the needed type prefix. If not, add it.
+			string prefix = UserData.current.GetMissionTypePrefix();
+			if (!missionName.StartsWith(prefix))
+			{
+				missionName = prefix + missionName;
+				path = Path.Combine(Path.GetDirectoryName(path), missionName);
+			}
+
+			string warning = "";
+			if (Path.GetFileNameWithoutExtension(missionName).Length > 7)
+				warning = " WARNING: File name length is greater than 7 and is not supported by Outpost 2!";
+
 			m_SavePath = path;
 
 			UserData.current.SaveMission(path);
 
-			Debug.Log("Mission saved to \"" + m_SavePath + "\".");
+			Debug.Log("Mission saved to \"" + m_SavePath + "\"." + warning);
 		}
 
 		public void OnClick_ExportMap()
@@ -213,6 +246,24 @@ namespace OP2MissionEditor.Menu
 			UserData.current.ExportMap(path);
 
 			Debug.Log("Map exported to \"" + path + "\".");
+		}
+
+		public void OnClick_ExportMission()
+		{
+			interactable = false;
+
+			// User needs to choose where to save the mission
+			FileBrowser.SetFilters(false, ".opm");
+			FileBrowser.ShowSaveDialog(OnExportMissionPath, OnCancelFileDialog, false, UserPrefs.gameDirectory, "Export Mission", "Export");
+		}
+
+		private void OnExportMissionPath(string missionPath)
+		{
+			interactable = true;
+
+			UserData.current.ExportMission(missionPath);
+
+			Debug.Log("Mission exported to \"" + missionPath + "\".");
 		}
 
 		public void OnClick_ExportPlugin()
