@@ -555,7 +555,9 @@ namespace OP2MissionEditor.Menu
 		{
 			string path = Path.Combine(UserPrefs.gameDirectory, "Outpost2.exe");
 
-			System.Diagnostics.Process.Start(path);
+			System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo(path);
+			startInfo.WorkingDirectory = UserPrefs.gameDirectory;
+			System.Diagnostics.Process.Start(startInfo);
 		}
 
 		public void OnClick_CopySDKToGame()
