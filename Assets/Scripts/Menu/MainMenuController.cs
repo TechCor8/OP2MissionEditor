@@ -557,5 +557,20 @@ namespace OP2MissionEditor.Menu
 
 			System.Diagnostics.Process.Start(path);
 		}
+
+		public void OnClick_CopySDKToGame()
+		{
+			// Copy SDK from streaming assets to the game directory
+			string interopPath = Path.Combine(Application.streamingAssetsPath, "DotNetInterop.dll");
+			string sdkPath = Path.Combine(Application.streamingAssetsPath, "DotNetMissionSDK.dll");
+
+			string interopOutputPath = Path.Combine(UserPrefs.gameDirectory, Path.GetFileName(interopPath));
+			string sdkOutputPath = Path.Combine(UserPrefs.gameDirectory, Path.GetFileName(sdkPath));
+
+			File.Copy(interopPath, interopOutputPath, true);
+			File.Copy(sdkPath, sdkOutputPath, true);
+
+			Debug.Log("SDK files copied to " + UserPrefs.gameDirectory + ".");
+		}
 	}
 }
