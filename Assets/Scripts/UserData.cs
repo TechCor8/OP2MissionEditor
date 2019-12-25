@@ -28,17 +28,17 @@ namespace OP2MissionEditor
 		public event OnUserDataCallback onChangedValuesCB;
 
 
-		public static void CreateNew()
+		public void CreateNew()
 		{
-			current?.Dispose();
+			Dispose();
 
-			current.map = new Map();
-			current.mission = new MissionRoot();
+			map = new Map();
+			mission = new MissionRoot();
 
-			current.onChangedValuesCB?.Invoke(current);
+			onChangedValuesCB?.Invoke(this);
 		}
 
-		public static bool LoadMission(string path)
+		public bool LoadMission(string path)
 		{
 			// Load mission
 			MissionRoot missionRoot = GetMissionData(path);
@@ -48,27 +48,27 @@ namespace OP2MissionEditor
 			// Load map
 			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
 			{
-				byte[] mapData = resourceManager.GetResource(current.mission.levelDetails.mapName, true);
+				byte[] mapData = resourceManager.GetResource(missionRoot.levelDetails.mapName, true);
 				if (mapData == null)
 					return false;
 
-				Map map = Map.ReadMap(mapData);
-				if (map == null)
+				Map tempMap = Map.ReadMap(mapData);
+				if (tempMap == null)
 					return false;
 
 				// Replace current mission with the loaded mission
-				current?.Dispose();
-				current.mission = missionRoot;
-				current.map = map;
+				Dispose();
+				mission = missionRoot;
+				map = tempMap;
 			}
 
 			// Inform listeners
-			current.onChangedValuesCB?.Invoke(current);
+			onChangedValuesCB?.Invoke(this);
 
 			return true;
 		}
 
-		private static MissionRoot GetMissionData(string path)
+		private MissionRoot GetMissionData(string path)
 		{
 			try
 			{
@@ -81,51 +81,51 @@ namespace OP2MissionEditor
 			}
 		}
 
-		public static bool ImportMap(string path)
+		public bool ImportMap(string path)
 		{
 			// Read map
-			Map map = Map.ReadMap(path);
-			if (map == null)
+			Map tempMap = Map.ReadMap(path);
+			if (tempMap == null)
 				return false;
 
 			// Replace current map with the imported map
-			current.map?.Dispose();
-			current.map = map;
+			map?.Dispose();
+			map = tempMap;
 
 			// Import successful. Inform listeners.
-			current.onChangedValuesCB?.Invoke(current);
+			onChangedValuesCB?.Invoke(this);
 
 			return true;
 		}
 
-		public static bool ImportMap(byte[] data)
+		public bool ImportMap(byte[] data)
 		{
 			// Read map
-			Map map = Map.ReadMap(data);
-			if (map == null)
+			Map tempMap = Map.ReadMap(data);
+			if (tempMap == null)
 				return false;
 
 			// Replace current map with the imported map
-			current.map?.Dispose();
-			current.map = map;
+			map?.Dispose();
+			map = tempMap;
 
 			// Import successful. Inform listeners.
-			current.onChangedValuesCB?.Invoke(current);
+			onChangedValuesCB?.Invoke(this);
 
 			return true;
 		}
 
-		public static bool ImportMission(string path)
+		public bool ImportMission(string path)
 		{
 			MissionRoot root = GetMissionData(path);
 			if (root == null)
 				return false;
 
 			// Replace current mission with the imported mission
-			current.mission = root;
+			mission = root;
 
 			// Import successful. Inform listeners.
-			current.onChangedValuesCB?.Invoke(current);
+			onChangedValuesCB?.Invoke(this);
 
 			return true;
 		}

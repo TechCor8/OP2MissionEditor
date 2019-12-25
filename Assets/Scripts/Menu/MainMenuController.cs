@@ -49,7 +49,7 @@ namespace OP2MissionEditor.Menu
 		private void CreateNew_NoRefresh()
 		{
 			m_SavePath = null;
-			UserData.CreateNew();
+			UserData.current.CreateNew();
 		}
 
 		public void OnClick_Open()
@@ -65,7 +65,7 @@ namespace OP2MissionEditor.Menu
 		{
 			m_SavePath = path;
 
-			if (!UserData.LoadMission(path))
+			if (!UserData.current.LoadMission(path))
 			{
 				// If load fails, clear out data by creating new mission instead
 				OnClick_New();
@@ -123,7 +123,7 @@ namespace OP2MissionEditor.Menu
 				default:
 					CreateNew_NoRefresh();
 
-					if (UserData.ImportMap(path))
+					if (UserData.current.ImportMap(path))
 					{
 						m_MapRenderer.Refresh(() =>
 						{
@@ -149,7 +149,7 @@ namespace OP2MissionEditor.Menu
 			byte[] mapData = volFile.ReadFileByName(mapName);
 			volFile.Dispose();
 
-			if (!UserData.ImportMap(mapData))
+			if (!UserData.current.ImportMap(mapData))
 			{
 				Debug.LogError("Failed to read map: " + mapName);
 				return;
@@ -175,7 +175,7 @@ namespace OP2MissionEditor.Menu
 		{
 			interactable = true;
 
-			if (!UserData.ImportMission(missionPath))
+			if (!UserData.current.ImportMission(missionPath))
 			{
 				Debug.LogError("Failed to read mission: " + missionPath);
 				return;
