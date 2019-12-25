@@ -143,8 +143,8 @@ namespace OP2MissionEditor.Dialogs
 				m_PlayerListBox.AddItem(item);
 			}
 
-			// Can't have more than 8 players in the game
-			if (m_Players.Count >= 8)
+			// Can't have more than 6 players in the game
+			if (m_Players.Count >= 6)
 				m_BtnAddPlayer.interactable = false;
 		}
 
