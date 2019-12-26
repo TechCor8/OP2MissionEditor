@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: DNAAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: ece12a82aef1b134b9fbbc12247fae1e, type: 3}
+    totalSpriteSurfaceArea: 5832
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: 00000000000000000000000000000000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: c19085100ec993b4dbf249d5d3d7f4cc, type: 3}
+  - {fileID: 21300000, guid: 4e757f10ae3033f4b989862c5dabfec3, type: 3}
+  - {fileID: 21300000, guid: 186a5b40af6e4fe40ac640c0ccd27e66, type: 3}
+  - {fileID: 21300000, guid: 0ef4fa50c834e3f4e95a796182f70778, type: 3}
+  - {fileID: 21300000, guid: 12612f01d4ff6fa448906aa183f21531, type: 3}
+  - {fileID: 21300000, guid: 1ef979a121d036341bb2f5a7ac3a81d7, type: 3}
+  - {fileID: 21300000, guid: e17677e16546fbe4d97b1d0bd143dc40, type: 3}
+  - {fileID: 21300000, guid: 8b37e9a259f2cb247a1618f1a1ef7aa2, type: 3}
+  - {fileID: 21300000, guid: 97cb26e2d2a355c41af91633e25efa22, type: 3}
+  - {fileID: 21300000, guid: 427a5703da4c625459ba9f97d8bae2d6, type: 3}
+  - {fileID: 21300000, guid: aeca5164ddd64a349be4af1a029878af, type: 3}
+  - {fileID: 21300000, guid: d15589a91742e5140a0386f6278abeaa, type: 3}
+  - {fileID: 21300000, guid: 9eb1271a0d11c41478db68a099e79bd1, type: 3}
+  - {fileID: 21300000, guid: 3060e64a18bd8a3478c4ec333f8fb305, type: 3}
+  - {fileID: 21300000, guid: 1f43955af28fa534c948cd5113f34b90, type: 3}
+  - {fileID: 21300000, guid: c93045bc3242b7b40a768ad883efe018, type: 3}
+  - {fileID: 21300000, guid: 9009f9dcbd4f30c4890d9880bc581d94, type: 3}
+  - {fileID: 21300000, guid: 5004a78db8c97704c8a6046bbdb80ebc, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - frm-23846
+  - frm-23840
+  - frm-23841
+  - frm-23850
+  - frm-23848
+  - frm-23849
+  - frm-23851
+  - frm-23852
+  - frm-23853
+  - frm-23843
+  - frm-23842
+  - frm-23836
+  - frm-23838
+  - frm-23847
+  - frm-23844
+  - frm-23837
+  - frm-23845
+  - frm-23839
+  m_Tag: DNAAtlas
+  m_IsVariant: 0

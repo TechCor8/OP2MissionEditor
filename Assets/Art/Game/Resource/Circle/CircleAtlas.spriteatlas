@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CircleAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 5588a96f55f96b140ac98653af351fb1, type: 3}
+    totalSpriteSurfaceArea: 28913
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: 00000000000000000000000000000000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 470c8dc1fde98f9499c43d9028324f85, type: 3}
+  - {fileID: 21300000, guid: 8d740e02737dac54bb1dd7a0eafa8b8a, type: 3}
+  - {fileID: 21300000, guid: 98b0cd14f084dd7469238fceceb03c08, type: 3}
+  - {fileID: 21300000, guid: 4c1f5644dddfca1478b9d6f4e323e304, type: 3}
+  - {fileID: 21300000, guid: 95634e842ba7d254e979aed18f1a6e90, type: 3}
+  - {fileID: 21300000, guid: 9350c5b582813204f8a15f4d8e34874f, type: 3}
+  - {fileID: 21300000, guid: 98f08917d14804941a30ff6f0736d122, type: 3}
+  - {fileID: 21300000, guid: c762edb75581d144e93064a221a063ed, type: 3}
+  - {fileID: 21300000, guid: 8c7b27b8204d3bb468919936ff744a25, type: 3}
+  - {fileID: 21300000, guid: a0bcfe791c50380438fdef5d65ff1df7, type: 3}
+  - {fileID: 21300000, guid: e463dde9a4dc8ea47ba68f4447c1b4d8, type: 3}
+  - {fileID: 21300000, guid: 61976b0a71e6afa4aad0ba9285889a03, type: 3}
+  - {fileID: 21300000, guid: 9003140b413c4e44ea58ff0a063a536a, type: 3}
+  - {fileID: 21300000, guid: 7f34e33b14546e343bc3a7d7e49d76a3, type: 3}
+  - {fileID: 21300000, guid: 050dd17d23239574a9352a9a5d2316b6, type: 3}
+  - {fileID: 21300000, guid: d768be0ee30e37e48a707756ee3ede0e, type: 3}
+  - {fileID: 21300000, guid: d54b9b4fa49652f43b9f07ece7442c3c, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - frm-18617
+  - frm-18609
+  - frm-18612
+  - frm-18624
+  - frm-18622
+  - frm-18619
+  - frm-18616
+  - frm-18614
+  - frm-18620
+  - frm-18618
+  - frm-18621
+  - frm-18608
+  - frm-18611
+  - frm-18615
+  - frm-18613
+  - frm-18610
+  - frm-18623
+  m_Tag: CircleAtlas
+  m_IsVariant: 0

@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BeakerAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: dbe587c82d912f645bbb0dc322398fc6, type: 3}
+    totalSpriteSurfaceArea: 14326
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: 00000000000000000000000000000000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: d253a9a106150af4ea1869cbda83ab1d, type: 3}
+  - {fileID: 21300000, guid: 3121c0e1a8ce3e34da5be8773fad8db5, type: 3}
+  - {fileID: 21300000, guid: a2acbc53806f2c04386b4c6de0b6eb44, type: 3}
+  - {fileID: 21300000, guid: 1fcc52c3276610244ad5f9756998ae5e, type: 3}
+  - {fileID: 21300000, guid: 081477045c35dca42a961a18441779cc, type: 3}
+  - {fileID: 21300000, guid: ba034e245b0dcb547a0a2f265a8e4669, type: 3}
+  - {fileID: 21300000, guid: 517eb934c7e8afc4e82a6559937737ba, type: 3}
+  - {fileID: 21300000, guid: fe6806859c359b449bd6249fc7f9a620, type: 3}
+  - {fileID: 21300000, guid: 1843e3e556a17e74aa12e279ddf3ec09, type: 3}
+  - {fileID: 21300000, guid: 1faeea66a2eaf4b44afaf7f207e5417e, type: 3}
+  - {fileID: 21300000, guid: 9e3cab665f3a0064ba730b8d1cd95a6a, type: 3}
+  - {fileID: 21300000, guid: 3553aab62692c244ca82c5844643a4a9, type: 3}
+  - {fileID: 21300000, guid: d89a29573abcc55469379ae0dcc7850c, type: 3}
+  - {fileID: 21300000, guid: b6834957f21985a4f88542a50b6f16ed, type: 3}
+  - {fileID: 21300000, guid: feb812a7f813f2a4e80836a1b0e09a79, type: 3}
+  - {fileID: 21300000, guid: 7b2aa8b70da7283459849893cb001e4b, type: 3}
+  - {fileID: 21300000, guid: 5668ec18dd612a54c9e7cbdf5adae57f, type: 3}
+  - {fileID: 21300000, guid: 31c151785344a6c44a59a628a7e59706, type: 3}
+  - {fileID: 21300000, guid: 6ab9b459e827f004682d9e608aa30d3c, type: 3}
+  - {fileID: 21300000, guid: 80f69ed977819ad43bc1220f688b6f78, type: 3}
+  - {fileID: 21300000, guid: 9c95171b29123ea488998325a3d1a899, type: 3}
+  - {fileID: 21300000, guid: baecd67bbd6e4ec4193512c720369a77, type: 3}
+  - {fileID: 21300000, guid: 764fcfcb80a400a4bb7ffb45e0b7c151, type: 3}
+  - {fileID: 21300000, guid: 3affc60c19f14674798d09cb33de764c, type: 3}
+  - {fileID: 21300000, guid: 92b2a1ddf965d8b41bb26170f1b49308, type: 3}
+  - {fileID: 21300000, guid: cbaf811eaa7a0d048b6a75970f194736, type: 3}
+  - {fileID: 21300000, guid: 8acb317ed3484ca4d82b672931afae9a, type: 3}
+  - {fileID: 21300000, guid: e0bb5fce8e254354087288ee7c572706, type: 3}
+  - {fileID: 21300000, guid: 7a0859de96df7e44ba95085be2baf768, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - frm-23865
+  - frm-23869
+  - frm-23861
+  - frm-23876
+  - frm-23859
+  - frm-23880
+  - frm-23881
+  - frm-23866
+  - frm-23877
+  - frm-23856
+  - frm-23868
+  - frm-23882
+  - frm-23875
+  - frm-23864
+  - frm-23860
+  - frm-23871
+  - frm-23858
+  - frm-23874
+  - frm-23870
+  - frm-23873
+  - frm-23854
+  - frm-23857
+  - frm-23879
+  - frm-23863
+  - frm-23878
+  - frm-23872
+  - frm-23855
+  - frm-23862
+  - frm-23867
+  m_Tag: BeakerAtlas
+  m_IsVariant: 0

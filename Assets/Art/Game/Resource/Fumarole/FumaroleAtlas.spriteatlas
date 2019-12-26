@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FumaroleAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: b1903535937b8144da6b434ddf8e6658, type: 3}
+    totalSpriteSurfaceArea: 12196
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: 00000000000000000000000000000000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 3a73335068a5d934f9496cbfffcc7449, type: 3}
+  - {fileID: 21300000, guid: 1a06d9e1762904149a0a4710ec1da5a3, type: 3}
+  - {fileID: 21300000, guid: e1bdc90278f5dbd40b9c9052c4d50a92, type: 3}
+  - {fileID: 21300000, guid: 02a7f2930344cdc46a8f786131a5c2f2, type: 3}
+  - {fileID: 21300000, guid: 92916145c640a0c44adc675f5672c9f5, type: 3}
+  - {fileID: 21300000, guid: 24170275aef72bf40a0bd7572998ccfc, type: 3}
+  - {fileID: 21300000, guid: 8edd35591e01a7a448b4346a4ced7c42, type: 3}
+  - {fileID: 21300000, guid: 48a5c979aa4c0b34299ff603c37d3e6d, type: 3}
+  - {fileID: 21300000, guid: c5e1df8aa4280144faa79ecdc3e3e219, type: 3}
+  - {fileID: 21300000, guid: 4fc12f7bf0ca3654aae96440899623a5, type: 3}
+  - {fileID: 21300000, guid: 9a41b61daaeecb04fb48a5fe264653bf, type: 3}
+  - {fileID: 21300000, guid: 4d9dba9dbe0482142b75f439b2d4edea, type: 3}
+  - {fileID: 21300000, guid: 856903bf52c847b4296885b370f5270c, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - frm-140
+  - frm-136
+  - frm-144
+  - frm-143
+  - frm-142
+  - frm-135
+  - frm-137
+  - frm-134
+  - frm-133
+  - frm-132
+  - frm-139
+  - frm-141
+  - frm-138
+  m_Tag: FumaroleAtlas
+  m_IsVariant: 0
