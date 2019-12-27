@@ -36,6 +36,32 @@ namespace OP2MissionEditor.Dialogs.Paint
 			map_id.ChildrenModule,
 		};
 
+		private string GetWreckageName(map_id wreckageType)
+		{
+			switch (wreckageType)
+			{
+				case map_id.EDWARDSatellite:	return "EDWARD Satellite";
+				case map_id.SolarSatellite:		return "Solar Satellite";
+				case map_id.IonDriveModule:		return "Ion Drive Module";
+				case map_id.FusionDriveModule:	return "Fusion Drive Module";
+				case map_id.CommandModule:		return "Command Module";
+				case map_id.FuelingSystems:		return "Fueling Systems";
+				case map_id.HabitatRing:		return "Habitat Ring";
+				case map_id.SensorPackage:		return "Sensor Package";
+				case map_id.Skydock:			return "Skydock";
+				case map_id.StasisSystems:		return "Stasis Systems";
+				case map_id.OrbitalPackage:		return "Orbital Package";
+				case map_id.PhoenixModule:		return "Phoenix Module";
+				case map_id.RareMetalsCargo:	return "Rare Metals Cargo";
+				case map_id.CommonMetalsCargo:	return "Common Metals Cargo";
+				case map_id.FoodCargo:			return "Food Cargo";
+				case map_id.EvacuationModule:	return "Evacuation Module";
+				case map_id.ChildrenModule:		return "Children Module";
+			}
+
+			return wreckageType.ToString();
+		}
+
 
 		protected override void Awake()
 		{
@@ -50,7 +76,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			// Read wreckage names
 			foreach (map_id wreckType in m_WreckageTypes)
-				wreckageNames.Add(wreckType.ToString());
+				wreckageNames.Add(GetWreckageName(wreckType));
 
 			// Update tileset dropdown options
 			m_DropdownWreckageTypes.ClearOptions();
