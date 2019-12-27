@@ -1,6 +1,7 @@
 ﻿using DotNetMissionSDK;
 using DotNetMissionSDK.AI;
 using DotNetMissionSDK.Json;
+using OP2MissionEditor.Systems.TechTree;
 using OP2MissionEditor.UserInterface;
 using OP2UtilityDotNet;
 using System.Collections;
@@ -92,43 +93,11 @@ namespace OP2MissionEditor.Dialogs
 			m_TechNames.Clear();
 			m_TechIds.Clear();
 
-			// Can't parse files in game directory if one hasn't been assigned yet.
-			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
-				return;
-
-			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
+			TechData[] technologies = TechFileReader.GetTechnologies(UserPrefs.gameDirectory, m_UserData.mission.levelDetails.techTreeName);
+			foreach (TechData tech in technologies)
 			{
-				byte[] techSheet = resourceManager.GetResource(m_UserData.mission.levelDetails.techTreeName, true);
-				if (techSheet == null)
-					return;
-
-				using (MemoryStream stream = new MemoryStream(techSheet))
-				using (StreamReader reader = new StreamReader(stream))
-				{
-					while (!reader.EndOfStream)
-					{
-						string line = reader.ReadLine();
-
-						if (!line.StartsWith("BEGIN_TECH"))
-							continue;
-
-						int firstIndexOfQuote = line.IndexOf('"');
-						int secondIndexOfQuote = line.IndexOf('"', firstIndexOfQuote+1);
-
-						string techName = line.Substring(firstIndexOfQuote+1, secondIndexOfQuote-firstIndexOfQuote-1);
-						string szTechId = line.Substring(secondIndexOfQuote+2);
-						int techId;
-
-						if (!int.TryParse(szTechId, out techId))
-						{
-							Debug.LogWarning("Failed to parse tech id: " + szTechId);
-							continue;
-						}
-
-						m_TechNames.Add(techId, techName);
-						m_TechIds.Add(techId);
-					}
-				}
+				m_TechNames.Add(tech.techID, tech.techName);
+				m_TechIds.Add(tech.techID);
 			}
 		}
 
