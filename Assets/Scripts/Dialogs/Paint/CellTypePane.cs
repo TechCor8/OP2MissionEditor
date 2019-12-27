@@ -22,7 +22,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_MapRenderer.HideCellTypeMap();
 		}
 
-		protected override void OnPaintTile(Vector3Int tileXY)
+		protected override void OnPaintTile(Vector2Int tileXY)
 		{
 			// Paint tile with cell type
 			UserData.current.map.SetCellType((ulong)tileXY.x, (ulong)tileXY.y, (CellType)m_DropdownCellType.value);

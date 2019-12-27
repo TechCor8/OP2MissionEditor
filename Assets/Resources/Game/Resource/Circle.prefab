@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6371981913742169235}
   - component: {fileID: 3364984098840773198}
   - component: {fileID: 7791758970838144661}
+  - component: {fileID: 731478600660203627}
   m_Layer: 0
   m_Name: Circle
   m_TagString: Untagged
@@ -100,3 +101,15 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &731478600660203627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546316400988052487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e263b85f7f8ef49833fbdeabd39e66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

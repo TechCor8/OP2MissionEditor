@@ -13,7 +13,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 	public class PaintPane : MonoBehaviour
 	{
 		private Tilemap m_Tilemap;
-		protected MapRenderer m_MapRenderer { get; private set; }
+		protected MapRenderer m_MapRenderer			{ get; private set; }
+		protected UnitRenderer m_UnitRenderer		{ get; private set; }
 
 		[System.NonSerialized] private bool m_IsPainting;
 
@@ -25,6 +26,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			Camera.main.transform.parent.GetComponentsInChildren(maps);
 			m_Tilemap = maps.Find(map => map.name == "Tilemap");
 			m_MapRenderer = m_Tilemap.GetComponent<MapRenderer>();
+
+			// Find unit renderer
+			List<UnitRenderer> unitRenderers = new List<UnitRenderer>();
+			Camera.main.transform.parent.GetComponentsInChildren(unitRenderers);
+			m_UnitRenderer = unitRenderers.Find(rend => rend.name == "Units");
 		}
 
 		protected virtual void Update()
@@ -60,10 +66,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Invert Y to match data storage instead of render value
 			cell.y = m_Tilemap.size.y-(cell.y+1);
 
-			OnPaintTile(cell);
+			OnPaintTile((Vector2Int)cell);
 		}
 
-		protected virtual void OnPaintTile(Vector3Int tileXY)
+		protected virtual void OnPaintTile(Vector2Int tileXY)
 		{
 		}
 	}

@@ -1313,6 +1313,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1184169049217847363}
+  - component: {fileID: 4005070623536424}
   m_Layer: 5
   m_Name: Wreckage
   m_TagString: Untagged
@@ -1345,6 +1346,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4005070623536424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796849049502200107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de8bddb252c0edd44b0d342fd9fe9b5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DropdownWreckageTypes: {fileID: 6779850920009264160}
+  m_InputID: {fileID: 7977627963380840349}
+  m_IsVisible: {fileID: 764598102642101693}
 --- !u!1 &865285797105499148
 GameObject:
   m_ObjectHideFlags: 0

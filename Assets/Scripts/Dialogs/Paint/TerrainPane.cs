@@ -135,7 +135,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_IsPainting = true;
 		}
 
-		protected override void OnPaintTile(Vector3Int tileXY)
+		protected override void OnPaintTile(Vector2Int tileXY)
 		{
 			if (!m_IsPainting)
 				return;

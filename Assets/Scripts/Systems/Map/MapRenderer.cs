@@ -165,7 +165,7 @@ namespace OP2MissionEditor.Systems.Map
 			});
 		}
 
-		public void RefreshTile(Vector3Int tileXY)
+		public void RefreshTile(Vector2Int tileXY)
 		{
 			ulong x = (ulong)tileXY.x;
 			ulong y = (ulong)tileXY.y;

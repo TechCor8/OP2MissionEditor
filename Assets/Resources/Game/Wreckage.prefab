@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 636159203642305387}
   - component: {fileID: 9082378993992154550}
   - component: {fileID: 4366282886826191213}
+  - component: {fileID: 8229583121625929983}
   m_Layer: 0
   m_Name: Wreckage
   m_TagString: Untagged
@@ -100,3 +101,15 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8229583121625929983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029494064947520511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14e8d9e7ac6a8e34eb3db9c9fd3c36f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
