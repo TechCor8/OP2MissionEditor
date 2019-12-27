@@ -1267,6 +1267,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 230889268}
   m_CullTransparentMesh: 0
+--- !u!1 &239670294
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 239670295}
+  - component: {fileID: 239670296}
+  m_Layer: 0
+  m_Name: Units
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &239670295
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239670294}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 830778999}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &239670296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239670294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c33259f1d7ef14e994ff5590daba24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Tilemap: {fileID: 1633291500}
 --- !u!1 &260848808
 GameObject:
   m_ObjectHideFlags: 0
@@ -3985,6 +4029,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1633291498}
+  - {fileID: 239670295}
   - {fileID: 1276008943}
   - {fileID: 1193677497}
   m_Father: {fileID: 1508418585}
@@ -6163,7 +6208,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830778999}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &1193677498
 TilemapRenderer:
@@ -6425,7 +6470,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830778999}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &1276008944
 TilemapRenderer:
@@ -8097,6 +8142,7 @@ MonoBehaviour:
   m_CellTypeMap: {fileID: 1276008945}
   m_GridOverlay: {fileID: 1193677499}
   m_GridOverlayTile: {fileID: 21300000, guid: d3ba28277050b8b418dc4185743db6b3, type: 3}
+  m_UnitRenderer: {fileID: 239670296}
 --- !u!1 &1645941390
 GameObject:
   m_ObjectHideFlags: 0

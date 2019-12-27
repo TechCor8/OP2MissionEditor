@@ -9,6 +9,7 @@ namespace OP2MissionEditor.Systems.Map
 		[SerializeField] private Tilemap m_CellTypeMap			= default;
 		[SerializeField] private Tilemap m_GridOverlay			= default;
 		[SerializeField] private Sprite m_GridOverlayTile		= default;
+		[SerializeField] private UnitRenderer m_UnitRenderer	= default;
 
 		private Tilemap m_Tilemap;
 
@@ -151,6 +152,9 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Apply minimap texture
 			minimapTexture.Apply();
+
+			// Create units
+			m_UnitRenderer.Refresh();
 
 			// Inform listeners that we are done
 			onCompleteCB?.Invoke();
