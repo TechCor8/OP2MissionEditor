@@ -16,6 +16,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private object m_Data;
 		
 
+		/// <summary>
+		/// Initializes a new button and adds it to a scroll view (or other container).
+		/// </summary>
 		public void Initialize(Transform parent, Sprite spriteToDisplay, OnClickCallback onClickCB, object data)
 		{
 			m_OnClickCB = onClickCB;
@@ -25,6 +28,17 @@ namespace OP2MissionEditor.Dialogs.Paint
 			GetComponent<Toggle>().group = parent.GetComponent<ToggleGroup>();
 
 			m_SpriteImage.sprite = spriteToDisplay;
+		}
+
+		/// <summary>
+		/// Initializes a button that is already in the scroll view.
+		/// </summary>
+		public void Initialize(OnClickCallback onClickCB, object data)
+		{
+			m_OnClickCB = onClickCB;
+			m_Data = data;
+
+			GetComponent<Toggle>().group = transform.parent.GetComponent<ToggleGroup>();
 		}
 
 		public void OnToggle_Button(bool isOn)
