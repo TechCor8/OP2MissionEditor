@@ -153,12 +153,16 @@ namespace OP2MissionEditor.Systems.Map
 			// Apply minimap texture
 			minimapTexture.Apply();
 
-			// Create units
-			m_UnitRenderer.Refresh();
+			onMapRefreshProgressCB?.Invoke(this, "Creating units", 1);
+			yield return null;
 
-			// Inform listeners that we are done
-			onCompleteCB?.Invoke();
-			onMapRefreshedCB?.Invoke(this);
+			// Create units
+			m_UnitRenderer.Refresh(() =>
+			{
+				// Inform listeners that we are done
+				onCompleteCB?.Invoke();
+				onMapRefreshedCB?.Invoke(this);
+			});
 		}
 
 		public void RefreshTile(Vector3Int tileXY)
