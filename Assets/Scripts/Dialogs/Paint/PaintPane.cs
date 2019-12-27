@@ -17,6 +17,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		protected UnitRenderer m_UnitRenderer		{ get; private set; }
 
 		[System.NonSerialized] private bool m_IsPainting;
+		[System.NonSerialized] private bool m_IsErasing;
 
 
 		protected virtual void Awake()
@@ -44,6 +45,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (Input.GetMouseButtonUp(0))
 				m_IsPainting = false;
 
+			if (Input.GetMouseButtonUp(1))
+				m_IsErasing = false;
+
 			// If mouse is over UI, we are not painting
 			if (EventSystem.current.IsPointerOverGameObject())
 				return;
@@ -52,7 +56,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (Input.GetMouseButtonDown(0))
 				m_IsPainting = true;
 
-			if (!m_IsPainting)
+			if (Input.GetMouseButtonDown(1))
+				m_IsErasing = true;
+
+			if (!m_IsPainting && !m_IsErasing)
 				return;
 
 			// Get the tile that was clicked on
@@ -66,10 +73,17 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Invert Y to match data storage instead of render value
 			cell.y = m_Tilemap.size.y-(cell.y+1);
 
-			OnPaintTile((Vector2Int)cell);
+			if (m_IsPainting)
+				OnPaintTile((Vector2Int)cell);
+			else if (m_IsErasing)
+				OnEraseTile((Vector2Int)cell);
 		}
 
 		protected virtual void OnPaintTile(Vector2Int tileXY)
+		{
+		}
+
+		protected virtual void OnEraseTile(Vector2Int tileXY)
 		{
 		}
 	}
