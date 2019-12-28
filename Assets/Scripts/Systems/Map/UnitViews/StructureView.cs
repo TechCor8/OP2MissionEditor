@@ -29,20 +29,18 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Set displayed sprite based on health level
 			if (unit.health > 0.66f)
-			{
 				m_Renderer.sprite = m_SpritesByHealth[0];
-				m_HealthBar.color = Color.green;
-			}
-			if (unit.health > 0.33f)
-			{
+			else if (unit.health > 0.33f)
 				m_Renderer.sprite = m_SpritesByHealth[1];
-				m_HealthBar.color = Color.yellow;
-			}
 			else
-			{
 				m_Renderer.sprite = m_SpritesByHealth[2];
+
+			if (unit.health > 0.5f)
+				m_HealthBar.color = Color.green;
+			else if (unit.health > 0.25f)
+				m_HealthBar.color = Color.yellow;
+			else
 				m_HealthBar.color = Color.red;
-			}
 
 			m_ColorOverlay.color = GetPlayerColor();
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);

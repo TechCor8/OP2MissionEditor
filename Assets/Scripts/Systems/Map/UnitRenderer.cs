@@ -16,7 +16,7 @@ namespace OP2MissionEditor.Systems.Map
 
 		[SerializeField] private Transform m_ResourceContainer	= default;
 		[SerializeField] private Transform m_StructureContainer	= default;
-		[SerializeField] private Transform m_UnitContainer		= default;
+		[SerializeField] private Transform m_VehicleContainer	= default;
 
 		public delegate void OnProgressCallback(float progress);
 		public delegate void OnCallback();
@@ -50,6 +50,11 @@ namespace OP2MissionEditor.Systems.Map
 			// Create walls and tubes
 
 			// Create units
+			foreach (PlayerData player in UserData.current.mission.players)
+			{
+				foreach (UnitData unit in player.units)
+					AddUnit(player, unit);
+			}
 
 			yield return 0;
 			
@@ -92,6 +97,27 @@ namespace OP2MissionEditor.Systems.Map
 			view.Initialize(wreck);
 		}
 
+		public void AddUnit(PlayerData player, UnitData unit)
+		{
+			string edenPath = player.isEden ? "Eden/" : "Plymouth/";
+			string weaponType = "";
+
+			if (unit.typeID == map_id.GuardPost || unit.typeID == map_id.Lynx || unit.typeID == map_id.Panther || unit.typeID == map_id.Tiger)
+				weaponType = "_" + ((map_id)unit.cargoType).ToString();
+
+			if (IsStructure(unit.typeID))
+			{
+				// Add structure
+				GameObject goUnit = CreateUnit("Structures/" + edenPath + unit.typeID.ToString() + weaponType, m_StructureContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
+				StructureView view = goUnit.GetComponent<StructureView>();
+				view.Initialize(player, unit);
+			}
+			else
+			{
+				// TODO: Add vehicle
+			}
+		}
+
 		public void RemoveUnit(GameData.Beacon beacon)
 		{
 			List<BeaconView> views = new List<BeaconView>(m_ResourceContainer.GetComponentsInChildren<BeaconView>());
@@ -111,6 +137,21 @@ namespace OP2MissionEditor.Systems.Map
 			List<WreckageView> views = new List<WreckageView>(m_ResourceContainer.GetComponentsInChildren<WreckageView>());
 			WreckageView view = views.Find((v) => v.wreck == wreck);
 			Destroy(view.gameObject);
+		}
+
+		public void RemoveUnit(UnitData unit)
+		{
+			if (IsStructure(unit.typeID))
+			{
+				// Remove structure
+				List<StructureView> views = new List<StructureView>(m_StructureContainer.GetComponentsInChildren<StructureView>());
+				StructureView view = views.Find((v) => v.unit == unit);
+				Destroy(view.gameObject);
+			}
+			else
+			{
+				// TODO: Remove vehicle
+			}
 		}
 
 		private GameObject CreateUnit(string resourcePath, Transform parent, int id, Vector2Int gridPosition)
@@ -145,5 +186,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			return 0;
 		}
+
+		private bool IsVehicle(map_id unitType)							{ return (int)unitType >= 1 && (int)unitType <= 15;					}
+		private bool IsStructure(map_id unitType)						{ return (int)unitType >= 21 && (int)unitType <= 58;				}
 	}
 }
