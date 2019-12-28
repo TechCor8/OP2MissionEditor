@@ -13,10 +13,12 @@ namespace OP2MissionEditor.Systems.Map
 		[SerializeField] private SpriteRenderer m_ColorOverlay	= default;
 		[SerializeField] private SpriteRenderer m_HealthFrame	= default;
 		[SerializeField] private SpriteRenderer m_HealthBar		= default;
+		[SerializeField] private SpriteRenderer m_BarYield		= default;
 		[SerializeField] private TextMesh m_txtTopLeft			= default;
 		[SerializeField] private TextMesh m_txtBottomRight		= default;
 
 		[SerializeField] private Sprite[] m_SpritesByHealth		= default;
+		[SerializeField] private Sprite[] m_BarYieldSprites		= default;
 
 		public PlayerData player	{ get; private set; }
 		public UnitData unit		{ get; private set; }
@@ -27,7 +29,7 @@ namespace OP2MissionEditor.Systems.Map
 			this.player = player;
 			this.unit = unit;
 
-			// Set displayed sprite based on health level
+			// Set displayed sprite based on health
 			if (unit.health > 0.66f)
 				m_Renderer.sprite = m_SpritesByHealth[0];
 			else if (unit.health > 0.33f)
@@ -35,6 +37,7 @@ namespace OP2MissionEditor.Systems.Map
 			else
 				m_Renderer.sprite = m_SpritesByHealth[2];
 
+			// Set health bar color based on health
 			if (unit.health > 0.5f)
 				m_HealthBar.color = Color.green;
 			else if (unit.health > 0.25f)
@@ -45,7 +48,31 @@ namespace OP2MissionEditor.Systems.Map
 			m_ColorOverlay.color = GetPlayerColor();
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
+			// Set mine bar yield
+			if (unit.typeID == map_id.CommonOreMine || unit.typeID == map_id.RareOreMine)
+			{
+				m_BarYield.gameObject.SetActive(true);
+				m_BarYield.sprite = m_BarYieldSprites[GetBarYieldIndex(unit.barYield)];
+			}
+			else
+			{
+				m_BarYield.gameObject.SetActive(false);
+			}
+
 			OnShowTextOverlay();
+		}
+
+		private int GetBarYieldIndex(Yield barYield)
+		{
+			switch (barYield)
+			{
+				case Yield.Random:	return 0;
+				case Yield.Bar1:	return 1;
+				case Yield.Bar2:	return 2;
+				case Yield.Bar3:	return 3;
+			}
+
+			return 0;
 		}
 
 		protected override void OnShowTextOverlay()

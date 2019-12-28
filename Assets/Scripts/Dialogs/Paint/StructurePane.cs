@@ -65,6 +65,19 @@ namespace OP2MissionEditor.Dialogs.Paint
 			bool isEden = UserData.current.mission.players[index].isEden;
 			m_ScrollViewEden.SetActive(isEden);
 			m_ScrollViewPlymouth.SetActive(!isEden);
+
+			// Update selected button on new scroll view to currently selected name
+			foreach (Transform t in m_ButtonContainerEden)
+			{
+				if (t.name == m_SelectedButtonName)
+					t.GetComponent<Toggle>().SetIsOnWithoutNotify(true);
+			}
+
+			foreach (Transform t in m_ButtonContainerPlymouth)
+			{
+				if (t.name == m_SelectedButtonName)
+					t.GetComponent<Toggle>().SetIsOnWithoutNotify(true);
+			}
 		}
 
 		public void OnChanged_SliderHealth(float value)
