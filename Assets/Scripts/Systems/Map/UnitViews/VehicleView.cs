@@ -61,21 +61,35 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (unit.cargoType != 0)
 			{
-				if (unit.typeID == map_id.CargoTruck && unit.cargoType >= 0 && unit.cargoType <= 9)
+				switch (unit.typeID)
 				{
-					if (unit.cargoType >= 1 && unit.cargoType <= 7)
-						m_txtBottomRight.text = ((TruckCargo)unit.cargoType).ToString() + ": " + unit.cargoAmount;
-					else
-						m_txtBottomRight.text = ((TruckCargo)unit.cargoType).ToString();
-				}
-				else
-				{
-					// Convec structure kit or truck starship part
-					m_txtBottomRight.text = ((map_id)unit.cargoType).ToString();
+					case map_id.CargoTruck:
+						// Show cargo and amount, or starship module
+						if (unit.cargoType >= 1 && unit.cargoType <= 7)
+							m_txtBottomRight.text = ((TruckCargo)unit.cargoType).ToString() + ": " + unit.cargoAmount;
+						else if (unit.cargoType >= 8 && unit.cargoType <= 9)
+							m_txtBottomRight.text = ((map_id)unit.cargoAmount).ToString();
+						else
+							m_txtBottomRight.text = "Gene Bank";
+
+						m_txtBottomRight.gameObject.SetActive(true);
+						break;
+
+					case map_id.ConVec:
+						// Show structure kit
+						m_txtBottomRight.text = ((map_id)unit.cargoType).ToString();
+						m_txtBottomRight.gameObject.SetActive(true);
+						break;
+
+					default:
+						m_txtBottomRight.gameObject.SetActive(false);
+						break;
 				}
 			}
-
-			m_txtBottomRight.gameObject.SetActive(unit.cargoType != 0);
+			else
+			{
+				m_txtBottomRight.gameObject.SetActive(false);
+			}
 
 			m_HealthFrame.gameObject.SetActive(true);
 			m_HealthBar.gameObject.SetActive(true);
