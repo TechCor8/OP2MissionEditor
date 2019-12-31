@@ -99,8 +99,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Start location has no adjustable parameters
 			bool isStartLocation = m_SelectedButtonName == "StartLocation";
 
+			m_DropdownCargoType.interactable = false;
 			m_InputID.interactable = !isStartLocation;
-			m_DropdownCargoType.interactable = !isStartLocation;
 			m_DropdownDirection.interactable = !isStartLocation;
 			m_SliderHealth.interactable = !isStartLocation;
 			m_ToggleLights.interactable = !isStartLocation;
@@ -112,8 +112,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Refresh cargo type dropdown
 			switch (GetMapIDFromName(m_SelectedButtonName))
 			{
-				case map_id.CargoTruck:	RefreshCargoTypeAsTruckOptions();		break;
-				case map_id.ConVec:		RefreshCargoTypeAsConvecOptions();		break;
+				case map_id.CargoTruck:	RefreshCargoTypeAsTruckOptions();	m_DropdownCargoType.interactable = true;	break;
+				case map_id.ConVec:		RefreshCargoTypeAsConvecOptions();	m_DropdownCargoType.interactable = true;	break;
 			}
 		}
 
