@@ -5,20 +5,21 @@ using UnityEngine;
 namespace OP2MissionEditor.Systems.Map
 {
 	/// <summary>
-	/// Represents a displayed structure on the map.
+	/// Represents a displayed vehicle on the map.
 	/// </summary>
-	public class StructureView : UnitView
+	public class VehicleView : UnitView
 	{
-		[SerializeField] private SpriteRenderer m_Renderer		= default;
-		[SerializeField] private SpriteRenderer m_ColorOverlay	= default;
-		[SerializeField] private SpriteRenderer m_HealthFrame	= default;
-		[SerializeField] private SpriteRenderer m_HealthBar		= default;
-		[SerializeField] private SpriteRenderer m_BarYield		= default;
-		[SerializeField] private TextMesh m_txtTopLeft			= default;
-		[SerializeField] private TextMesh m_txtBottomRight		= default;
+		[SerializeField] private SpriteRenderer m_Renderer			= default;
+		[SerializeField] private SpriteRenderer m_ColorOverlay		= default;
+		[SerializeField] private SpriteRenderer m_WeaponRenderer	= default;
+		[SerializeField] private SpriteRenderer m_WeaponColorOverlay= default;
+		[SerializeField] private SpriteRenderer m_HealthFrame		= default;
+		[SerializeField] private SpriteRenderer m_HealthBar			= default;
+		[SerializeField] private TextMesh m_txtTopLeft				= default;
+		[SerializeField] private TextMesh m_txtBottomRight			= default;
 
-		[SerializeField] private Sprite[] m_SpritesByHealth		= default;
-		[SerializeField] private Sprite[] m_BarYieldSprites		= default;
+		[SerializeField] private Sprite[] m_BodySprites				= default;
+		[SerializeField] private Sprite[] m_WeaponSprites			= default;
 
 		public PlayerData player	{ get; private set; }
 		public UnitData unit		{ get; private set; }
@@ -29,13 +30,10 @@ namespace OP2MissionEditor.Systems.Map
 			this.player = player;
 			this.unit = unit;
 
-			// Set displayed sprite based on health
-			if (unit.health > 0.66f)
-				m_Renderer.sprite = m_SpritesByHealth[0];
-			else if (unit.health > 0.33f)
-				m_Renderer.sprite = m_SpritesByHealth[1];
-			else
-				m_Renderer.sprite = m_SpritesByHealth[2];
+			// Set displayed sprite based on direction
+			m_Renderer.sprite = m_BodySprites[(int)unit.direction];
+			if (m_WeaponRenderer != null && m_WeaponSprites.Length > 0)
+				m_WeaponRenderer.sprite = m_WeaponSprites[(int)unit.direction];
 
 			// Set health bar color based on health
 			if (unit.health > 0.5f)
@@ -46,33 +44,10 @@ namespace OP2MissionEditor.Systems.Map
 				m_HealthBar.color = Color.red;
 
 			m_ColorOverlay.color = GetPlayerColor();
+			m_WeaponColorOverlay.color = m_ColorOverlay.color;
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
-			// Set mine bar yield
-			if (unit.typeID == map_id.CommonOreMine || unit.typeID == map_id.RareOreMine)
-			{
-				m_BarYield.gameObject.SetActive(true);
-				m_BarYield.sprite = m_BarYieldSprites[GetBarYieldIndex(unit.barYield)];
-			}
-			else
-			{
-				m_BarYield.gameObject.SetActive(false);
-			}
-
 			OnShowTextOverlay();
-		}
-
-		private int GetBarYieldIndex(Yield barYield)
-		{
-			switch (barYield)
-			{
-				case Yield.Random:	return 0;
-				case Yield.Bar1:	return 1;
-				case Yield.Bar2:	return 2;
-				case Yield.Bar3:	return 3;
-			}
-
-			return 0;
 		}
 
 		protected override void OnShowTextOverlay()
@@ -81,13 +56,26 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (unit.id > 0)
 				m_txtTopLeft.text = unit.id.ToString();
-			
+
 			m_txtTopLeft.gameObject.SetActive(unit.id > 0);
 
-			if (unit.barVariant != Variant.Random)
-				m_txtBottomRight.text = "v" + ((int)(unit.barVariant)+1).ToString();
-			
-			m_txtBottomRight.gameObject.SetActive(unit.barVariant != Variant.Random);
+			if (unit.cargoType != 0)
+			{
+				if (unit.typeID == map_id.CargoTruck && unit.cargoType >= 0 && unit.cargoType <= 9)
+				{
+					if (unit.cargoType >= 1 && unit.cargoType <= 7)
+						m_txtBottomRight.text = ((TruckCargo)unit.cargoType).ToString() + ": " + unit.cargoAmount;
+					else
+						m_txtBottomRight.text = ((TruckCargo)unit.cargoType).ToString();
+				}
+				else
+				{
+					// Convec structure kit or truck starship part
+					m_txtBottomRight.text = ((map_id)unit.cargoType).ToString();
+				}
+			}
+
+			m_txtBottomRight.gameObject.SetActive(unit.cargoType != 0);
 
 			m_HealthFrame.gameObject.SetActive(true);
 			m_HealthBar.gameObject.SetActive(true);

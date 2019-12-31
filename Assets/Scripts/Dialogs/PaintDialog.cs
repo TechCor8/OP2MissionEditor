@@ -9,7 +9,6 @@ namespace OP2MissionEditor.Dialogs
 	/// </summary>
 	public class PaintDialog : MonoBehaviour
 	{
-		[SerializeField] private Dropdown		m_DropdownPlayer			= default;
 		[SerializeField] private Dropdown		m_DropdownEditMode			= default;
 		[SerializeField] private GameObject[]	m_EditModePanes				= default;
 		
@@ -20,32 +19,10 @@ namespace OP2MissionEditor.Dialogs
 
 		private void Initialize(OnCloseCallback onCloseCB)
 		{
-			UserData.current.onChangedValuesCB += OnChangedUserData;
-
 			m_OnCloseCB = onCloseCB;
 
 			// Set default edit mode to Terrain
 			OnClick_EditMode(0);
-
-			Refresh();
-		}
-
-		private void OnChangedUserData(UserData src)
-		{
-			Refresh();
-		}
-
-		private void Refresh()
-		{
-			// Add player options
-			m_DropdownPlayer.ClearOptions();
-			List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
-			for (int i=0; i < UserData.current.mission.players.Length; ++i)
-				options.Add(new Dropdown.OptionData("Player " + (i+1)));
-
-			m_DropdownPlayer.AddOptions(options);
-
-			//m_DropdownPlayer.value			= (-(int)userData.mission.levelDetails.missionType)-1;
 		}
 
 		public void OnClick_EditMode(int editMode)
@@ -65,11 +42,6 @@ namespace OP2MissionEditor.Dialogs
 			Destroy(gameObject);
 
 			m_OnCloseCB?.Invoke();
-		}
-
-		private void OnDestroy()
-		{
-			UserData.current.onChangedValuesCB -= OnChangedUserData;
 		}
 
 		/// <summary>

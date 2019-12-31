@@ -27,13 +27,13 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (beacon.id > 0)
 				m_txtTopLeft.text = beacon.id.ToString();
-			else
-				m_txtTopLeft.gameObject.SetActive(false);
+
+			m_txtTopLeft.gameObject.SetActive(beacon.id > 0);
 
 			if (beacon.barVariant != DotNetMissionSDK.Variant.Random)
 				m_txtBottomRight.text = "v" + ((int)(beacon.barVariant)+1).ToString();
-			else
-				m_txtBottomRight.gameObject.SetActive(false);
+
+			m_txtBottomRight.gameObject.SetActive(beacon.barVariant != DotNetMissionSDK.Variant.Random);
 		}
 
 		protected override void OnHideTextOverlay()

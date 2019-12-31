@@ -29,8 +29,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (wreck.id > 0)
 				m_txtTopLeft.text = wreck.id.ToString();
-			else
-				m_txtTopLeft.gameObject.SetActive(false);
+
+			m_txtTopLeft.gameObject.SetActive(wreck.id > 0);
 
 			m_txtBottomRight.text = GetShortName(wreck.techID);
 			m_goNotVisible.SetActive(!wreck.isVisible);

@@ -42,10 +42,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void UpdatePaint()
 		{
 			// If mouse button is up, always stop painting
-			if (Input.GetMouseButtonUp(0))
+			if (!Input.GetMouseButton(0))
 				m_IsPainting = false;
 
-			if (Input.GetMouseButtonUp(1))
+			if (!Input.GetMouseButton(1))
 				m_IsErasing = false;
 
 			// If mouse is over UI, we are not painting

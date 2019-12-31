@@ -15,8 +15,8 @@ namespace OP2MissionEditor.Systems.Map
 		[SerializeField] private Tilemap m_Tilemap				= default;
 
 		[SerializeField] private Transform m_ResourceContainer	= default;
-		[SerializeField] private Transform m_StructureContainer	= default;
-		[SerializeField] private Transform m_VehicleContainer	= default;
+		[SerializeField] private Transform m_UnitContainer		= default;
+		[SerializeField] private Transform m_StartContainer		= default;
 
 		public delegate void OnProgressCallback(float progress);
 		public delegate void OnCallback();
@@ -49,9 +49,15 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Create walls and tubes
 
-			// Create units
-			foreach (PlayerData player in UserData.current.mission.players)
+			// Player data
+			for (int i=0; i < UserData.current.mission.players.Length; ++i)
 			{
+				PlayerData player = UserData.current.mission.players[i];
+
+				// Set start location
+				SetStartLocation(i, player);
+
+				// Create units
 				foreach (UnitData unit in player.units)
 					AddUnit(player, unit);
 			}
@@ -62,6 +68,20 @@ namespace OP2MissionEditor.Systems.Map
 			// Inform listeners that we are done
 			onCompleteCB?.Invoke();
 			onRefreshedCB?.Invoke();
+		}
+
+		public void SetStartLocation(int playerIndex, PlayerData player)
+		{
+			// Remove old start location
+			List<StartLocationView> views = new List<StartLocationView>(m_StartContainer.GetComponentsInChildren<StartLocationView>());
+			StartLocationView view = views.Find((v) => v.player == player);
+			if (view != null)
+				Destroy(view.gameObject);
+
+			// Create new start location
+			GameObject goUnit = CreateUnit("StartLocation", m_StartContainer, 0, new Vector2Int(player.centerView.x, player.centerView.y));
+			view = goUnit.GetComponent<StartLocationView>();
+			view.Initialize(player);
 		}
 
 		public void AddUnit(GameData.Beacon beacon)
@@ -104,17 +124,32 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (unit.typeID == map_id.GuardPost || unit.typeID == map_id.Lynx || unit.typeID == map_id.Panther || unit.typeID == map_id.Tiger)
 				weaponType = "_" + ((map_id)unit.cargoType).ToString();
+			else if (unit.typeID == map_id.CargoTruck && unit.cargoType != 0)
+			{
+				// Cargo truck type
+				if (unit.cargoType >= 1 && unit.cargoType <= 7)
+					weaponType = "_" + ((TruckCargo)unit.cargoType).ToString();
+				else if (unit.cargoType == 8)
+					weaponType = "_Starship";
+				else if (unit.cargoType == 9)
+					weaponType = "_Wreckage";
+				else
+					weaponType = "_GeneBank";
+			}
 
 			if (IsStructure(unit.typeID))
 			{
 				// Add structure
-				GameObject goUnit = CreateUnit("Structures/" + edenPath + unit.typeID.ToString() + weaponType, m_StructureContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
+				GameObject goUnit = CreateUnit("Structures/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
 				StructureView view = goUnit.GetComponent<StructureView>();
 				view.Initialize(player, unit);
 			}
 			else
 			{
-				// TODO: Add vehicle
+				// Add vehicle
+				GameObject goUnit = CreateUnit("Vehicles/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
+				VehicleView view = goUnit.GetComponent<VehicleView>();
+				view.Initialize(player, unit);
 			}
 		}
 
@@ -144,13 +179,16 @@ namespace OP2MissionEditor.Systems.Map
 			if (IsStructure(unit.typeID))
 			{
 				// Remove structure
-				List<StructureView> views = new List<StructureView>(m_StructureContainer.GetComponentsInChildren<StructureView>());
+				List<StructureView> views = new List<StructureView>(m_UnitContainer.GetComponentsInChildren<StructureView>());
 				StructureView view = views.Find((v) => v.unit == unit);
 				Destroy(view.gameObject);
 			}
 			else
 			{
-				// TODO: Remove vehicle
+				// Remove vehicle
+				List<VehicleView> views = new List<VehicleView>(m_UnitContainer.GetComponentsInChildren<VehicleView>());
+				VehicleView view = views.Find((v) => v.unit == unit);
+				Destroy(view.gameObject);
 			}
 		}
 

@@ -26,8 +26,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (marker.id > 0)
 				m_txtTopLeft.text = marker.id.ToString();
-			else
-				m_txtTopLeft.gameObject.SetActive(false);
+			
+			m_txtTopLeft.gameObject.SetActive(marker.id > 0);
 		}
 
 		protected override void OnHideTextOverlay()
