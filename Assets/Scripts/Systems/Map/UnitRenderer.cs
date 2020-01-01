@@ -35,6 +35,16 @@ namespace OP2MissionEditor.Systems.Map
 
 		private IEnumerator _Refresh(System.Action onCompleteCB)
 		{
+			// Delete everything
+			foreach (Transform t in m_ResourceContainer)
+				Destroy(t.gameObject);
+
+			foreach (Transform t in m_UnitContainer)
+				Destroy(t.gameObject);
+
+			foreach (Transform t in m_StartContainer)
+				Destroy(t.gameObject);
+
 			// Create beacons
 			foreach (GameData.Beacon beacon in UserData.current.mission.tethysGame.beacons)
 				AddUnit(beacon);
