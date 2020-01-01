@@ -318,40 +318,41 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			switch (index)
 			{
-				case 0:		return map_id.Agridome;
-				case 1:		return map_id.AdvancedLab;
-				case 2:		return map_id.AdvancedResidence;
-				case 3:		return map_id.ArachnidFactory;
-				case 4:		return map_id.BasicLab;
-				case 5:		return map_id.CommandCenter;
-				case 6:		return map_id.CommonOreSmelter;
-				case 7:		return map_id.CommonStorage;
-				case 8:		return map_id.ConsumerFactory;
-				case 9:		return map_id.DIRT;
-				case 10:	return map_id.Forum;
-				case 11:	return map_id.Garage;
-				case 12:	return map_id.GORF;
-				case 13:	return map_id.GuardPost;
-				case 14:	return map_id.LightTower;
-				case 15:	return map_id.MedicalCenter;
-				case 16:	return map_id.MeteorDefense;
-				case 17:	return map_id.MHDGenerator;
-				case 18:	return map_id.Nursery;
-				case 19:	return map_id.Observatory;
-				case 20:	return map_id.RareOreSmelter;
-				case 21:	return map_id.RareStorage;
-				case 22:	return map_id.RecreationFacility;
-				case 23:	return map_id.ReinforcedResidence;
-				case 24:	return map_id.Residence;
-				case 25:	return map_id.RobotCommand;
-				case 26:	return map_id.SolarPowerArray;
-				case 27:	return map_id.Spaceport;
-				case 28:	return map_id.StandardLab;
-				case 29:	return map_id.StructureFactory;
-				case 30:	return map_id.Tokamak;
-				case 31:	return map_id.TradeCenter;
-				case 32:	return map_id.University;
-				case 33:	return map_id.VehicleFactory;
+				case 0:		return map_id.None;
+				case 1:		return map_id.Agridome;
+				case 2:		return map_id.AdvancedLab;
+				case 3:		return map_id.AdvancedResidence;
+				case 4:		return map_id.ArachnidFactory;
+				case 5:		return map_id.BasicLab;
+				case 6:		return map_id.CommandCenter;
+				case 7:		return map_id.CommonOreSmelter;
+				case 8:		return map_id.CommonStorage;
+				case 9:		return map_id.ConsumerFactory;
+				case 10:	return map_id.DIRT;
+				case 11:	return map_id.Forum;
+				case 12:	return map_id.Garage;
+				case 13:	return map_id.GORF;
+				case 14:	return map_id.GuardPost;
+				case 15:	return map_id.LightTower;
+				case 16:	return map_id.MedicalCenter;
+				case 17:	return map_id.MeteorDefense;
+				case 18:	return map_id.MHDGenerator;
+				case 19:	return map_id.Nursery;
+				case 20:	return map_id.Observatory;
+				case 21:	return map_id.RareOreSmelter;
+				case 22:	return map_id.RareStorage;
+				case 23:	return map_id.RecreationFacility;
+				case 24:	return map_id.ReinforcedResidence;
+				case 25:	return map_id.Residence;
+				case 26:	return map_id.RobotCommand;
+				case 27:	return map_id.SolarPowerArray;
+				case 28:	return map_id.Spaceport;
+				case 29:	return map_id.StandardLab;
+				case 30:	return map_id.StructureFactory;
+				case 31:	return map_id.Tokamak;
+				case 32:	return map_id.TradeCenter;
+				case 33:	return map_id.University;
+				case 34:	return map_id.VehicleFactory;
 			}
 
 			return map_id.None;
@@ -360,6 +361,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void RefreshCargoTypeAsConvecOptions()
 		{
 			List<string> cargoOptions = new List<string>();
+			cargoOptions.Add("Empty");
 			cargoOptions.Add("Agridome");
 			cargoOptions.Add("Advanced Lab");
 			cargoOptions.Add("Advanced Residence");
