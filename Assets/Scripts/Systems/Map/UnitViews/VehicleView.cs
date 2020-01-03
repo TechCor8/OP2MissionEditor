@@ -10,9 +10,7 @@ namespace OP2MissionEditor.Systems.Map
 	public class VehicleView : UnitView
 	{
 		[SerializeField] private SpriteRenderer m_Renderer			= default;
-		[SerializeField] private SpriteRenderer m_ColorOverlay		= default;
 		[SerializeField] private SpriteRenderer m_WeaponRenderer	= default;
-		[SerializeField] private SpriteRenderer m_WeaponColorOverlay= default;
 		[SerializeField] private SpriteRenderer m_HealthFrame		= default;
 		[SerializeField] private SpriteRenderer m_HealthBar			= default;
 		[SerializeField] private TextMesh m_txtTopLeft				= default;
@@ -43,8 +41,8 @@ namespace OP2MissionEditor.Systems.Map
 			else
 				m_HealthBar.color = Color.red;
 
-			m_ColorOverlay.color = GetPlayerColor();
-			m_WeaponColorOverlay.color = m_ColorOverlay.color;
+			m_Renderer.material.SetInt("_PaletteIndex", (int)player.color);
+			m_WeaponRenderer.material.SetInt("_PaletteIndex", (int)player.color);
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
 			OnShowTextOverlay();
@@ -104,22 +102,6 @@ namespace OP2MissionEditor.Systems.Map
 
 			m_HealthFrame.gameObject.SetActive(false);
 			m_HealthBar.gameObject.SetActive(false);
-		}
-
-		private Color GetPlayerColor()
-		{
-			switch (player.color)
-			{
-				case PlayerColor.Blue:		return Color.blue;
-				case PlayerColor.Red:		return Color.red;
-				case PlayerColor.Green:		return Color.green;
-				case PlayerColor.Yellow:	return Color.yellow;
-				case PlayerColor.Cyan:		return Color.cyan;
-				case PlayerColor.Magenta:	return Color.magenta;
-				case PlayerColor.Black:		return Color.black;
-			}
-
-			return Color.white;
 		}
 	}
 }

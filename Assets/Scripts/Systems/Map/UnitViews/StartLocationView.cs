@@ -9,7 +9,6 @@ namespace OP2MissionEditor.Systems.Map
 	/// </summary>
 	public class StartLocationView : UnitView
 	{
-		[SerializeField] private SpriteRenderer m_Renderer			= default;
 		[SerializeField] private SpriteRenderer m_ColorOverlay		= default;
 		
 		public PlayerData player	{ get; private set; }
