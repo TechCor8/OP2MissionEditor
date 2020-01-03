@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace OP2MissionEditor.Menu
@@ -16,8 +17,23 @@ namespace OP2MissionEditor.Menu
 	/// </summary>
 	public class MainMenuController : MonoBehaviour
 	{
+		[System.Serializable]
+		private class MenuOption
+		{
+			public string id;
+			public Text txtShortcut;
+
+			public KeyCode shortcutModifier1;
+			public KeyCode shortcutModifier2;
+			public KeyCode shortcutKey;
+
+			public UnityEvent buttonMethod;
+		}
+
 		[SerializeField] private CanvasGroup m_CanvasGroup		= default;
 		[SerializeField] private MapRenderer m_MapRenderer		= default;
+
+		[SerializeField] private MenuOption[] m_MenuOptions		= default;
 
 		private string m_SavePath;
 
@@ -29,6 +45,8 @@ namespace OP2MissionEditor.Menu
 			// Show these windows at startup
 			OnClick_ShowMinimap();
 			OnClick_ShowPaintWindow();
+
+			InitializeMenuShortcuts();
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -43,6 +61,8 @@ namespace OP2MissionEditor.Menu
 			m_MapRenderer.Refresh(() =>
 			{
 				interactable = true;
+
+				Debug.Log("New mission loaded.");
 			});
 		}
 
@@ -573,6 +593,80 @@ namespace OP2MissionEditor.Menu
 			File.Copy(sdkPath, sdkOutputPath, true);
 
 			Debug.Log("SDK files copied to " + UserPrefs.gameDirectory + ".");
+		}
+
+		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		// Menu Shortcuts
+		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		private void InitializeMenuShortcuts()
+		{
+			// Set shortcut text for options that have shortcuts
+			foreach (MenuOption option in m_MenuOptions)
+			{
+				if (option.shortcutKey == KeyCode.None)
+					continue;
+
+				option.txtShortcut.text = GetModifierName(option.shortcutModifier1) + GetModifierName(option.shortcutModifier2) + option.shortcutKey.ToString();
+			}
+		}
+
+		private string GetModifierName(KeyCode modifier)
+		{
+			if (modifier == KeyCode.None)
+				return "";
+
+			switch (modifier)
+			{
+				case KeyCode.LeftShift:
+				case KeyCode.RightShift:
+					return "Shift+";
+
+				case KeyCode.LeftControl:
+				case KeyCode.RightControl:
+					return "Ctrl+";
+
+				case KeyCode.LeftAlt:
+				case KeyCode.RightAlt:
+					return "Alt+";
+			}
+
+			return modifier.ToString();
+		}
+
+		private bool IsModifierDown(KeyCode modifier)
+		{
+			if (modifier == KeyCode.None)
+				return true;
+
+			switch (modifier)
+			{
+				case KeyCode.LeftShift:
+				case KeyCode.RightShift:
+					return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+				case KeyCode.LeftControl:
+				case KeyCode.RightControl:
+					return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+
+				case KeyCode.LeftAlt:
+				case KeyCode.RightAlt:
+					return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+			}
+
+			return Input.GetKey(modifier);
+		}
+
+		private void Update()
+		{
+			// Invoke pressed shortcuts
+			foreach (MenuOption option in m_MenuOptions)
+			{
+				if (!IsModifierDown(option.shortcutModifier1)) continue;
+				if (!IsModifierDown(option.shortcutModifier2)) continue;
+				if (!Input.GetKeyDown(option.shortcutKey)) continue;
+
+				option.buttonMethod.Invoke();
+			}
 		}
 	}
 }
