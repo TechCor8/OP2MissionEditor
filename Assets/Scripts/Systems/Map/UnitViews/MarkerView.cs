@@ -17,7 +17,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.marker = marker;
 
-			OnShowTextOverlay();
+			RefreshOverlay();
 		}
 
 		protected override void OnShowTextOverlay()

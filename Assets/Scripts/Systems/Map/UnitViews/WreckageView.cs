@@ -20,7 +20,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.wreck = wreck;
 
-			OnShowTextOverlay();
+			RefreshOverlay();
 		}
 
 		protected override void OnShowTextOverlay()

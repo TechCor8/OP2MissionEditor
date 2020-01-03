@@ -423,6 +423,11 @@ namespace OP2MissionEditor.Menu
 			UserPrefs.isGridOverlayVisible = !UserPrefs.isGridOverlayVisible;
 		}
 
+		public void OnClick_UnitOverlay()
+		{
+			UserPrefs.isUnitOverlayVisible = !UserPrefs.isUnitOverlayVisible;
+		}
+
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// Archive Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

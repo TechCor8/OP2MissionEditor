@@ -58,7 +58,7 @@ namespace OP2MissionEditor.Systems.Map
 				m_BarYield.gameObject.SetActive(false);
 			}
 
-			OnShowTextOverlay();
+			RefreshOverlay();
 		}
 
 		private int GetBarYieldIndex(Yield barYield)

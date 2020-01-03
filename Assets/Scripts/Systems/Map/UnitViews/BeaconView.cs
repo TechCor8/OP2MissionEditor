@@ -18,7 +18,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.beacon = beacon;
 
-			OnShowTextOverlay();
+			RefreshOverlay();
 		}
 
 		protected override void OnShowTextOverlay()

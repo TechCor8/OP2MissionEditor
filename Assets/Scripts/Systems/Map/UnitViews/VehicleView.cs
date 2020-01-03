@@ -45,7 +45,7 @@ namespace OP2MissionEditor.Systems.Map
 			m_WeaponRenderer.material.SetInt("_PaletteIndex", (int)player.color);
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
-			OnShowTextOverlay();
+			RefreshOverlay();
 		}
 
 		protected override void OnShowTextOverlay()

@@ -19,6 +19,8 @@ namespace OP2MissionEditor.Systems.Map
 			this.player = player;
 
 			m_ColorOverlay.color = GetPlayerColor();
+
+			RefreshOverlay();
 		}
 
 		private Color GetPlayerColor()
