@@ -35,6 +35,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			// Refresh grid color
 			m_GridOverlay.color = UserPrefs.gridOverlayColor;
+			m_GridOverlay.gameObject.SetActive(UserPrefs.isGridOverlayVisible);
 		}
 
 		public void ShowCellTypeMap()
@@ -135,6 +136,7 @@ namespace OP2MissionEditor.Systems.Map
 			}
 
 			m_GridOverlay.color = UserPrefs.gridOverlayColor;
+			m_GridOverlay.gameObject.SetActive(UserPrefs.isGridOverlayVisible);
 
 			onMapRefreshProgressCB?.Invoke(this, "Setting tiles", 1);
 			yield return null;

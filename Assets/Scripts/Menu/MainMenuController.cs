@@ -35,6 +35,9 @@ namespace OP2MissionEditor.Menu
 
 		[SerializeField] private MenuOption[] m_MenuOptions		= default;
 
+		private MinimapDialog m_MinimapDialog;
+		private PaintDialog m_PaintDialog;
+
 		private string m_SavePath;
 
 		public bool interactable { get { return m_CanvasGroup.interactable; } set { m_CanvasGroup.interactable = value; } }
@@ -359,6 +362,14 @@ namespace OP2MissionEditor.Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		public void OnClick_ShowMinimap()
 		{
+			if (m_MinimapDialog != null)
+			{
+				// Close Minimap
+				Destroy(m_MinimapDialog.gameObject);
+				return;
+			}
+
+			// Open Minimap
 			MinimapDialog minimapDlg = MinimapDialog.Create(m_MapRenderer);
 
 			// Set minimap to top-right corner
@@ -374,10 +385,20 @@ namespace OP2MissionEditor.Menu
 			position.y = 362 - size.y;
 
 			rTransform.anchoredPosition = position;
+
+			m_MinimapDialog = minimapDlg;
 		}
 
 		public void OnClick_ShowPaintWindow()
 		{
+			if (m_PaintDialog != null)
+			{
+				// Close Paint Window
+				Destroy(m_PaintDialog.gameObject);
+				return;
+			}
+
+			// Open Paint Window
 			PaintDialog paintDialog = PaintDialog.Create();
 
 			// Set paint window to mid-right corner
@@ -394,10 +415,12 @@ namespace OP2MissionEditor.Menu
 
 			rTransform.anchoredPosition = position;
 
-			//RectTransform rTransform = paintDialog.transform.GetChild(0).GetComponent<RectTransform>();
-			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(1.0f, 1.0f);
-			//rTransform.anchoredPosition = new Vector2(0, -277);
-			//rTransform.anchorMin = rTransform.anchorMax = rTransform.pivot = new Vector2(0.5f, 0.5f);
+			m_PaintDialog = paintDialog;
+		}
+
+		public void OnClick_ShowGrid()
+		{
+			UserPrefs.isGridOverlayVisible = !UserPrefs.isGridOverlayVisible;
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

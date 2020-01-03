@@ -41,5 +41,14 @@ namespace OP2MissionEditor
 				onChangedPrefsCB?.Invoke();
 			}
 		}
+
+		/// <summary>
+		/// Is the grid overlay visible?
+		/// </summary>
+		public static bool isGridOverlayVisible
+		{
+			get { return PlayerPrefs.GetInt("GridOverlay_Visible", 1) != 0;													}
+			set { PlayerPrefs.SetInt("GridOverlay_Visible", value ? 1 : 0); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();	}
+		}
 	}
 }
