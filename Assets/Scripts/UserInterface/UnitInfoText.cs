@@ -117,9 +117,12 @@ namespace OP2MissionEditor.UserInterface
 
 				headers.AppendLine("ID:");			info.AppendLine(beacon.id.ToString());
 				headers.AppendLine("Type:");		info.AppendLine(beacon.mapID.ToString());
-				headers.AppendLine("Ore Type:");	info.AppendLine(beacon.oreType.ToString());
-				headers.AppendLine("Yield:");		info.AppendLine(beacon.barYield.ToString());
-				headers.AppendLine("Variant:");		info.AppendLine(beacon.barVariant.ToString());
+				if (beacon.mapID == map_id.MiningBeacon)
+				{
+					headers.AppendLine("Ore Type:");	info.AppendLine(beacon.oreType.ToString());
+					headers.AppendLine("Yield:");		info.AppendLine(beacon.barYield.ToString());
+					headers.AppendLine("Variant:");		info.AppendLine(beacon.barVariant.ToString());
+				}
 				headers.AppendLine("Position:");	info.AppendLine(beacon.position.x.ToString() + ", " + beacon.position.y.ToString());
 				
 				m_txtHeaders.text = headers.ToString();
