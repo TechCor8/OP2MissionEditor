@@ -20,14 +20,14 @@ namespace OP2MissionEditor.Menu
 		[System.Serializable]
 		private class MenuOption
 		{
-			public string id;
-			public Text txtShortcut;
+			public string id									= default;
+			public Text txtShortcut								= default;
 
-			public KeyCode shortcutModifier1;
-			public KeyCode shortcutModifier2;
-			public KeyCode shortcutKey;
+			public KeyCode shortcutModifier1					= default;
+			public KeyCode shortcutModifier2					= default;
+			public KeyCode shortcutKey							= default;
 
-			public UnityEvent buttonMethod;
+			public UnityEvent buttonMethod						= default;
 		}
 
 		[SerializeField] private CanvasGroup m_CanvasGroup		= default;

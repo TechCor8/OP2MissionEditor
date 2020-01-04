@@ -13,7 +13,7 @@ namespace OP2MissionEditor.UserInterface
 	/// </summary>
 	public class UnitInfoText : MonoBehaviour
 	{
-		[SerializeField] private Text m_txtHeaders;
+		[SerializeField] private Text m_txtHeaders			= default;
 
 		private Text m_txtInfo;
 		private Tilemap m_Tilemap;
