@@ -79,8 +79,14 @@ namespace OP2MissionEditor.UserInterface
 				System.Text.StringBuilder headers = new System.Text.StringBuilder();
 				System.Text.StringBuilder info = new System.Text.StringBuilder();
 
+				string type = unitOnTile.typeID.ToString();
+
+				// Add weapon to type
+				if (unitOnTile.typeID == map_id.GuardPost || unitOnTile.typeID == map_id.Lynx || unitOnTile.typeID == map_id.Panther || unitOnTile.typeID == map_id.Tiger)
+					type += " " + ((map_id)unitOnTile.cargoType).ToString();
+
 				headers.AppendLine("ID:");		info.AppendLine(unitOnTile.id.ToString());
-				headers.AppendLine("Type:");	info.AppendLine(unitOnTile.typeID.ToString());
+				headers.AppendLine("Type:");	info.AppendLine(type);
 				if (IsVehicle(unitOnTile.typeID) || IsStructure(unitOnTile.typeID))		{ headers.AppendLine("Health:");	info.AppendLine((unitOnTile.health * 100).ToString("N2") + "%");	}
 				if (IsVehicle(unitOnTile.typeID))										{ headers.AppendLine("Direction:");	info.AppendLine(unitOnTile.direction.ToString());					}
 				if (IsVehicle(unitOnTile.typeID))										{ headers.AppendLine("Lights:");	info.AppendLine(unitOnTile.lights ? "On" : "Off");					}
