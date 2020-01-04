@@ -428,6 +428,15 @@ namespace OP2MissionEditor.Menu
 			UserPrefs.isUnitOverlayVisible = !UserPrefs.isUnitOverlayVisible;
 		}
 
+		public void OnClick_UnitInfo()
+		{
+			UserPrefs.isUnitInfoVisible = !UserPrefs.isUnitInfoVisible;
+		}
+
+		public void OnClick_Console()
+		{
+		}
+
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// Archive Menu
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

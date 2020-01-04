@@ -59,5 +59,14 @@ namespace OP2MissionEditor
 			get { return PlayerPrefs.GetInt("UnitOverlay_Visible", 0) != 0;													}
 			set { PlayerPrefs.SetInt("UnitOverlay_Visible", value ? 1 : 0); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();	}
 		}
+
+		/// <summary>
+		/// Is unit info text visible?
+		/// </summary>
+		public static bool isUnitInfoVisible
+		{
+			get { return PlayerPrefs.GetInt("UnitInfo_Visible", 1) != 0;													}
+			set { PlayerPrefs.SetInt("UnitInfo_Visible", value ? 1 : 0); PlayerPrefs.Save(); onChangedPrefsCB?.Invoke();	}
+		}
 	}
 }
