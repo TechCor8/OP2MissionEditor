@@ -14,6 +14,7 @@ namespace OP2MissionEditor.Scenes
 
 		private void Awake()
 		{
+			ConsoleLog.Initialize();
 			TextureManager.Initialize();
 
 			// Register events
@@ -25,6 +26,8 @@ namespace OP2MissionEditor.Scenes
 			// If game directory hasn't been set, Open "Locate Outpost2" dialog to force user to select one
 			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				PreferencesDialog.Create();
+
+			Debug.Log("Editor initialized.");
 		}
 
 		private void OnMapRefreshProgress(MapRenderer mapRenderer, string state, float progress)

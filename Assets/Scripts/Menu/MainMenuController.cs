@@ -435,6 +435,7 @@ namespace OP2MissionEditor.Menu
 
 		public void OnClick_Console()
 		{
+			ConsoleDialog.Create();
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
