@@ -15,11 +15,20 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void OnEnable()
 		{
 			m_MapRenderer.ShowCellTypeMap();
+
+			// Refresh overlay
+			OnChanged_CellType();
 		}
 
 		private void OnDisable()
 		{
 			m_MapRenderer.HideCellTypeMap();
+		}
+
+		public void OnChanged_CellType()
+		{
+			// Set overlay sprite
+			m_OverlayRenderer.SetOverlay(m_MapRenderer.GetCellTypeSprite((CellType)m_DropdownCellType.value));
 		}
 
 		protected override void OnPaintTile(Vector2Int tileXY)

@@ -7,6 +7,7 @@ namespace OP2MissionEditor.Systems.Map
 	/// </summary>
 	public abstract class UnitView : MonoBehaviour
 	{
+		private bool m_CanShowTextOverlay = true;
 		private bool m_IsUnitOverlayVisible;
 
 
@@ -21,6 +22,9 @@ namespace OP2MissionEditor.Systems.Map
 			if (m_IsUnitOverlayVisible == UserPrefs.isUnitOverlayVisible)
 				return;
 
+			if (!m_CanShowTextOverlay)
+				return;
+
 			RefreshOverlay();
 		}
 
@@ -30,6 +34,16 @@ namespace OP2MissionEditor.Systems.Map
 
 			if (UserPrefs.isUnitOverlayVisible)
 				OnShowTextOverlay();
+			else
+				OnHideTextOverlay();
+		}
+
+		public void SetCanShowTextOverlay(bool canShow)
+		{
+			m_CanShowTextOverlay = canShow;
+
+			if (m_CanShowTextOverlay)
+				RefreshOverlay();
 			else
 				OnHideTextOverlay();
 		}

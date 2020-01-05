@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OP2MissionEditor.Systems.Map;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,13 @@ namespace OP2MissionEditor.Dialogs
 			OnClick_EditMode(0);
 		}
 
+		private void OnEnable()
+		{
+			// Enable overlay renderer
+			OverlayRenderer overlayRenderer = Camera.main.transform.parent.GetComponentInChildren<OverlayRenderer>(true);
+			overlayRenderer.gameObject.SetActive(true);
+		}
+
 		public void OnClick_EditMode(int editMode)
 		{
 			// Activate correct pane for the selected mode
@@ -42,6 +50,16 @@ namespace OP2MissionEditor.Dialogs
 			Destroy(gameObject);
 
 			m_OnCloseCB?.Invoke();
+		}
+
+		private void OnDisable()
+		{
+			if (Camera.main == null)
+				return;
+
+			// Disable overlay renderer
+			OverlayRenderer overlayRenderer = Camera.main.transform.parent.GetComponentInChildren<OverlayRenderer>(true);
+			overlayRenderer.gameObject.SetActive(false);
 		}
 
 		/// <summary>

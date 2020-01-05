@@ -12,9 +12,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 	/// </summary>
 	public class PaintPane : MonoBehaviour
 	{
-		private Tilemap m_Tilemap;
+		protected Tilemap m_Tilemap					{ get; private set; }
 		protected MapRenderer m_MapRenderer			{ get; private set; }
 		protected UnitRenderer m_UnitRenderer		{ get; private set; }
+		protected OverlayRenderer m_OverlayRenderer { get; private set; }
 
 		[System.NonSerialized] private bool m_IsPainting;
 		[System.NonSerialized] private bool m_IsErasing;
@@ -32,6 +33,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 			List<UnitRenderer> unitRenderers = new List<UnitRenderer>();
 			Camera.main.transform.parent.GetComponentsInChildren(unitRenderers);
 			m_UnitRenderer = unitRenderers.Find(rend => rend.name == "Units");
+
+			// Find overlay renderer
+			m_OverlayRenderer = Camera.main.transform.parent.GetComponentInChildren<OverlayRenderer>(true);
 		}
 
 		protected virtual void Update()
@@ -59,9 +63,6 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (Input.GetMouseButtonDown(1))
 				m_IsErasing = true;
 
-			if (!m_IsPainting && !m_IsErasing)
-				return;
-
 			// Get the tile that was clicked on
 			Vector2 worldMousePt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			Vector3Int cell = m_Tilemap.WorldToCell(worldMousePt);
@@ -73,6 +74,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Invert Y to match data storage instead of render value
 			cell.y = m_Tilemap.size.y-(cell.y+1);
 
+			// Draw overlay
+			OnOverTile((Vector2Int)cell);
+
+			// Paint or erase
 			if (m_IsPainting)
 				OnPaintTile((Vector2Int)cell);
 			else if (m_IsErasing)
@@ -85,6 +90,20 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		protected virtual void OnEraseTile(Vector2Int tileXY)
 		{
+		}
+
+		protected virtual void OnOverTile(Vector2Int tileXY)
+		{
+			// Invert Y to match data storage instead of render value
+			tileXY.y = m_Tilemap.size.y-tileXY.y-1;
+
+			Vector3 worldPt = m_Tilemap.CellToWorld((Vector3Int)tileXY);
+
+			// Center point in tile
+			worldPt.x += m_Tilemap.cellSize.x / 2.0f;
+			worldPt.y += m_Tilemap.cellSize.y / 2.0f;
+			
+			m_OverlayRenderer.SetPosition(worldPt);
 		}
 	}
 }

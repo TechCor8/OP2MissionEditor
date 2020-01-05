@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK;
 using DotNetMissionSDK.Json;
+using OP2MissionEditor.Systems.Map;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,6 +47,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 				btn.Initialize(OnClick_VehicleButton, btn.name);
 		}
 
+		private void OnEnable()
+		{
+			RefreshOverlay();
+		}
+
 		private void OnChangedUserData(UserData src)
 		{
 			RefreshPlayerDropdown();
@@ -81,6 +87,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 				if (t.name == m_SelectedButtonName)
 					t.GetComponent<Toggle>().SetIsOnWithoutNotify(true);
 			}
+
+			RefreshOverlay();
 		}
 
 		public void OnChanged_SliderHealth(float value)
@@ -105,6 +113,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_SliderHealth.interactable = !isStartLocation;
 			m_ToggleLights.interactable = !isStartLocation;
 
+			RefreshOverlay();
+
 			if (isStartLocation)
 				return;
 
@@ -114,6 +124,25 @@ namespace OP2MissionEditor.Dialogs.Paint
 			{
 				case map_id.CargoTruck:	RefreshCargoTypeAsTruckOptions();	m_DropdownCargoType.interactable = true;	break;
 				case map_id.ConVec:		RefreshCargoTypeAsConvecOptions();	m_DropdownCargoType.interactable = true;	break;
+			}
+		}
+
+		public void RefreshOverlay()
+		{
+			if (m_SelectedButtonName == null)
+				return;
+
+			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+
+			if (m_SelectedButtonName == "StartLocation")
+			{
+				StartLocationView startLocationView = Instantiate(Resources.Load<GameObject>("Game/StartLocation")).GetComponent<StartLocationView>();
+				startLocationView.Initialize(player);
+				m_OverlayRenderer.SetOverlay(startLocationView, Vector2Int.zero, Vector2.zero);
+			}
+			else
+			{
+				m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(player, GetVehicleData()), Vector2Int.one, Vector2.zero);
 			}
 		}
 
@@ -130,6 +159,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 						m_DropdownCargoSubtype.gameObject.SetActive(true);
 						m_DropdownCargoSubtype.interactable = true;
 						RefreshSubtypeAsWeaponOptions();
+						RefreshOverlay();
 						return;
 					}
 					break;
@@ -142,6 +172,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 						m_DropdownCargoSubtype.gameObject.SetActive(false);
 						m_InputCargoAmount.gameObject.SetActive(true);
 						m_InputCargoAmount.interactable = true;
+						RefreshOverlay();
 						return;
 					}
 					else if (truckCargoID == 8 || truckCargoID == 9)
@@ -151,6 +182,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 						m_DropdownCargoSubtype.gameObject.SetActive(true);
 						m_DropdownCargoSubtype.interactable = true;
 						RefreshSubtypeAsStarshipOptions();
+						RefreshOverlay();
 						return;
 					}
 					break;
@@ -159,6 +191,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// No subtype or amount to change
 			m_DropdownCargoSubtype.interactable = false;
 			m_InputCargoAmount.interactable = false;
+			RefreshOverlay();
 		}
 
 		protected override void OnPaintTile(Vector2Int tileXY)
@@ -170,14 +203,38 @@ namespace OP2MissionEditor.Dialogs.Paint
 			{
 				// Set player start location
 				PlayerData player1 = UserData.current.mission.players[m_DropdownPlayer.value];
-				player1.centerView.x = tileXY.x;
-				player1.centerView.y = tileXY.y;
+				DataLocation centerView = new DataLocation();
+				centerView.x = tileXY.x;
+				centerView.y = tileXY.y;
+				player1.centerView = centerView;
 				UserData.current.SetUnsaved();
 
 				m_UnitRenderer.SetStartLocation(m_DropdownPlayer.value, player1);
 				return;
 			}
 
+			// Check if tile is passable
+			if (!IsTilePassable(tileXY))
+				return;
+
+			// Check if area is blocked by units or structures
+			if (AreUnitsOnTile(tileXY))
+				return;
+
+			UnitData vehicle = GetVehicleData();
+			vehicle.position = new LOCATION(tileXY.x, tileXY.y);
+
+			// Add vehicle to tile
+			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			player.units.Add(vehicle);
+			UserData.current.SetUnsaved();
+
+			m_UnitRenderer.AddUnit(player, vehicle);
+		}
+
+		private UnitData GetVehicleData()
+		{
+			// Get unit type
 			map_id selectedTypeID = GetMapIDFromName(m_SelectedButtonName);
 
 			// Get cargo type
@@ -189,14 +246,6 @@ namespace OP2MissionEditor.Dialogs.Paint
 				selectedCargoTypeID = (int)GetCargoTypeForConvecOption(m_DropdownCargoType.value);
 			else
 				selectedCargoTypeID = (int)GetCargoMapIDFromName(m_SelectedButtonName);
-			
-			// Check if tile is passable
-			if (!IsTilePassable(tileXY))
-				return;
-
-			// Check if area is blocked by units or structures
-			if (AreUnitsOnTile(tileXY))
-				return;
 
 			int id;
 			int.TryParse(m_InputID.text, out id);
@@ -234,14 +283,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			vehicle.cargoType = selectedCargoTypeID;
 			vehicle.cargoAmount = cargoAmount;
 			vehicle.direction = (UnitDirection)m_DropdownDirection.value;
-			vehicle.position = new LOCATION(tileXY.x, tileXY.y);
 
-			// Add vehicle to tile
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
-			player.units.Add(vehicle);
-			UserData.current.SetUnsaved();
-
-			m_UnitRenderer.AddUnit(player, vehicle);
+			return vehicle;
 		}
 
 		protected override void OnEraseTile(Vector2Int tileXY)
@@ -282,6 +325,20 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(vehicleToRemove);
+		}
+
+		protected override void OnOverTile(Vector2Int tileXY)
+		{
+			base.OnOverTile(tileXY);
+
+			// Add game coordinates
+			tileXY += Vector2Int.one;
+
+			if (m_SelectedButtonName != "StartLocation")
+			{
+				bool canPlace = IsTilePassable(tileXY) && !AreUnitsOnTile(tileXY);
+				m_OverlayRenderer.SetTileStatus(Vector2Int.zero, canPlace ? Color.green : Color.red);
+			}
 		}
 
 		private map_id GetMapIDFromName(string name)

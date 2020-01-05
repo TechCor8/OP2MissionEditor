@@ -29,12 +29,30 @@ namespace OP2MissionEditor.Dialogs.Paint
 				btn.Initialize(OnClick_ResourceButton, btn.name);
 		}
 
+		private void OnEnable()
+		{
+			RefreshOverlay();
+		}
+
 		private void OnClick_ResourceButton(object data)
 		{
 			m_SelectedButtonName = (string)data;
 
 			// Markers do not have variants
 			m_DropdownVariant.interactable = !IsMarkerName(m_SelectedButtonName);
+
+			RefreshOverlay();
+		}
+
+		private void RefreshOverlay()
+		{
+			if (m_SelectedButtonName == null)
+				return;
+
+			if (IsMarkerName(m_SelectedButtonName))
+				m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(GetMarkerData()), Vector2Int.zero, Vector2.zero);
+			else
+				m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(GetBeaconData()), Vector2Int.zero, Vector2.zero);
 		}
 
 		protected override void OnPaintTile(Vector2Int tileXY)
@@ -54,15 +72,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (UserData.current.mission.tethysGame.markers.Find((m) => m.position.x == tileXY.x && m.position.y == tileXY.y) != null)
 				return;
 
-			int id;
-			int.TryParse(m_InputID.text, out id);
-
 			// Create marker data
-			GameData.Marker marker = new GameData.Marker();
-			marker.id = id;
-			MarkerType mType;
-			System.Enum.TryParse(m_SelectedButtonName, out mType);
-			marker.markerType = mType;
+			GameData.Marker marker = GetMarkerData();
 			marker.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add marker to tile
@@ -72,22 +83,28 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_UnitRenderer.AddUnit(marker);
 		}
 
+		private GameData.Marker GetMarkerData()
+		{
+			int id;
+			int.TryParse(m_InputID.text, out id);
+
+			GameData.Marker marker = new GameData.Marker();
+			marker.id = id;
+			MarkerType mType;
+			System.Enum.TryParse(m_SelectedButtonName, out mType);
+			marker.markerType = mType;
+
+			return marker;
+		}
+
 		private void AddBeacon(Vector2Int tileXY)
 		{
 			// If tile already contains beacon, cancel
 			if (UserData.current.mission.tethysGame.beacons.Find((b) => b.position.x == tileXY.x && b.position.y == tileXY.y) != null)
 				return;
 
-			int id;
-			int.TryParse(m_InputID.text, out id);
-
 			// Create beacon data
-			GameData.Beacon beacon = new GameData.Beacon();
-			beacon.id = id;
-			beacon.mapID = GetMapIDFromName(m_SelectedButtonName);
-			beacon.oreType = GetOreTypeFromName(m_SelectedButtonName);
-			beacon.barYield = GetYieldFromName(m_SelectedButtonName);
-			beacon.barVariant = GetVariant();
+			GameData.Beacon beacon = GetBeaconData();
 			beacon.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add beacon to tile
@@ -95,6 +112,21 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(beacon);
+		}
+
+		private GameData.Beacon GetBeaconData()
+		{
+			int id;
+			int.TryParse(m_InputID.text, out id);
+
+			GameData.Beacon beacon = new GameData.Beacon();
+			beacon.id = id;
+			beacon.mapID = GetMapIDFromName(m_SelectedButtonName);
+			beacon.oreType = GetOreTypeFromName(m_SelectedButtonName);
+			beacon.barYield = GetYieldFromName(m_SelectedButtonName);
+			beacon.barVariant = GetVariant();
+
+			return beacon;
 		}
 
 		protected override void OnEraseTile(Vector2Int tileXY)

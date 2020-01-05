@@ -94,7 +94,7 @@ namespace OP2MissionEditor.Systems.Map
 			view.Initialize(player);
 		}
 
-		public void AddUnit(GameData.Beacon beacon)
+		public UnitView AddUnit(GameData.Beacon beacon)
 		{
 			string prefabPath = null;
 
@@ -106,28 +106,31 @@ namespace OP2MissionEditor.Systems.Map
 			}
 
 			if (prefabPath == null)
-				return;
+				return null;
 
 			GameObject goUnit = CreateUnit(prefabPath, m_ResourceContainer, beacon.id, new Vector2Int(beacon.position.x,beacon.position.y));
 			BeaconView view = goUnit.GetComponent<BeaconView>();
 			view.Initialize(beacon);
+			return view;
 		}
 
-		public void AddUnit(GameData.Marker marker)
+		public UnitView AddUnit(GameData.Marker marker)
 		{
 			GameObject goUnit = CreateUnit("Resource/" + marker.markerType.ToString(), m_ResourceContainer, marker.id, new Vector2Int(marker.position.x,marker.position.y));
 			MarkerView view = goUnit.GetComponent<MarkerView>();
 			view.Initialize(marker);
+			return view;
 		}
 
-		public void AddUnit(GameData.Wreckage wreck)
+		public UnitView AddUnit(GameData.Wreckage wreck)
 		{
 			GameObject goUnit = CreateUnit("Wreckage", m_ResourceContainer, wreck.id, new Vector2Int(wreck.position.x,wreck.position.y));
 			WreckageView view = goUnit.GetComponent<WreckageView>();
 			view.Initialize(wreck);
+			return view;
 		}
 
-		public void AddUnit(PlayerData player, UnitData unit)
+		public UnitView AddUnit(PlayerData player, UnitData unit)
 		{
 			string edenPath = player.isEden ? "Eden/" : "Plymouth/";
 			string weaponType = "";
@@ -153,6 +156,7 @@ namespace OP2MissionEditor.Systems.Map
 				GameObject goUnit = CreateUnit("Structures/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
 				StructureView view = goUnit.GetComponent<StructureView>();
 				view.Initialize(player, unit);
+				return view;
 			}
 			else
 			{
@@ -160,6 +164,7 @@ namespace OP2MissionEditor.Systems.Map
 				GameObject goUnit = CreateUnit("Vehicles/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
 				VehicleView view = goUnit.GetComponent<VehicleView>();
 				view.Initialize(player, unit);
+				return view;
 			}
 		}
 

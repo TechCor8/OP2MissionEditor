@@ -28,6 +28,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			RefreshTilesets();
 		}
 
+		private void OnEnable()
+		{
+			RefreshOverlay();
+		}
+
 		private void OnChangedUserData(UserData src)
 		{
 			RefreshTilesets();
@@ -133,6 +138,23 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			m_SelectedMappingIndex = (ulong)data;
 			m_IsPainting = true;
+
+			RefreshOverlay();
+		}
+
+		private void RefreshOverlay()
+		{
+			if (m_SelectedMappingIndex < 0 || m_SelectedMappingIndex >= UserData.current.map.GetTileMappingCount())
+				return;
+
+			// Get mapping and tileset data from mapping index
+			OP2UtilityDotNet.TileMapping mapping = UserData.current.map.GetTileMapping(m_SelectedMappingIndex);
+			string tilesetName = UserData.current.map.GetTilesetSourceFilename(mapping.tilesetIndex);
+			Texture2D tileset = TextureManager.GetTileset(tilesetName);
+			int numTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(mapping.tilesetIndex);
+
+			// Set overlay sprite to mapping
+			m_OverlayRenderer.SetOverlay(TextureManager.GetTileSprite(tileset, numTiles, mapping.tileGraphicIndex));
 		}
 
 		protected override void OnPaintTile(Vector2Int tileXY)

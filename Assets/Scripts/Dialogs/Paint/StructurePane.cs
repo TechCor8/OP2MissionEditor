@@ -43,6 +43,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 				btn.Initialize(OnClick_StructureButton, btn.name);
 		}
 
+		private void OnEnable()
+		{
+			RefreshOverlay();
+		}
+
 		private void OnChangedUserData(UserData src)
 		{
 			RefreshPlayerDropdown();
@@ -78,6 +83,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 				if (t.name == m_SelectedButtonName)
 					t.GetComponent<Toggle>().SetIsOnWithoutNotify(true);
 			}
+
+			RefreshOverlay();
 		}
 
 		public void OnChanged_SliderHealth(float value)
@@ -91,6 +98,22 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			// Only mines have variants
 			m_DropdownVariant.interactable = IsOreMineName(m_SelectedButtonName);
+
+			RefreshOverlay();
+		}
+
+		public void RefreshOverlay()
+		{
+			if (m_SelectedButtonName == null)
+				return;
+
+			UnitData structure = GetStructureData();
+			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			Vector2 offset = new Vector2(-structureSize.x / 2, -structureSize.y / 2);
+			offset *= m_Tilemap.cellSize;
+
+			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(player, structure), structureSize, offset);
 		}
 
 		protected override void OnPaintTile(Vector2Int tileXY)
@@ -98,9 +121,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Add game coordinates
 			tileXY += Vector2Int.one;
 
-			map_id selectedTypeID = GetMapIDFromName(m_SelectedButtonName);
-			map_id selectedCargoTypeID = GetCargoMapIDFromName(m_SelectedButtonName);
-			RectInt structureArea = GetStructureArea(tileXY, selectedTypeID);
+			UnitData structure = GetStructureData();
+			structure.position = new LOCATION(tileXY.x, tileXY.y);
+
+			RectInt structureArea = GetStructureArea(tileXY, structure.typeID);
 
 			// Check if area is not buildable
 			if (!IsAreaPassable(structureArea))
@@ -110,6 +134,16 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (AreUnitsInArea(structureArea))
 				return;
 
+			// Add structure to tile
+			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			player.units.Add(structure);
+			UserData.current.SetUnsaved();
+
+			m_UnitRenderer.AddUnit(player, structure);
+		}
+
+		private UnitData GetStructureData()
+		{
 			int id;
 			int.TryParse(m_InputID.text, out id);
 
@@ -118,12 +152,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			
 			// Standard info
 			structure.id = id;
-			structure.typeID = selectedTypeID;
-			structure.cargoType = (int)selectedCargoTypeID;
+			structure.typeID = GetMapIDFromName(m_SelectedButtonName);
+			structure.cargoType = (int)GetCargoMapIDFromName(m_SelectedButtonName);
 			structure.health = m_SliderHealth.value;
 			structure.barVariant = Variant.Random;
-			structure.position = new LOCATION(tileXY.x, tileXY.y);
-
+			
 			// Used for ore mines
 			if (IsOreMineName(m_SelectedButtonName))
 			{
@@ -131,12 +164,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 				structure.barVariant = GetVariant();
 			}
 
-			// Add structure to tile
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
-			player.units.Add(structure);
-			UserData.current.SetUnsaved();
-
-			m_UnitRenderer.AddUnit(player, structure);
+			return structure;
 		}
 
 		protected override void OnEraseTile(Vector2Int tileXY)
@@ -178,6 +206,31 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(structureToRemove);
+		}
+
+		protected override void OnOverTile(Vector2Int tileXY)
+		{
+			base.OnOverTile(tileXY);
+
+			// Add game coordinates
+			tileXY += Vector2Int.one;
+
+			UnitData structure = GetStructureData();
+			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			Vector2Int minOffset = new Vector2Int(-structureSize.x / 2, -structureSize.y / 2);
+
+			// Set each tile status based on collision within structure area
+			for (int x=0; x < structureSize.x; ++x)
+			{
+				for (int y=0; y < structureSize.y; ++y)
+				{
+					Vector2Int localTileXY = new Vector2Int(x,y);
+					Vector2Int curTileXY = tileXY + localTileXY + minOffset;
+					bool canPlace = IsTilePassable(curTileXY) && !AreUnitsInArea(new RectInt(curTileXY, Vector2Int.one));
+
+					m_OverlayRenderer.SetTileStatus(localTileXY, canPlace ? Color.green : Color.red);
+				}
+			}
 		}
 
 		private bool IsOreMineName(string name)

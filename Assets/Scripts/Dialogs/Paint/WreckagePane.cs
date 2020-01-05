@@ -68,6 +68,12 @@ namespace OP2MissionEditor.Dialogs.Paint
 			base.Awake();
 
 			RefreshWreckageTypes();
+			RefreshOverlay();
+		}
+
+		private void OnEnable()
+		{
+			RefreshOverlay();
 		}
 
 		private void RefreshWreckageTypes()
@@ -83,6 +89,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_DropdownWreckageTypes.AddOptions(wreckageNames);
 		}
 
+		private void RefreshOverlay()
+		{
+			m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(GetWreckageData()), Vector2Int.zero, Vector2.zero);
+		}
+
 		protected override void OnPaintTile(Vector2Int tileXY)
 		{
 			// Add game coordinates
@@ -92,6 +103,19 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (UserData.current.mission.tethysGame.wreckage.Find((w) => w.position.x == tileXY.x && w.position.y == tileXY.y) != null)
 				return;
 
+			// Create wreckage data
+			GameData.Wreckage wreck = GetWreckageData();
+			wreck.position = new LOCATION(tileXY.x, tileXY.y);
+
+			// Add wreckage to tile
+			UserData.current.mission.tethysGame.wreckage.Add(wreck);
+			UserData.current.SetUnsaved();
+
+			m_UnitRenderer.AddUnit(wreck);
+		}
+
+		private GameData.Wreckage GetWreckageData()
+		{
 			int id;
 			int.TryParse(m_InputID.text, out id);
 
@@ -100,13 +124,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			wreck.id = id;
 			wreck.techID = m_WreckageTypes[m_DropdownWreckageTypes.value];
 			wreck.isVisible = m_IsVisible.isOn;
-			wreck.position = new LOCATION(tileXY.x, tileXY.y);
 
-			// Add wreckage to tile
-			UserData.current.mission.tethysGame.wreckage.Add(wreck);
-			UserData.current.SetUnsaved();
-
-			m_UnitRenderer.AddUnit(wreck);
+			return wreck;
 		}
 
 		protected override void OnEraseTile(Vector2Int tileXY)
