@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,6 +13,8 @@ namespace OP2MissionEditor.Systems.Map
 		[SerializeField] private UnitRenderer m_UnitRenderer	= default;
 
 		private Tilemap m_Tilemap;
+		private Dictionary<string, Dictionary<int, TileBase>> m_TileCache = new Dictionary<string, Dictionary<int, TileBase>>();
+		private TileBase[] m_CellTypeCache;
 
 		public Texture2D minimapTexture			{ get; private set; }
 
@@ -28,7 +31,30 @@ namespace OP2MissionEditor.Systems.Map
 
 			UserPrefs.onChangedPrefsCB += OnChangedPrefs;
 
+			InitializeCellTypeCache();
 			HideCellTypeMap();
+		}
+
+		private void InitializeCellTypeCache()
+		{
+			m_CellTypeCache = new TileBase[32];
+
+			for (int i=0; i < m_CellTypeCache.Length; ++i)
+				m_CellTypeCache[i] = GetCellTypeTile(i);
+		}
+
+		private TileBase GetCellTypeTile(int cellType)
+		{
+			Tile tile = ScriptableObject.CreateInstance<Tile>();
+			tile.sprite = GetCellTypeSprite((OP2UtilityDotNet.CellType)cellType);
+			tile.color = Color.white;
+
+			return tile;
+		}
+
+		public Sprite GetCellTypeSprite(OP2UtilityDotNet.CellType cellType)
+		{
+			return Resources.Load<Sprite>("CellTypes/" + cellType.ToString());
 		}
 
 		private void OnChangedPrefs()
@@ -69,6 +95,8 @@ namespace OP2MissionEditor.Systems.Map
 			m_GridOverlay.ClearAllTiles();
 			m_CellTypeMap.ClearAllTiles();
 
+			m_TileCache.Clear();
+
 			uint mapWidth = UserData.current.map.GetWidthInTiles();
 			uint mapHeight = UserData.current.map.GetHeightInTiles();
 
@@ -79,11 +107,11 @@ namespace OP2MissionEditor.Systems.Map
 			TileBase[] cellTypes = new TileBase[(int)(mapWidth*mapHeight)];
 			int index = 0;
 
-			int updateFrequency = (int)mapWidth / 100;
+			int updateFrequency = 5;
 
 			for (uint x=0; x < mapWidth; ++x)
 			{
-				if (updateFrequency == 0 || x % updateFrequency == 0)
+				if (index % updateFrequency == 0)
 				{
 					onMapRefreshProgressCB?.Invoke(this, "Reading tiles", (float)(x*mapHeight) / (mapWidth*mapHeight));
 					yield return null;
@@ -112,19 +140,33 @@ namespace OP2MissionEditor.Systems.Map
 					int inverseTileIndex = tileSetNumTiles-tileImageIndex-1;
 					int texOffset = inverseTileIndex * tileSize;
 
-					// Create sprite
-					Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
-						
-					// Load sprite into tile map
-					Tile tile = ScriptableObject.CreateInstance<Tile>();
-					tile.sprite = tileSprite;
-					tile.color = Color.white;
+					// Get tileset tile cache
+					Dictionary<int, TileBase> tileCache;
+					if (!m_TileCache.TryGetValue(tileSetPath, out tileCache))
+					{
+						tileCache = new Dictionary<int, TileBase>();
+						m_TileCache.Add(tileSetPath, tileCache);
+					}
 
+					// Get tile from cache
+					TileBase tile;
+					if (!tileCache.TryGetValue(texOffset, out tile))
+					{
+						// Create new tile
+						Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+						Tile tile2 = ScriptableObject.CreateInstance<Tile>();
+						tile2.sprite = tileSprite;
+						tile2.color = Color.white;
+						tileCache.Add(texOffset, tile2);
+						tile = tile2;
+					}
+						
+					// Load tile into tile map
 					Vector3Int cellPosition = new Vector3Int((int)x,(int)(mapHeight-y-1),0);
 
 					cellPositions[index] = cellPosition;
 					cellTiles[index] = tile;
-					cellTypes[index] = GetCellTypeTile(UserData.current.map.GetCellType(x, y));
+					cellTypes[index] = m_CellTypeCache[UserData.current.map.GetCellType(x, y)];
 
 					++cellPosition.y;
 
@@ -150,15 +192,26 @@ namespace OP2MissionEditor.Systems.Map
 			yield return null;
 
 			// Set tiles
+			System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 			m_Tilemap.SetTiles(cellPositions, cellTiles);
+			sw.Stop();
+			Debug.Log(sw.Elapsed.TotalMilliseconds);
+
+			// Create cell types
+			onMapRefreshProgressCB?.Invoke(this, "Setting cell types", 1);
+			yield return null;
+
+			m_CellTypeMap.SetTiles(cellPositions, cellTypes);
+
+			// Create grid
+			onMapRefreshProgressCB?.Invoke(this, "Creating grid", 1);
+			yield return null;
 
 			TileBase[] overlayTiles = new TileBase[cellPositions.Length];
 			for (int i = 0; i < overlayTiles.Length; ++i)
 				overlayTiles[i] = gridOverlayTile;
 
 			m_GridOverlay.SetTiles(cellPositions, overlayTiles);
-
-			m_CellTypeMap.SetTiles(cellPositions, cellTypes);
 
 			// Apply minimap texture
 			minimapTexture.Apply();
@@ -213,22 +266,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Set tiles
 			m_Tilemap.SetTile(cellPosition, tile);
-			m_CellTypeMap.SetTile(cellPosition, GetCellTypeTile(UserData.current.map.GetCellType(x, y)));
+			m_CellTypeMap.SetTile(cellPosition, m_CellTypeCache[UserData.current.map.GetCellType(x, y)]);
 			minimapTexture.Apply();
-		}
-
-		private TileBase GetCellTypeTile(int cellType)
-		{
-			Tile tile = ScriptableObject.CreateInstance<Tile>();
-			tile.sprite = GetCellTypeSprite((OP2UtilityDotNet.CellType)cellType);
-			tile.color = Color.white;
-
-			return tile;
-		}
-
-		public Sprite GetCellTypeSprite(OP2UtilityDotNet.CellType cellType)
-		{
-			return Resources.Load<Sprite>("CellTypes/" + cellType.ToString());
 		}
 	}
 }
