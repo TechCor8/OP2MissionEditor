@@ -72,7 +72,7 @@ namespace OP2MissionEditor.Systems.Map
 			uint mapWidth = UserData.current.map.GetWidthInTiles();
 			uint mapHeight = UserData.current.map.GetHeightInTiles();
 
-			minimapTexture = new Texture2D((int)mapWidth, (int)mapHeight, TextureFormat.ARGB32, false);
+			minimapTexture = new Texture2D((int)mapWidth*TextureManager.minimapScale, (int)mapHeight*TextureManager.minimapScale, TextureFormat.ARGB32, false);
 
 			Vector3Int[] cellPositions = new Vector3Int[(int)(mapWidth*mapHeight)];
 			TileBase[] cellTiles = new TileBase[(int)(mapWidth*mapHeight)];
@@ -126,10 +126,18 @@ namespace OP2MissionEditor.Systems.Map
 					cellTiles[index] = tile;
 					cellTypes[index] = GetCellTypeTile(UserData.current.map.GetCellType(x, y));
 
+					++cellPosition.y;
+
 					// Set minimap pixel
 					Texture2D mTexture = TextureManager.LoadMinimapTileset(tileSetPath, tileSetNumTiles);
-					Color color = mTexture.GetPixel(0, inverseTileIndex);
-					minimapTexture.SetPixel(cellPosition.x, cellPosition.y, color);
+					for (int my=0; my < TextureManager.minimapScale; ++my)
+					{
+						for (int mx=0; mx < TextureManager.minimapScale; ++mx)
+						{
+							Color color = mTexture.GetPixel(mx, inverseTileIndex*TextureManager.minimapScale + my);
+							minimapTexture.SetPixel(cellPosition.x*TextureManager.minimapScale + mx, cellPosition.y*TextureManager.minimapScale + my - 1, color);
+						}
+					}
 						
 					++index;
 				}

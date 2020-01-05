@@ -16,6 +16,8 @@ namespace OP2MissionEditor.Systems
 		private static string m_ArchiveDirectory;
 		private static ResourceManager m_ResourceManager;
 
+		public const int minimapScale = 4;
+
 
 		/// <summary>
 		/// Initializes the texture manager for use.
@@ -112,13 +114,18 @@ namespace OP2MissionEditor.Systems
 				return null;
 
 			// Create minimap tileset
-			Texture2D minimapTileset = new Texture2D(1, tileSetNumTiles, TextureFormat.ARGB32, false);
-			Color[] scaledTiles = new Color[tileSetNumTiles];
+			Texture2D minimapTileset = new Texture2D(minimapScale, tileSetNumTiles*minimapScale, TextureFormat.ARGB32, false);
+			Color[] scaledTiles = new Color[minimapScale*tileSetNumTiles*minimapScale];
 
-			int tileHeight = tilesetTexture.height / tileSetNumTiles;
+			int tileWidth = tilesetTexture.width / minimapScale;
+			int tileHeight = tilesetTexture.height / (tileSetNumTiles*minimapScale);
 
-			for (int i=0; i < tileSetNumTiles; ++i)
-				scaledTiles[i] = GetTileColor(tilesetTexture, i * tileHeight, tilesetTexture.width, tileHeight);
+
+			for (int y=0; y < tileSetNumTiles*minimapScale; ++y)
+			{
+				for (int x=0; x < minimapScale; ++x)
+					scaledTiles[x+y*minimapScale] = GetTileColor(tilesetTexture, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+			}
 
 			minimapTileset.SetPixels(scaledTiles);
 			minimapTileset.Apply();
@@ -127,9 +134,9 @@ namespace OP2MissionEditor.Systems
 			return minimapTileset;
 		}
 
-		private static Color GetTileColor(Texture2D tileTexture, int tileOffset, int tileWidth, int tileHeight)
+		private static Color GetTileColor(Texture2D tileTexture, int tileOffsetX, int tileOffsetY, int tileWidth, int tileHeight)
 		{
-			Color[] tilePixels = tileTexture.GetPixels(0,tileOffset, tileWidth, tileHeight, 0);
+			Color[] tilePixels = tileTexture.GetPixels(tileOffsetX,tileOffsetY, tileWidth, tileHeight, 0);
 
 			Color avgColor = Color.black;
 

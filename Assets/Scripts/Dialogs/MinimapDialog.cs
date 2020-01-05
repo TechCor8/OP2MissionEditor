@@ -22,6 +22,8 @@ namespace OP2MissionEditor.Dialogs
 		private bool m_IsMouseOverMinimap;
 		private bool m_IsPainting;
 
+		private Vector2Int m_MapSize;
+
 
 		private void Initialize(MapRenderer mapRenderer, OnCloseCallback onCloseCB)
 		{
@@ -31,12 +33,14 @@ namespace OP2MissionEditor.Dialogs
 			mapRenderer.onMapRefreshedCB += OnMapRefreshed;
 
 			m_MinimapImage.texture = mapRenderer.minimapTexture;
+			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
 		}
 
 		private void OnMapRefreshed(MapRenderer mapRenderer)
 		{
 			// Update minimap texture
 			m_MinimapImage.texture = mapRenderer.minimapTexture;
+			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
 		}
 
 		public void OnPointerEnter(BaseEventData evData)
@@ -70,7 +74,7 @@ namespace OP2MissionEditor.Dialogs
 
 				// Move camera to position clicked on minimap
 				Vector3 cameraPosition	= Camera.main.transform.position;
-				Vector2 mapSize			= new Vector2(m_MinimapImage.texture.width*32, m_MinimapImage.texture.height*32);
+				Vector2 mapSize			= new Vector2(m_MapSize.x*32, m_MapSize.y*32);
 
 				cameraPosition = new Vector3(percPosition.x * mapSize.x, percPosition.y * mapSize.y, cameraPosition.z);
 				Camera.main.transform.position = cameraPosition;
@@ -86,7 +90,7 @@ namespace OP2MissionEditor.Dialogs
 			// Get information about camera, map and minimap
 			Vector3 cameraPosition	= Camera.main.transform.position;
 			Vector2 cameraSize		= new Vector2(Camera.main.orthographicSize*2 * Camera.main.aspect, Camera.main.orthographicSize*2);
-			Vector2 mapSize			= new Vector2(m_MinimapImage.texture.width*32, m_MinimapImage.texture.height*32);
+			Vector2 mapSize			= new Vector2(m_MapSize.x*32, m_MapSize.y*32);
 			Vector2 minimapSize		= m_MinimapImage.rectTransform.rect.size;
 			Vector2 minimapScale	= new Vector2(minimapSize.x / mapSize.x, minimapSize.y / mapSize.y);
 
