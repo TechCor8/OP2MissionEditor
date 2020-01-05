@@ -192,11 +192,8 @@ namespace OP2MissionEditor.Systems.Map
 			yield return null;
 
 			// Set tiles
-			System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 			m_Tilemap.SetTiles(cellPositions, cellTiles);
-			sw.Stop();
-			Debug.Log(sw.Elapsed.TotalMilliseconds);
-
+			
 			// Create cell types
 			onMapRefreshProgressCB?.Invoke(this, "Setting cell types", 1);
 			yield return null;
