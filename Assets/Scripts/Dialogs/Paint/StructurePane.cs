@@ -109,6 +109,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			UnitData structure = GetStructureData();
 			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			structureSize += new Vector2Int(2, 2); // Bulldozed area
 			Vector2 offset = new Vector2(-structureSize.x / 2, -structureSize.y / 2);
 			offset *= m_Tilemap.cellSize;
 
@@ -125,9 +126,12 @@ namespace OP2MissionEditor.Dialogs.Paint
 			structure.position = new LOCATION(tileXY.x, tileXY.y);
 
 			RectInt structureArea = GetStructureArea(tileXY, structure.typeID);
+			RectInt bulldozedArea = structureArea;
+			bulldozedArea.min -= Vector2Int.one;
+			bulldozedArea.max += Vector2Int.one;
 
 			// Check if area is not buildable
-			if (!IsAreaPassable(structureArea))
+			if (!IsAreaPassable(bulldozedArea))
 				return;
 
 			// Check if area is blocked by units or structures
@@ -217,6 +221,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			UnitData structure = GetStructureData();
 			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			structureSize += new Vector2Int(2,2); // Bulldozed area
 			Vector2Int minOffset = new Vector2Int(-structureSize.x / 2, -structureSize.y / 2);
 
 			// Set each tile status based on collision within structure area
@@ -226,9 +231,21 @@ namespace OP2MissionEditor.Dialogs.Paint
 				{
 					Vector2Int localTileXY = new Vector2Int(x,y);
 					Vector2Int curTileXY = tileXY + localTileXY + minOffset;
-					bool canPlace = IsTilePassable(curTileXY) && !AreUnitsInArea(new RectInt(curTileXY, Vector2Int.one));
 
-					m_OverlayRenderer.SetTileStatus(localTileXY, canPlace ? Color.green : Color.red);
+					bool isInBulldozedArea = x == 0 || y ==0 || x == structureSize.x-1 || y == structureSize.y-1;
+
+					// Structures can't be placed on impassable terrain, including bulldozed area
+					bool canPlace = IsTilePassable(curTileXY);
+
+					// Structures can have units in bulldozed area, but not in building area
+					if (canPlace && !isInBulldozedArea)
+						canPlace = !AreUnitsInArea(new RectInt(curTileXY, Vector2Int.one));
+
+					Color color = Color.red;
+					if (canPlace)
+						color = isInBulldozedArea ? Color.yellow : Color.green;
+
+					m_OverlayRenderer.SetTileStatus(localTileXY, color);
 				}
 			}
 		}
