@@ -140,28 +140,8 @@ namespace OP2MissionEditor.Systems.Map
 					int inverseTileIndex = tileSetNumTiles-tileImageIndex-1;
 					int texOffset = inverseTileIndex * tileSize;
 
-					// Get tileset tile cache
-					Dictionary<int, TileBase> tileCache;
-					if (!m_TileCache.TryGetValue(tileSetPath, out tileCache))
-					{
-						tileCache = new Dictionary<int, TileBase>();
-						m_TileCache.Add(tileSetPath, tileCache);
-					}
-
-					// Get tile from cache
-					TileBase tile;
-					if (!tileCache.TryGetValue(texOffset, out tile))
-					{
-						// Create new tile
-						Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
-						Tile tile2 = ScriptableObject.CreateInstance<Tile>();
-						tile2.sprite = tileSprite;
-						tile2.color = Color.white;
-						tileCache.Add(texOffset, tile2);
-						tile = tile2;
-					}
-						
 					// Load tile into tile map
+					TileBase tile = LoadTile(tileSetPath, texOffset);
 					Vector3Int cellPosition = new Vector3Int((int)x,(int)(mapHeight-y-1),0);
 
 					cellPositions[index] = cellPosition;
@@ -246,14 +226,8 @@ namespace OP2MissionEditor.Systems.Map
 			int inverseTileIndex = tileSetNumTiles-tileImageIndex-1;
 			int texOffset = inverseTileIndex * tileSize;
 
-			// Create sprite
-			Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
-						
-			// Load sprite into tile
-			Tile tile = ScriptableObject.CreateInstance<Tile>();
-			tile.sprite = tileSprite;
-			tile.color = Color.white;
-
+			// Load tile into tile map
+			TileBase tile = LoadTile(tileSetPath, texOffset);
 			Vector3Int cellPosition = new Vector3Int((int)x,m_Tilemap.size.y-(int)y-1,0);
 
 			// Set minimap pixel
@@ -265,6 +239,37 @@ namespace OP2MissionEditor.Systems.Map
 			m_Tilemap.SetTile(cellPosition, tile);
 			m_CellTypeMap.SetTile(cellPosition, m_CellTypeCache[UserData.current.map.GetCellType(x, y)]);
 			minimapTexture.Apply();
+		}
+
+		private TileBase LoadTile(string tileSetPath, int texOffset)
+		{
+			// Get tile texture
+			Texture2D texture = TextureManager.LoadTileset(tileSetPath);
+			if (texture == null)
+				return null;
+
+			// Get tileset tile cache
+			Dictionary<int, TileBase> tileCache;
+			if (!m_TileCache.TryGetValue(tileSetPath, out tileCache))
+			{
+				tileCache = new Dictionary<int, TileBase>();
+				m_TileCache.Add(tileSetPath, tileCache);
+			}
+
+			// Get tile from cache
+			TileBase tile;
+			if (!tileCache.TryGetValue(texOffset, out tile))
+			{
+				// Create new tile
+				Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+				Tile tile2 = ScriptableObject.CreateInstance<Tile>();
+				tile2.sprite = tileSprite;
+				tile2.color = Color.white;
+				tileCache.Add(texOffset, tile2);
+				tile = tile2;
+			}
+
+			return tile;
 		}
 	}
 }
