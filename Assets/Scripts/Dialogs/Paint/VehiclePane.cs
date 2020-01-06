@@ -35,6 +35,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			UserData.current.onChangedValuesCB += OnChangedUserData;
 
+			RefreshPlayerDropdown();
 			OnChanged_Player(m_DropdownPlayer.value);
 
 			m_DropdownCargoSubtype.gameObject.SetActive(false);
@@ -90,7 +91,46 @@ namespace OP2MissionEditor.Dialogs.Paint
 					t.GetComponent<Toggle>().SetIsOnWithoutNotify(true);
 			}
 
+			RefreshIconColors();
+
 			RefreshOverlay();
+		}
+
+		private void RefreshIconColors()
+		{
+			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+
+			// Refresh Eden icons
+			foreach (Image button in GetIcons(m_ButtonContainerEden))
+			{
+				Material mat = Instantiate(button.material);
+				mat.name = "UnitIconMaterial(clone)";
+				mat.SetInt("_PaletteIndex", (int)player.color);
+				button.material = mat;
+			}
+
+			// Refresh Plymouth icons
+			foreach (Image button in GetIcons(m_ButtonContainerPlymouth))
+			{
+				Material mat = Instantiate(button.material);
+				mat.name = "UnitIconMaterial(clone)";
+				mat.SetInt("_PaletteIndex", (int)player.color);
+				button.material = mat;
+			}
+		}
+
+		private List<Image> GetIcons(Transform container)
+		{
+			List<Image> icons = new List<Image>();
+
+			Image[] buttons = container.GetComponentsInChildren<Image>(true);
+			foreach (Image button in buttons)
+			{
+				if (button.name == "TileImage" || button.name == "WeaponImage")
+					icons.Add(button);
+			}
+
+			return icons;
 		}
 
 		public void OnChanged_SliderHealth(float value)
