@@ -28,6 +28,11 @@ namespace OP2MissionEditor.Systems.Map
 		public event OnCallback onRefreshedCB;
 
 
+		private void Start()
+		{
+			unitMinimap.CreateMinimap();
+		}
+
 		/// <summary>
 		/// Refreshes the map units with data from UserData.
 		/// </summary>

@@ -39,9 +39,12 @@ namespace OP2MissionEditor.Systems.Map
 			m_Units.Clear();
 
 			// Create texture
-			minimapTexture = new Texture2D((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles(), TextureFormat.ARGB32, false);
-			minimapTexture.SetPixels32(new Color32[UserData.current.map.GetWidthInTiles()*UserData.current.map.GetHeightInTiles()]);
-			minimapTexture.Apply();
+			if (UserData.current.map.GetWidthInTiles() > 0)
+			{
+				minimapTexture = new Texture2D((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles(), TextureFormat.ARGB32, false);
+				minimapTexture.SetPixels32(new Color32[UserData.current.map.GetWidthInTiles() * UserData.current.map.GetHeightInTiles()]);
+				minimapTexture.Apply();
+			}
 
 			// Create state map
 			m_UnitMap = new List<UnitMapState>[UserData.current.map.GetWidthInTiles(), UserData.current.map.GetHeightInTiles()];
