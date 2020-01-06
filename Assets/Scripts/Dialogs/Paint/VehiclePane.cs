@@ -66,6 +66,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			m_DropdownPlayer.ClearOptions();
 			m_DropdownPlayer.AddOptions(options);
+
+			OnChanged_Player(0);
 		}
 
 		public void OnChanged_Player(int index)
@@ -137,7 +139,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (m_SelectedButtonName == "StartLocation")
 			{
 				StartLocationView startLocationView = Instantiate(Resources.Load<GameObject>("Game/StartLocation")).GetComponent<StartLocationView>();
-				startLocationView.Initialize(m_Tilemap, m_UnitRenderer.unitMinimap);
+				startLocationView.Initialize(m_Tilemap, m_UnitRenderer);
 				startLocationView.Initialize(player);
 				m_OverlayRenderer.SetOverlay(startLocationView, Vector2Int.zero, Vector2.zero);
 			}

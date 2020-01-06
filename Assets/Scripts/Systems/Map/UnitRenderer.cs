@@ -222,7 +222,7 @@ namespace OP2MissionEditor.Systems.Map
 			goUnit.transform.SetParent(parent);
 			goUnit.transform.localScale = Vector3.one;
 			UnitView unit = goUnit.GetComponent<UnitView>();
-			unit.Initialize(m_Tilemap, unitMinimap);
+			unit.Initialize(m_Tilemap, this);
 			unit.SetPosition(gridPosition);
 
 			return goUnit;

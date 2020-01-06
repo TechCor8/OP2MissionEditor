@@ -62,6 +62,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			m_DropdownPlayer.ClearOptions();
 			m_DropdownPlayer.AddOptions(options);
+
+			OnChanged_Player(0);
 		}
 
 		public void OnChanged_Player(int index)

@@ -297,7 +297,10 @@ namespace OP2MissionEditor.Dialogs
 			m_UserData.mission.levelDetails.numPlayers = m_Players.Count;
 
 			if (m_SelectedPlayer == null)
+			{
+				m_UserData.Dirty();
 				return;
+			}
 
 			m_SelectedPlayer.isEden					= m_DropdownColonyType.value == 0;
 			m_SelectedPlayer.color					= (PlayerColor)m_DropdownColor.value;
@@ -317,6 +320,8 @@ namespace OP2MissionEditor.Dialogs
 			m_SelectedPlayer.commonOre				= GetValueFromInputField(m_InputCommonMetal, "Common Metal", m_SelectedPlayer.commonOre);
 			m_SelectedPlayer.rareOre				= GetValueFromInputField(m_InputRareMetal, "Rare Metal", m_SelectedPlayer.rareOre);
 			m_SelectedPlayer.food					= GetValueFromInputField(m_InputFood, "Food", m_SelectedPlayer.food);
+
+			m_UserData.Dirty();
 		}
 
 		private int GetValueFromInputField(InputField input, string fieldName, int originalValue)

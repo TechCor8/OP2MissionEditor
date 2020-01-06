@@ -19,6 +19,8 @@ namespace OP2MissionEditor.Systems.Map
 		[SerializeField] private Sprite[] m_BodySprites				= default;
 		[SerializeField] private Sprite[] m_WeaponSprites			= default;
 
+		private bool m_IsEden;
+
 		public PlayerData player	{ get; private set; }
 		public UnitData unit		{ get; private set; }
 
@@ -27,6 +29,10 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.player = player;
 			this.unit = unit;
+
+			m_IsEden = player.isEden;
+
+			UserData.current.onChangedValuesCB += OnChanged_MissionData;
 
 			// Set displayed sprite based on direction
 			m_Renderer.sprite = m_BodySprites[(int)unit.direction];
@@ -49,6 +55,40 @@ namespace OP2MissionEditor.Systems.Map
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(unit.position.x, unit.position.y)), 2);
 
 			RefreshOverlay();
+		}
+
+		private void OnChanged_MissionData(UserData src)
+		{
+			// Check if player was destroyed
+			bool foundPlayer = false;
+			foreach (PlayerData pData in UserData.current.mission.players)
+			{
+				if (pData == player)
+				{
+					foundPlayer = true;
+					break;
+				}
+			}
+
+			if (!foundPlayer)
+			{
+				// Unit is no longer tied to a player. Destroy it.
+				Destroy(gameObject);
+				return;
+			}
+
+			if (player.isEden != m_IsEden)
+			{
+				// Player colony changed. Need to reinstantiate the unit.
+				Destroy(gameObject);
+				m_UnitRenderer.AddUnit(player, unit);
+				return;
+			}
+
+			// Update player color
+			m_Renderer.material.SetInt("_PaletteIndex", (int)player.color);
+			m_WeaponRenderer.material.SetInt("_PaletteIndex", (int)player.color);
+			m_UnitMinimap.MoveUnit(this, GetMapCoordinates(new Vector2Int(unit.position.x, unit.position.y)));
 		}
 
 		public override Color GetMinimapColor()
@@ -126,6 +166,13 @@ namespace OP2MissionEditor.Systems.Map
 
 			m_HealthFrame.gameObject.SetActive(false);
 			m_HealthBar.gameObject.SetActive(false);
+		}
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+
+			UserData.current.onChangedValuesCB -= OnChanged_MissionData;
 		}
 	}
 }

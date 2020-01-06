@@ -18,12 +18,39 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.player = player;
 
+			UserData.current.onChangedValuesCB += OnChanged_MissionData;
+
 			m_ColorOverlay.color = GetPlayerColor();
 
 			// Add to minimap
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(player.centerView.x, player.centerView.y)), 4);
 
 			RefreshOverlay();
+		}
+
+		private void OnChanged_MissionData(UserData src)
+		{
+			// Check if player was destroyed
+			bool foundPlayer = false;
+			foreach (PlayerData pData in UserData.current.mission.players)
+			{
+				if (pData == player)
+				{
+					foundPlayer = true;
+					break;
+				}
+			}
+
+			if (!foundPlayer)
+			{
+				// Unit is no longer tied to a player. Destroy it.
+				Destroy(gameObject);
+				return;
+			}
+
+			// Update player color
+			m_ColorOverlay.color = GetPlayerColor();
+			m_UnitMinimap.MoveUnit(this, GetMapCoordinates(new Vector2Int(player.centerView.x, player.centerView.y)));
 		}
 
 		public override Color GetMinimapColor()
@@ -45,6 +72,13 @@ namespace OP2MissionEditor.Systems.Map
 			}
 
 			return Color.white;
+		}
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+
+			UserData.current.onChangedValuesCB -= OnChanged_MissionData;
 		}
 	}
 }

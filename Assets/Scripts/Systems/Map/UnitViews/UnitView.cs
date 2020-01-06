@@ -10,6 +10,7 @@ namespace OP2MissionEditor.Systems.Map
 	{
 		private Tilemap m_Tilemap;
 		protected UnitMinimap m_UnitMinimap;
+		protected UnitRenderer m_UnitRenderer;
 
 		private bool m_CanShowTextOverlay = true;
 		private bool m_IsUnitOverlayVisible;
@@ -20,10 +21,11 @@ namespace OP2MissionEditor.Systems.Map
 			UserPrefs.onChangedPrefsCB += OnChangedPrefs;
 		}
 
-		public void Initialize(Tilemap tilemap, UnitMinimap unitMinimap)
+		public void Initialize(Tilemap tilemap, UnitRenderer unitRenderer)
 		{
 			m_Tilemap = tilemap;
-			m_UnitMinimap = unitMinimap;
+			m_UnitMinimap = unitRenderer.unitMinimap;
+			m_UnitRenderer = unitRenderer;
 		}
 
 		public void SetPosition(Vector2Int gridPosition)
@@ -91,7 +93,7 @@ namespace OP2MissionEditor.Systems.Map
 		protected virtual void OnHideTextOverlay() { }
 
 
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			UserPrefs.onChangedPrefsCB -= OnChangedPrefs;
 
