@@ -11,6 +11,7 @@ namespace OP2MissionEditor.Dialogs
 	/// </summary>
 	public class MinimapDialog : MonoBehaviour
 	{
+		[SerializeField] private RectTransform m_Frame				= default;
 		[SerializeField] private RawImage m_MinimapImage			= default;
 		[SerializeField] private RawImage m_MinimapUnitImage		= default;
 		[SerializeField] private RectTransform m_MinimapBounds		= default;
@@ -35,9 +36,7 @@ namespace OP2MissionEditor.Dialogs
 
 			mapRenderer.onMapRefreshedCB += OnMapRefreshed;
 
-			m_MinimapImage.texture = mapRenderer.minimapTexture;
-			m_MinimapUnitImage.texture = unitRenderer.unitMinimap.minimapTexture;
-			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
+			OnMapRefreshed(mapRenderer);
 		}
 
 		private void OnMapRefreshed(MapRenderer mapRenderer)
@@ -46,6 +45,14 @@ namespace OP2MissionEditor.Dialogs
 			m_MinimapImage.texture = mapRenderer.minimapTexture;
 			m_MinimapUnitImage.texture = m_UnitRenderer.unitMinimap.minimapTexture;
 			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
+
+			// Don't change aspect if map has not yet been initialized
+			if (m_MapSize.y == 0)
+				return;
+
+			// Adjust window to match map aspect ratio
+			float mapAspect = (float)m_MapSize.x / m_MapSize.y;
+			m_Frame.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_Frame.rect.height * mapAspect);
 		}
 
 		public void OnPointerEnter(BaseEventData evData)

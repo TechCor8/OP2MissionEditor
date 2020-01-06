@@ -277,6 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a3fcbd37820e14ab248a5b1d49d5bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Frame: {fileID: 1469346310271924762}
   m_MinimapImage: {fileID: 245902978233959846}
   m_MinimapUnitImage: {fileID: 341218765514125748}
   m_MinimapBounds: {fileID: 4200326624094267559}

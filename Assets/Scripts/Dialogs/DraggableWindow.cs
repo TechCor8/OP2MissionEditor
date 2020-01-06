@@ -39,5 +39,11 @@ namespace OP2MissionEditor.Dialogs
 
 			m_DraggableWindow.anchoredPosition = position;
 		}
+
+		private void OnRectTransformDimensionsChange()
+		{
+			// If window has changed size, keep it in bounds
+			OnEndDrag(null);
+		}
 	}
 }
