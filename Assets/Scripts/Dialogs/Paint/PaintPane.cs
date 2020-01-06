@@ -94,16 +94,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		protected virtual void OnOverTile(Vector2Int tileXY)
 		{
-			// Invert Y to match data storage instead of render value
-			tileXY.y = m_Tilemap.size.y-tileXY.y-1;
-
-			Vector3 worldPt = m_Tilemap.CellToWorld((Vector3Int)tileXY);
-
-			// Center point in tile
-			worldPt.x += m_Tilemap.cellSize.x / 2.0f;
-			worldPt.y += m_Tilemap.cellSize.y / 2.0f;
-			
-			m_OverlayRenderer.SetPosition(worldPt);
+			m_OverlayRenderer.SetPosition(m_Tilemap, tileXY + Vector2Int.one); // Adds game coordinates
 		}
 	}
 }

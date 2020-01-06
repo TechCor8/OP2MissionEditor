@@ -17,6 +17,9 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.marker = marker;
 
+			// Add to minimap
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(marker.position.x, marker.position.y)), 3);
+
 			RefreshOverlay();
 		}
 

@@ -20,7 +20,15 @@ namespace OP2MissionEditor.Systems.Map
 
 			m_ColorOverlay.color = GetPlayerColor();
 
+			// Add to minimap
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(player.centerView.x, player.centerView.y)), 4);
+
 			RefreshOverlay();
+		}
+
+		public override Color GetMinimapColor()
+		{
+			return GetPlayerColor();
 		}
 
 		private Color GetPlayerColor()

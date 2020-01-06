@@ -20,6 +20,9 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.wreck = wreck;
 
+			// Add to minimap
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(wreck.position.x, wreck.position.y)), 1);
+
 			RefreshOverlay();
 		}
 

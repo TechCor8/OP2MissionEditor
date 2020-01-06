@@ -18,6 +18,9 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			this.beacon = beacon;
 
+			// Add to minimap
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(beacon.position.x, beacon.position.y)), 1);
+
 			RefreshOverlay();
 		}
 

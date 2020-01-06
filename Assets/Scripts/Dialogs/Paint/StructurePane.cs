@@ -168,6 +168,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 				structure.barVariant = GetVariant();
 			}
 
+			structure.position = new DataLocation(new LOCATION(1,1));
+
 			return structure;
 		}
 

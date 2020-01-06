@@ -124,6 +124,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			wreck.id = id;
 			wreck.techID = m_WreckageTypes[m_DropdownWreckageTypes.value];
 			wreck.isVisible = m_IsVisible.isOn;
+			wreck.position = new DataLocation(new LOCATION(1,1));
 
 			return wreck;
 		}

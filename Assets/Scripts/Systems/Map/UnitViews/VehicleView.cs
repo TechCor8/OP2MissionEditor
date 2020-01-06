@@ -45,7 +45,31 @@ namespace OP2MissionEditor.Systems.Map
 			m_WeaponRenderer.material.SetInt("_PaletteIndex", (int)player.color);
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
+			// Add to minimap
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(unit.position.x, unit.position.y)), 2);
+
 			RefreshOverlay();
+		}
+
+		public override Color GetMinimapColor()
+		{
+			return GetPlayerColor();
+		}
+
+		private Color GetPlayerColor()
+		{
+			switch (player.color)
+			{
+				case PlayerColor.Blue:		return Color.blue;
+				case PlayerColor.Red:		return Color.red;
+				case PlayerColor.Green:		return Color.green;
+				case PlayerColor.Yellow:	return Color.yellow;
+				case PlayerColor.Cyan:		return Color.cyan;
+				case PlayerColor.Magenta:	return Color.magenta;
+				case PlayerColor.Black:		return Color.black;
+			}
+
+			return Color.white;
 		}
 
 		protected override void OnShowTextOverlay()

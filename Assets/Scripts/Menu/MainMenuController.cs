@@ -32,6 +32,7 @@ namespace OP2MissionEditor.Menu
 
 		[SerializeField] private CanvasGroup m_CanvasGroup		= default;
 		[SerializeField] private MapRenderer m_MapRenderer		= default;
+		[SerializeField] private UnitRenderer m_UnitRenderer	= default;
 
 		[SerializeField] private MenuOption[] m_MenuOptions		= default;
 
@@ -370,7 +371,7 @@ namespace OP2MissionEditor.Menu
 			}
 
 			// Open Minimap
-			MinimapDialog minimapDlg = MinimapDialog.Create(m_MapRenderer);
+			MinimapDialog minimapDlg = MinimapDialog.Create(m_MapRenderer, m_UnitRenderer);
 
 			// Set minimap to top-right corner
 			RectTransform rTransform = minimapDlg.transform.GetChild(0).GetComponent<RectTransform>();

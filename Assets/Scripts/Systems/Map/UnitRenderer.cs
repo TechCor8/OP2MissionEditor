@@ -16,7 +16,10 @@ namespace OP2MissionEditor.Systems.Map
 
 		[SerializeField] private Transform m_ResourceContainer	= default;
 		[SerializeField] private Transform m_UnitContainer		= default;
+		[SerializeField] private Transform m_MarkerContainer	= default;
 		[SerializeField] private Transform m_StartContainer		= default;
+
+		public UnitMinimap unitMinimap			{ get; private set; } = new UnitMinimap();
 
 		public delegate void OnProgressCallback(float progress);
 		public delegate void OnCallback();
@@ -42,9 +45,15 @@ namespace OP2MissionEditor.Systems.Map
 			foreach (Transform t in m_UnitContainer)
 				Destroy(t.gameObject);
 
+			foreach (Transform t in m_MarkerContainer)
+				Destroy(t.gameObject);
+
 			foreach (Transform t in m_StartContainer)
 				Destroy(t.gameObject);
 
+			// Create minimap texture
+			unitMinimap.CreateMinimap();
+			
 			// Create beacons
 			foreach (GameData.Beacon beacon in UserData.current.mission.tethysGame.beacons)
 				AddUnit(beacon);
@@ -116,7 +125,7 @@ namespace OP2MissionEditor.Systems.Map
 
 		public UnitView AddUnit(GameData.Marker marker)
 		{
-			GameObject goUnit = CreateUnit("Resource/" + marker.markerType.ToString(), m_ResourceContainer, marker.id, new Vector2Int(marker.position.x,marker.position.y));
+			GameObject goUnit = CreateUnit("Resource/" + marker.markerType.ToString(), m_MarkerContainer, marker.id, new Vector2Int(marker.position.x,marker.position.y));
 			MarkerView view = goUnit.GetComponent<MarkerView>();
 			view.Initialize(marker);
 			return view;
@@ -209,20 +218,12 @@ namespace OP2MissionEditor.Systems.Map
 
 		private GameObject CreateUnit(string resourcePath, Transform parent, int id, Vector2Int gridPosition)
 		{
-			// Remove game coordinates
-			gridPosition -= Vector2Int.one;
-
-			// Invert grid Y
-			gridPosition.y = m_Tilemap.size.y-gridPosition.y-1;
-			
-			// Add half to center in the tile
-			Vector3 position = new Vector3(gridPosition.x, gridPosition.y) + new Vector3(0.5f, 0.5f);
-
 			GameObject goUnit = Instantiate(Resources.Load<GameObject>("Game/" + resourcePath));
 			goUnit.transform.SetParent(parent);
 			goUnit.transform.localScale = Vector3.one;
-			goUnit.transform.position = Vector3.Scale(position, m_Tilemap.cellSize);
-			goUnit.transform.localPosition = new Vector3(goUnit.transform.localPosition.x, goUnit.transform.localPosition.y, 0);
+			UnitView unit = goUnit.GetComponent<UnitView>();
+			unit.Initialize(m_Tilemap, unitMinimap);
+			unit.SetPosition(gridPosition);
 
 			return goUnit;
 		}

@@ -12,11 +12,13 @@ namespace OP2MissionEditor.Dialogs
 	public class MinimapDialog : MonoBehaviour
 	{
 		[SerializeField] private RawImage m_MinimapImage			= default;
+		[SerializeField] private RawImage m_MinimapUnitImage		= default;
 		[SerializeField] private RectTransform m_MinimapBounds		= default;
 		
 		public delegate void OnCloseCallback();
 
 		private MapRenderer m_MapRenderer;
+		private UnitRenderer m_UnitRenderer;
 		private OnCloseCallback m_OnCloseCB;
 
 		private bool m_IsMouseOverMinimap;
@@ -25,14 +27,16 @@ namespace OP2MissionEditor.Dialogs
 		private Vector2Int m_MapSize;
 
 
-		private void Initialize(MapRenderer mapRenderer, OnCloseCallback onCloseCB)
+		private void Initialize(MapRenderer mapRenderer, UnitRenderer unitRenderer, OnCloseCallback onCloseCB)
 		{
 			m_MapRenderer = mapRenderer;
+			m_UnitRenderer = unitRenderer;
 			m_OnCloseCB = onCloseCB;
 
 			mapRenderer.onMapRefreshedCB += OnMapRefreshed;
 
 			m_MinimapImage.texture = mapRenderer.minimapTexture;
+			m_MinimapUnitImage.texture = unitRenderer.unitMinimap.minimapTexture;
 			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
 		}
 
@@ -40,6 +44,7 @@ namespace OP2MissionEditor.Dialogs
 		{
 			// Update minimap texture
 			m_MinimapImage.texture = mapRenderer.minimapTexture;
+			m_MinimapUnitImage.texture = m_UnitRenderer.unitMinimap.minimapTexture;
 			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
 		}
 
@@ -135,12 +140,13 @@ namespace OP2MissionEditor.Dialogs
 		/// Creates and presents the Preferences dialog to the user.
 		/// </summary>
 		/// <param name="mapRenderer">The map to render as a minimap.</param>
+		/// <param name="unitRenderer">The units to render to the minimap.</param>
 		/// <param name="onCloseCB">The callback fired when the dialog closes.</param>
-		public static MinimapDialog Create(MapRenderer mapRenderer, OnCloseCallback onCloseCB=null)
+		public static MinimapDialog Create(MapRenderer mapRenderer, UnitRenderer unitRenderer, OnCloseCallback onCloseCB=null)
 		{
 			GameObject goDialog = Instantiate(Resources.Load<GameObject>("Dialogs/MinimapDialog"));
 			MinimapDialog dialog = goDialog.GetComponent<MinimapDialog>();
-			dialog.Initialize(mapRenderer, onCloseCB);
+			dialog.Initialize(mapRenderer, unitRenderer, onCloseCB);
 
 			return dialog;
 		}

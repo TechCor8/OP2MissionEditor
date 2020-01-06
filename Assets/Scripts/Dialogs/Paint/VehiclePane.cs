@@ -137,6 +137,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (m_SelectedButtonName == "StartLocation")
 			{
 				StartLocationView startLocationView = Instantiate(Resources.Load<GameObject>("Game/StartLocation")).GetComponent<StartLocationView>();
+				startLocationView.Initialize(m_Tilemap, m_UnitRenderer.unitMinimap);
 				startLocationView.Initialize(player);
 				m_OverlayRenderer.SetOverlay(startLocationView, Vector2Int.zero, Vector2.zero);
 			}
@@ -283,6 +284,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			vehicle.cargoType = selectedCargoTypeID;
 			vehicle.cargoAmount = cargoAmount;
 			vehicle.direction = (UnitDirection)m_DropdownDirection.value;
+			vehicle.position = new DataLocation(new LOCATION(1,1));
 
 			return vehicle;
 		}

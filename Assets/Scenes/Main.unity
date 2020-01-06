@@ -1375,6 +1375,7 @@ Transform:
   m_Children:
   - {fileID: 608501905}
   - {fileID: 1827795921}
+  - {fileID: 847703310}
   - {fileID: 1351541873}
   m_Father: {fileID: 830778999}
   m_RootOrder: 1
@@ -1394,6 +1395,7 @@ MonoBehaviour:
   m_Tilemap: {fileID: 1633291500}
   m_ResourceContainer: {fileID: 608501905}
   m_UnitContainer: {fileID: 1827795921}
+  m_MarkerContainer: {fileID: 847703310}
   m_StartContainer: {fileID: 1351541873}
 --- !u!1 &260848808
 GameObject:
@@ -5139,6 +5141,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 843711183}
   m_CullTransparentMesh: 0
+--- !u!1 &847703309
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 847703310}
+  m_Layer: 0
+  m_Name: Markers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &847703310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847703309}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 239670295}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &861182468
 GameObject:
   m_ObjectHideFlags: 0
@@ -8765,11 +8797,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1351541872}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2}
+  m_LocalPosition: {x: 0, y: 0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 239670295}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1361335034
 GameObject:
@@ -12368,6 +12400,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_CanvasGroup: {fileID: 1835127157}
   m_MapRenderer: {fileID: 1633291501}
+  m_UnitRenderer: {fileID: 239670296}
   m_MenuOptions:
   - id: File New
     txtShortcut: {fileID: 1673929380}

@@ -93,6 +93,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			MarkerType mType;
 			System.Enum.TryParse(m_SelectedButtonName, out mType);
 			marker.markerType = mType;
+			marker.position = new DataLocation(new LOCATION(1,1));
 
 			return marker;
 		}
@@ -125,6 +126,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			beacon.oreType = GetOreTypeFromName(m_SelectedButtonName);
 			beacon.barYield = GetYieldFromName(m_SelectedButtonName);
 			beacon.barVariant = GetVariant();
+			beacon.position = new DataLocation(new LOCATION(1,1));
 
 			return beacon;
 		}

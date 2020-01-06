@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace OP2MissionEditor.Systems.Map
 {
@@ -81,15 +82,30 @@ namespace OP2MissionEditor.Systems.Map
 		/// <summary>
 		/// Sets the position of the overlay.
 		/// </summary>
-		public void SetPosition(Vector2 position)
+		public void SetPosition(Tilemap tilemap, Vector2Int tileXY)
 		{
-			m_SpriteOverlay.transform.localPosition = position;
-
+			// Set unit overlay position
 			if (m_UnitView != null)
-				m_UnitView.transform.localPosition = new Vector3(position.x, position.y, 0);
+				m_UnitView.SetPosition(tileXY);
 
+			// Remove game coordinates
+			tileXY -= Vector2Int.one;
+
+			// Invert Y to match render value instead of data storage
+			tileXY.y = tilemap.size.y-tileXY.y-1;
+
+			Vector3 worldPt = tilemap.CellToWorld((Vector3Int)tileXY);
+
+			// Center point in tile
+			worldPt.x += tilemap.cellSize.x / 2.0f;
+			worldPt.y += tilemap.cellSize.y / 2.0f;
+
+			// Set sprite overlay position
+			m_SpriteOverlay.transform.localPosition = worldPt;
+
+			// Set status tile container position
 			if (m_StatusTileContainer != null)
-				m_StatusTileContainer.transform.localPosition = position;
+				m_StatusTileContainer.transform.localPosition = worldPt;
 		}
 
 		/// <summary>
