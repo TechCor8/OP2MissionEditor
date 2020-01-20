@@ -36,7 +36,7 @@ namespace OP2MissionEditor.Dialogs
 		private UserData m_UserData;
 		private OnCloseCallback m_OnCloseCB;
 
-		private bool m_DidInitialize;
+		private bool m_ShouldSave;
 		private List<int> m_SongIDs;
 
 
@@ -44,6 +44,8 @@ namespace OP2MissionEditor.Dialogs
 		{
 			m_UserData = userData;
 			m_OnCloseCB = onCloseCB;
+
+			UserData.current.onSelectVariantCB += OnChangedUserData;
 
 			// Initialize display
 			m_InputDescription.text			= userData.mission.levelDetails.description;
@@ -53,15 +55,24 @@ namespace OP2MissionEditor.Dialogs
 			m_InputMaxTechLevel.text		= userData.mission.levelDetails.maxTechLevel.ToString();
 			m_ToggleUnitOnlyMission.isOn	= userData.mission.levelDetails.unitOnlyMission;
 
-			m_ToggleDaylightEverywhere.isOn = userData.mission.tethysGame.daylightEverywhere;
-			m_ToggleDaylightMoves.isOn		= userData.mission.tethysGame.daylightMoves;
-			m_InputInitialLightLevel.text	= userData.mission.tethysGame.initialLightLevel.ToString();
+			OnChangedUserData(userData);
 
-			m_SongIDs						= new List<int>(userData.mission.tethysGame.musicPlayList.songIDs);
+			m_ShouldSave = true;
+		}
+
+		private void OnChangedUserData(UserData userData)
+		{
+			m_ShouldSave = false;
+
+			m_ToggleDaylightEverywhere.isOn = userData.selectedVariant.tethysGame.daylightEverywhere;
+			m_ToggleDaylightMoves.isOn		= userData.selectedVariant.tethysGame.daylightMoves;
+			m_InputInitialLightLevel.text	= userData.selectedVariant.tethysGame.initialLightLevel.ToString();
+
+			m_SongIDs						= new List<int>(userData.selectedVariant.tethysGame.musicPlayList.songIDs);
 
 			RefreshMusicTrackState();
 
-			m_DidInitialize = true;
+			m_ShouldSave = true;
 		}
 
 		private void RefreshMusicTrackState()
@@ -73,9 +84,9 @@ namespace OP2MissionEditor.Dialogs
 			// Populate music tracks
 			List<string> repeatOptions = new List<string>();
 
-			for (int i=0; i < m_UserData.mission.tethysGame.musicPlayList.songIDs.Length; ++i)
+			for (int i=0; i < m_UserData.selectedVariant.tethysGame.musicPlayList.songIDs.Length; ++i)
 			{
-				int songID = m_UserData.mission.tethysGame.musicPlayList.songIDs[i];
+				int songID = m_UserData.selectedVariant.tethysGame.musicPlayList.songIDs[i];
 				string name = i.ToString() + ": " + (SongID)songID;
 
 				GameObject item = Instantiate(m_MusicPlayListPrefab);
@@ -205,7 +216,7 @@ namespace OP2MissionEditor.Dialogs
 
 		public void Save()
 		{
-			if (!m_DidInitialize)
+			if (!m_ShouldSave)
 				return;
 
 			m_UserData.mission.levelDetails.description			= m_InputDescription.text;
@@ -223,18 +234,18 @@ namespace OP2MissionEditor.Dialogs
 
 			m_UserData.mission.levelDetails.unitOnlyMission		= m_ToggleUnitOnlyMission.isOn;
 
-			m_UserData.mission.tethysGame.daylightEverywhere	= m_ToggleDaylightEverywhere.isOn;
-			m_UserData.mission.tethysGame.daylightMoves			= m_ToggleDaylightMoves.isOn;
+			m_UserData.selectedVariant.tethysGame.daylightEverywhere	= m_ToggleDaylightEverywhere.isOn;
+			m_UserData.selectedVariant.tethysGame.daylightMoves			= m_ToggleDaylightMoves.isOn;
 			if (int.TryParse(m_InputInitialLightLevel.text, out val))
-				m_UserData.mission.tethysGame.initialLightLevel = val;
+				m_UserData.selectedVariant.tethysGame.initialLightLevel = val;
 			else
 			{
 				Debug.Log("Bad value assigned to Initial Light Level.");
-				m_InputInitialLightLevel.text = m_UserData.mission.tethysGame.initialLightLevel.ToString();
+				m_InputInitialLightLevel.text = m_UserData.selectedVariant.tethysGame.initialLightLevel.ToString();
 			}
 
-			m_UserData.mission.tethysGame.musicPlayList.songIDs = m_SongIDs.ToArray();
-			m_UserData.mission.tethysGame.musicPlayList.repeatStartIndex = m_DropdownRepeatStartIndex.value;
+			m_UserData.selectedVariant.tethysGame.musicPlayList.songIDs = m_SongIDs.ToArray();
+			m_UserData.selectedVariant.tethysGame.musicPlayList.repeatStartIndex = m_DropdownRepeatStartIndex.value;
 		}
 
 		public void OnClick_Close()
@@ -242,6 +253,11 @@ namespace OP2MissionEditor.Dialogs
 			Destroy(gameObject);
 
 			m_OnCloseCB?.Invoke();
+		}
+
+		private void OnDestroy()
+		{
+			UserData.current.onSelectVariantCB -= OnChangedUserData;
 		}
 
 

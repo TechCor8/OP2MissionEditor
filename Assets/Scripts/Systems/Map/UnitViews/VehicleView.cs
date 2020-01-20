@@ -61,7 +61,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			// Check if player was destroyed
 			bool foundPlayer = false;
-			foreach (PlayerData pData in UserData.current.mission.players)
+			foreach (PlayerData pData in UserData.current.selectedVariant.players)
 			{
 				if (pData == player)
 				{

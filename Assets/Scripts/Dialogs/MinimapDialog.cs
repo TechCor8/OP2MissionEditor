@@ -35,14 +35,20 @@ namespace OP2MissionEditor.Dialogs
 			m_OnCloseCB = onCloseCB;
 
 			mapRenderer.onMapRefreshedCB += OnMapRefreshed;
+			m_UnitRenderer.onRefreshedCB += OnUnitRendererRefreshed;
 
 			OnMapRefreshed(mapRenderer);
+		}
+
+		private void OnUnitRendererRefreshed()
+		{
+			OnMapRefreshed(null);
 		}
 
 		private void OnMapRefreshed(MapRenderer mapRenderer)
 		{
 			// Update minimap texture
-			m_MinimapImage.texture = mapRenderer.minimapTexture;
+			m_MinimapImage.texture = m_MapRenderer.minimapTexture;
 			m_MinimapUnitImage.texture = m_UnitRenderer.unitMinimap.minimapTexture;
 			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
 
@@ -139,6 +145,7 @@ namespace OP2MissionEditor.Dialogs
 
 		private void OnDestroy()
 		{
+			m_UnitRenderer.onRefreshedCB -= OnUnitRendererRefreshed;
 			m_MapRenderer.onMapRefreshedCB -= OnMapRefreshed;
 		}
 

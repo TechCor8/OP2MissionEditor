@@ -34,6 +34,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			base.Awake();
 
 			UserData.current.onChangedValuesCB += OnChangedUserData;
+			UserData.current.onSelectVariantCB += OnChangedUserData;
 
 			RefreshPlayerDropdown();
 			OnChanged_Player(m_DropdownPlayer.value);
@@ -62,7 +63,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			List<string> options = new List<string>();
 
-			for (int i=0; i < UserData.current.mission.players.Length; ++i)
+			for (int i=0; i < UserData.current.selectedVariant.players.Count; ++i)
 				options.Add("Player " + (i+1));
 
 			m_DropdownPlayer.ClearOptions();
@@ -74,7 +75,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		public void OnChanged_Player(int index)
 		{
 			// Toggle which structure buttons are visible based on the current player's colony type.
-			bool isEden = UserData.current.mission.players[index].isEden;
+			bool isEden = UserData.current.selectedVariant.players[index].isEden;
 			m_ScrollViewEden.SetActive(isEden);
 			m_ScrollViewPlymouth.SetActive(!isEden);
 
@@ -98,7 +99,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void RefreshIconColors()
 		{
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 
 			// Refresh Eden icons
 			foreach (Image button in GetIcons(m_ButtonContainerEden))
@@ -174,7 +175,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (m_SelectedButtonName == null)
 				return;
 
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 
 			if (m_SelectedButtonName == "StartLocation")
 			{
@@ -245,11 +246,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (m_SelectedButtonName == "StartLocation")
 			{
 				// Set player start location
-				PlayerData player1 = UserData.current.mission.players[m_DropdownPlayer.value];
+				PlayerData player1 = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 				DataLocation centerView = new DataLocation();
 				centerView.x = tileXY.x;
 				centerView.y = tileXY.y;
-				player1.centerView = centerView;
+				player1.difficulties[UserData.current.selectedDifficultyIndex].centerView = centerView;
 				UserData.current.SetUnsaved();
 
 				m_UnitRenderer.SetStartLocation(m_DropdownPlayer.value, player1);
@@ -268,8 +269,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			vehicle.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add vehicle to tile
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
-			player.units.Add(vehicle);
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
+			player.difficulties[UserData.current.selectedDifficultyIndex].units.Add(vehicle);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(player, vehicle);
@@ -340,13 +341,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 			int playerIndex = 0;
 			int unitIndex = -1;
 
-			for (playerIndex=0; playerIndex < UserData.current.mission.players.Length; ++playerIndex)
+			for (playerIndex=0; playerIndex < UserData.current.selectedVariant.players.Count; ++playerIndex)
 			{
-				PlayerData player = UserData.current.mission.players[playerIndex];
+				PlayerData.ResourceData playerResData = UserData.current.GetPlayerResourceData(playerIndex);
 
-				for (int i=0; i < player.units.Count; ++i)
+				for (int i=0; i < playerResData.units.Count; ++i)
 				{
-					UnitData unit = player.units[i];
+					UnitData unit = playerResData.units[i];
 
 					if (unit.position.x == tileXY.x && unit.position.y == tileXY.y)
 					{
@@ -362,10 +363,10 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (unitIndex < 0)
 				return;
 			
-			UnitData vehicleToRemove = UserData.current.mission.players[playerIndex].units[unitIndex];
+			UnitData vehicleToRemove = UserData.current.GetPlayerResourceData(playerIndex).units[unitIndex];
 
 			// Remove vehicle from tile
-			UserData.current.mission.players[playerIndex].units.RemoveAt(unitIndex);
+			UserData.current.GetPlayerResourceData(playerIndex).units.RemoveAt(unitIndex);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(vehicleToRemove);
@@ -698,9 +699,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private bool AreUnitsOnTile(Vector2Int tileXY)
 		{
-			foreach (PlayerData player in UserData.current.mission.players)
+			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				foreach (UnitData unit in player.units)
+				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
 				{
 					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 					if (otherArea.Contains(tileXY))
@@ -742,6 +743,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void OnDestroy()
 		{
 			UserData.current.onChangedValuesCB -= OnChangedUserData;
+			UserData.current.onSelectVariantCB -= OnChangedUserData;
 		}
 	}
 }

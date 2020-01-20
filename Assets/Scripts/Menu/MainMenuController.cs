@@ -36,6 +36,7 @@ namespace OP2MissionEditor.Menu
 
 		[SerializeField] private MenuOption[] m_MenuOptions		= default;
 
+		private MissionVariantsDialog m_MissionVariantsDialog;
 		private MinimapDialog m_MinimapDialog;
 		private PaintDialog m_PaintDialog;
 
@@ -346,7 +347,7 @@ namespace OP2MissionEditor.Menu
 		{
 			interactable = false;
 
-			PlayerPropertiesDialog.Create(UserData.current, () =>
+			PlayerPropertiesDialog.Create(() =>
 			{
 				interactable = true;
 			});
@@ -417,6 +418,21 @@ namespace OP2MissionEditor.Menu
 			rTransform.anchoredPosition = position;
 
 			m_PaintDialog = paintDialog;
+		}
+
+		public void OnClick_ShowMissionVariants()
+		{
+			if (m_MissionVariantsDialog != null)
+			{
+				// Close mission variants
+				Destroy(m_MissionVariantsDialog.gameObject);
+				return;
+			}
+
+			// Open mission variants
+			MissionVariantsDialog variantsDialog = MissionVariantsDialog.Create(m_UnitRenderer);
+
+			m_MissionVariantsDialog = variantsDialog;
 		}
 
 		public void OnClick_ShowGrid()

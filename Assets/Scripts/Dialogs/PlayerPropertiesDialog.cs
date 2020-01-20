@@ -51,7 +51,6 @@ namespace OP2MissionEditor.Dialogs
 		
 		public delegate void OnCloseCallback();
 
-		private UserData m_UserData;
 		private OnCloseCallback m_OnCloseCB;
 
 		private bool m_CanSave;
@@ -60,22 +59,19 @@ namespace OP2MissionEditor.Dialogs
 		private Dictionary<int, string> m_TechNames = new Dictionary<int, string>();
 		private List<int> m_TechIds = new List<int>();
 
-		private List<PlayerData> m_Players;
-		
 		// Selected player parameters
 		private PlayerData m_SelectedPlayer;
 		private List<int> m_Allies;
 		private List<int> m_CompletedTech;
 
 
-		private void Initialize(UserData userData, OnCloseCallback onCloseCB)
+		private void Initialize(OnCloseCallback onCloseCB)
 		{
-			m_UserData = userData;
 			m_OnCloseCB = onCloseCB;
 
-			// Initialize display
-			m_Players = new List<PlayerData>(userData.mission.players);
+			UserData.current.onSelectVariantCB += OnChanged_SelectedVariant;
 
+			// Initialize display
 			m_PlayerListBox.onSelectedItemCB += OnSelect_Player;
 			m_AllyListBox.onSelectedItemCB += OnSelect_Ally;
 			m_CompletedTechListBox.onSelectedItemCB += OnSelect_CompletedTech;
@@ -87,13 +83,22 @@ namespace OP2MissionEditor.Dialogs
 			m_CanSave = true;
 		}
 
+		private void OnChanged_SelectedVariant(UserData src)
+		{
+			m_CanSave = false;
+
+			PopulatePlayerList();
+
+			m_CanSave = true;
+		}
+
 		private void ReadTechFile()
 		{
 			// Read technology from tech sheet
 			m_TechNames.Clear();
 			m_TechIds.Clear();
 
-			TechData[] technologies = TechFileReader.GetTechnologies(UserPrefs.gameDirectory, m_UserData.mission.levelDetails.techTreeName);
+			TechData[] technologies = TechFileReader.GetTechnologies(UserPrefs.gameDirectory, UserData.current.mission.levelDetails.techTreeName);
 			foreach (TechData tech in technologies)
 			{
 				m_TechNames.Add(tech.techID, tech.techName);
@@ -103,23 +108,34 @@ namespace OP2MissionEditor.Dialogs
 
 		private void PopulatePlayerList()
 		{
+			int selectedIndex = m_PlayerListBox.selectedIndex;
+
 			m_PlayerListBox.Clear();
 
-			for (int i=0; i < m_Players.Count; ++i)
+			for (int i=0; i < UserData.current.selectedVariant.players.Count; ++i)
 			{
 				ListBoxItem item = ListBoxItem.Create(m_PlayerListPrefab, "Player " + (i+1));
-				item.userData = m_Players[i];
+				item.userData = UserData.current.selectedVariant.players[i];
 				m_PlayerListBox.AddItem(item);
 			}
 
+			m_PlayerListBox.selectedIndex = selectedIndex;
+
 			// Can't have more than 6 players in the game
-			if (m_Players.Count >= 6)
+			if (UserData.current.selectedVariant.players.Count >= 6)
 				m_BtnAddPlayer.interactable = false;
 		}
 
 		public void OnClick_AddPlayer()
 		{
-			m_Players.Add(new PlayerData(m_Players.Count));
+			PlayerData player = new PlayerData(UserData.current.selectedVariant.players.Count);
+
+			// Make sure difficulty count is sync'd to other players
+			player.difficulties.Clear();
+			foreach (PlayerData.ResourceData resData in UserData.current.selectedVariant.players[0].difficulties)
+				player.difficulties.Add(new PlayerData.ResourceData());
+
+			UserData.current.AddPlayer(player);
 			Save();
 
 			PopulatePlayerList();
@@ -127,7 +143,7 @@ namespace OP2MissionEditor.Dialogs
 
 		public void OnClick_RemovePlayer()
 		{
-			m_Players.RemoveAt(m_PlayerListBox.selectedIndex);
+			UserData.current.RemovePlayer(m_PlayerListBox.selectedIndex);
 			Save();
 
 			m_BtnRemovePlayer.interactable = false;
@@ -138,12 +154,13 @@ namespace OP2MissionEditor.Dialogs
 		private void OnSelect_Player(ListBoxItem item)
 		{
 			PlayerData player = (PlayerData)item.userData;
+			PlayerData.ResourceData playerResData = player.difficulties[UserData.current.selectedDifficultyIndex];
 
 			m_CanSave = false;
 
 			m_SelectedPlayer = player;
 
-			if (m_Players.Count > 1)
+			if (UserData.current.selectedVariant.players.Count > 1)
 				m_BtnRemovePlayer.interactable = true;
 
 			m_DropdownColonyType.value				= player.isEden ? 0 : 1;
@@ -152,23 +169,23 @@ namespace OP2MissionEditor.Dialogs
 				m_DropdownControlType.value			= player.botType == BotType.None ? 0 : 2;
 			else
 				m_DropdownControlType.value			= 1; // OP2 AI
-			m_InputTechLevel.text					= player.techLevel.ToString();
-			m_DropdownMoraleLevel.value				= (int)player.moraleLevel;
-			m_ToggleFreeMorale.isOn					= player.freeMorale;
+			m_InputTechLevel.text					= playerResData.techLevel.ToString();
+			m_DropdownMoraleLevel.value				= (int)playerResData.moraleLevel;
+			m_ToggleFreeMorale.isOn					= playerResData.freeMorale;
 
 			m_Allies								= new List<int>(player.allies);
-			m_CompletedTech							= new List<int>(player.completedResearch);
+			m_CompletedTech							= new List<int>(playerResData.completedResearch);
 
 			PopulateAllyList();
 			PopulateCompletedTechList();
 
-			m_InputSolarSats.text					= player.solarSatellites.ToString();
-			m_InputKids.text						= player.kids.ToString();
-			m_InputWorkers.text						= player.workers.ToString();
-			m_InputScientists.text					= player.scientists.ToString();
-			m_InputCommonMetal.text					= player.commonOre.ToString();
-			m_InputRareMetal.text					= player.rareOre.ToString();
-			m_InputFood.text						= player.food.ToString();
+			m_InputSolarSats.text					= playerResData.solarSatellites.ToString();
+			m_InputKids.text						= playerResData.kids.ToString();
+			m_InputWorkers.text						= playerResData.workers.ToString();
+			m_InputScientists.text					= playerResData.scientists.ToString();
+			m_InputCommonMetal.text					= playerResData.commonOre.ToString();
+			m_InputRareMetal.text					= playerResData.rareOre.ToString();
+			m_InputFood.text						= playerResData.food.ToString();
 
 			m_CanSave = true;
 		}
@@ -187,7 +204,7 @@ namespace OP2MissionEditor.Dialogs
 
 			// Fill ally dropdown with unallied players
 			List<string> unalliedPlayers = new List<string>();
-			foreach (PlayerData player in m_Players)
+			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
 				if (m_Allies.Contains(player.id)) continue;
 				if (m_SelectedPlayer.id == player.id) continue;
@@ -292,36 +309,36 @@ namespace OP2MissionEditor.Dialogs
 			if (!m_CanSave)
 				return;
 
-			m_UserData.mission.players				= m_Players.ToArray();
-
-			m_UserData.mission.levelDetails.numPlayers = m_Players.Count;
+			UserData.current.mission.levelDetails.numPlayers = UserData.current.selectedVariant.players.Count;
 
 			if (m_SelectedPlayer == null)
 			{
-				m_UserData.Dirty();
+				UserData.current.Dirty();
 				return;
 			}
+
+			PlayerData.ResourceData playerResData = m_SelectedPlayer.difficulties[UserData.current.selectedDifficultyIndex];
 
 			m_SelectedPlayer.isEden					= m_DropdownColonyType.value == 0;
 			m_SelectedPlayer.color					= (PlayerColor)m_DropdownColor.value;
 			m_SelectedPlayer.isHuman				= m_DropdownControlType.value != 1; // OP2 AI
 			m_SelectedPlayer.botType				= m_DropdownControlType.value == 0 ? BotType.None : BotType.Balanced;
-			m_SelectedPlayer.techLevel				= GetValueFromInputField(m_InputTechLevel, "Tech Level", m_SelectedPlayer.techLevel);
-			m_SelectedPlayer.moraleLevel			= (MoraleLevel)m_DropdownMoraleLevel.value;
-			m_SelectedPlayer.freeMorale				= m_ToggleFreeMorale.isOn;
+			playerResData.techLevel					= GetValueFromInputField(m_InputTechLevel, "Tech Level", playerResData.techLevel);
+			playerResData.moraleLevel				= (MoraleLevel)m_DropdownMoraleLevel.value;
+			playerResData.freeMorale				= m_ToggleFreeMorale.isOn;
 
 			m_SelectedPlayer.allies					= m_Allies.ToArray();
-			m_SelectedPlayer.completedResearch		= m_CompletedTech.ToArray();
+			playerResData.completedResearch			= m_CompletedTech.ToArray();
 
-			m_SelectedPlayer.solarSatellites		= GetValueFromInputField(m_InputSolarSats, "Solar Satellites", m_SelectedPlayer.solarSatellites);
-			m_SelectedPlayer.kids					= GetValueFromInputField(m_InputKids, "Kids", m_SelectedPlayer.kids);
-			m_SelectedPlayer.workers				= GetValueFromInputField(m_InputWorkers, "Workers", m_SelectedPlayer.workers);
-			m_SelectedPlayer.scientists				= GetValueFromInputField(m_InputScientists, "Scientists", m_SelectedPlayer.scientists);
-			m_SelectedPlayer.commonOre				= GetValueFromInputField(m_InputCommonMetal, "Common Metal", m_SelectedPlayer.commonOre);
-			m_SelectedPlayer.rareOre				= GetValueFromInputField(m_InputRareMetal, "Rare Metal", m_SelectedPlayer.rareOre);
-			m_SelectedPlayer.food					= GetValueFromInputField(m_InputFood, "Food", m_SelectedPlayer.food);
+			playerResData.solarSatellites			= GetValueFromInputField(m_InputSolarSats, "Solar Satellites", playerResData.solarSatellites);
+			playerResData.kids						= GetValueFromInputField(m_InputKids, "Kids", playerResData.kids);
+			playerResData.workers					= GetValueFromInputField(m_InputWorkers, "Workers", playerResData.workers);
+			playerResData.scientists				= GetValueFromInputField(m_InputScientists, "Scientists", playerResData.scientists);
+			playerResData.commonOre					= GetValueFromInputField(m_InputCommonMetal, "Common Metal", playerResData.commonOre);
+			playerResData.rareOre					= GetValueFromInputField(m_InputRareMetal, "Rare Metal", playerResData.rareOre);
+			playerResData.food						= GetValueFromInputField(m_InputFood, "Food", playerResData.food);
 
-			m_UserData.Dirty();
+			UserData.current.Dirty();
 		}
 
 		private int GetValueFromInputField(InputField input, string fieldName, int originalValue)
@@ -350,19 +367,20 @@ namespace OP2MissionEditor.Dialogs
 			m_PlayerListBox.onSelectedItemCB -= OnSelect_Player;
 			m_AllyListBox.onSelectedItemCB -= OnSelect_Ally;
 			m_CompletedTechListBox.onSelectedItemCB -= OnSelect_CompletedTech;
+
+			UserData.current.onSelectVariantCB -= OnChanged_SelectedVariant;
 		}
 
 
 		/// <summary>
 		/// Creates and presents the Player Properties dialog to the user.
 		/// </summary>
-		/// <param name="userData">The user data to display and modify.</param>
 		/// <param name="onCloseCB">The callback fired when the dialog closes.</param>
-		public static PlayerPropertiesDialog Create(UserData userData, OnCloseCallback onCloseCB=null)
+		public static PlayerPropertiesDialog Create(OnCloseCallback onCloseCB=null)
 		{
 			GameObject goDialog = Instantiate(Resources.Load<GameObject>("Dialogs/PlayerPropertiesDialog"));
 			PlayerPropertiesDialog dialog = goDialog.GetComponent<PlayerPropertiesDialog>();
-			dialog.Initialize(userData, onCloseCB);
+			dialog.Initialize(onCloseCB);
 
 			return dialog;
 		}

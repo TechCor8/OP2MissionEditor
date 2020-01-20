@@ -29,6 +29,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			base.Awake();
 
 			UserData.current.onChangedValuesCB += OnChangedUserData;
+			UserData.current.onSelectVariantCB += OnChangedUserData;
 
 			// Default variant to "Random"
 			m_DropdownVariant.value = m_DropdownVariant.options.Count-1;
@@ -58,7 +59,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			List<string> options = new List<string>();
 
-			for (int i=0; i < UserData.current.mission.players.Length; ++i)
+			for (int i=0; i < UserData.current.selectedVariant.players.Count; ++i)
 				options.Add("Player " + (i+1));
 
 			m_DropdownPlayer.ClearOptions();
@@ -70,7 +71,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		public void OnChanged_Player(int index)
 		{
 			// Toggle which structure buttons are visible based on the current player's colony type.
-			bool isEden = UserData.current.mission.players[index].isEden;
+			bool isEden = UserData.current.selectedVariant.players[index].isEden;
 			m_ScrollViewEden.SetActive(isEden);
 			m_ScrollViewPlymouth.SetActive(!isEden);
 
@@ -94,7 +95,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void RefreshIconColors()
 		{
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 
 			// Refresh Eden icons
 			foreach (Image button in GetIcons(m_ButtonContainerEden))
@@ -155,7 +156,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			Vector2 offset = new Vector2(-structureSize.x / 2, -structureSize.y / 2);
 			offset *= m_Tilemap.cellSize;
 
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 			m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(player, structure), structureSize, offset);
 		}
 
@@ -181,8 +182,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 				return;
 
 			// Add structure to tile
-			PlayerData player = UserData.current.mission.players[m_DropdownPlayer.value];
-			player.units.Add(structure);
+			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
+			player.difficulties[UserData.current.selectedDifficultyIndex].units.Add(structure);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(player, structure);
@@ -224,13 +225,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 			int playerIndex = 0;
 			int unitIndex = -1;
 
-			for (playerIndex=0; playerIndex < UserData.current.mission.players.Length; ++playerIndex)
+			for (playerIndex=0; playerIndex < UserData.current.selectedVariant.players.Count; ++playerIndex)
 			{
-				PlayerData player = UserData.current.mission.players[playerIndex];
+				PlayerData.ResourceData resData = UserData.current.GetPlayerResourceData(playerIndex);
 
-				for (int i=0; i < player.units.Count; ++i)
+				for (int i=0; i < resData.units.Count; ++i)
 				{
-					UnitData unit = player.units[i];
+					UnitData unit = resData.units[i];
 
 					RectInt structureArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 					if (structureArea.Contains(tileXY))
@@ -246,11 +247,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			if (unitIndex < 0)
 				return;
+
+			PlayerData.ResourceData playerResData = UserData.current.GetPlayerResourceData(playerIndex);
 			
-			UnitData structureToRemove = UserData.current.mission.players[playerIndex].units[unitIndex];
+			UnitData structureToRemove = playerResData.units[unitIndex];
 
 			// Remove structure from tile
-			UserData.current.mission.players[playerIndex].units.RemoveAt(unitIndex);
+			playerResData.units.RemoveAt(unitIndex);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(structureToRemove);
@@ -432,9 +435,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private bool AreUnitsInArea(RectInt area)
 		{
-			foreach (PlayerData player in UserData.current.mission.players)
+			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				foreach (UnitData unit in player.units)
+				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
 				{
 					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 
@@ -496,6 +499,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void OnDestroy()
 		{
 			UserData.current.onChangedValuesCB -= OnChangedUserData;
+			UserData.current.onSelectVariantCB -= OnChangedUserData;
 		}
 	}
 }

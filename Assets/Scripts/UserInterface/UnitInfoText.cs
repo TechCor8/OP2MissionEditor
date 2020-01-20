@@ -108,7 +108,7 @@ namespace OP2MissionEditor.UserInterface
 			}
 
 			// Get beacon on tile
-			GameData.Beacon beacon = UserData.current.mission.tethysGame.beacons.Find((b) => b.position.x == cell.x && b.position.y == cell.y);
+			GameData.Beacon beacon = UserData.current.selectedVariant.tethysGame.beacons.Find((b) => b.position.x == cell.x && b.position.y == cell.y);
 			if (beacon != null)
 			{
 				// Display info for beacon on tile
@@ -131,7 +131,7 @@ namespace OP2MissionEditor.UserInterface
 			}
 
 			// Get marker on tile
-			GameData.Marker marker = UserData.current.mission.tethysGame.markers.Find((m) => m.position.x == cell.x && m.position.y == cell.y);
+			GameData.Marker marker = UserData.current.selectedVariant.tethysGame.markers.Find((m) => m.position.x == cell.x && m.position.y == cell.y);
 			if (marker != null)
 			{
 				// Display info for marker on tile
@@ -148,7 +148,7 @@ namespace OP2MissionEditor.UserInterface
 			}
 
 			// Get wreckage on tile
-			GameData.Wreckage wreckage = UserData.current.mission.tethysGame.wreckage.Find((w) => w.position.x == cell.x && w.position.y == cell.y);
+			GameData.Wreckage wreckage = UserData.current.selectedVariant.tethysGame.wreckage.Find((w) => w.position.x == cell.x && w.position.y == cell.y);
 			if (wreckage != null)
 			{
 				// Display info for wreckage on tile
@@ -166,9 +166,11 @@ namespace OP2MissionEditor.UserInterface
 			}
 
 			// Get start location on tile
-			foreach (PlayerData player in UserData.current.mission.players)
+			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				if (player.centerView.x == cell.x && player.centerView.y == cell.y)
+				PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+
+				if (resData.centerView.x == cell.x && resData.centerView.y == cell.y)
 				{
 					// Display info for start location
 					System.Text.StringBuilder headers = new System.Text.StringBuilder();
@@ -176,7 +178,7 @@ namespace OP2MissionEditor.UserInterface
 
 					headers.AppendLine("Player:");		info.AppendLine(player.id.ToString());
 					headers.AppendLine("Type:");		info.AppendLine("Start Location");
-					headers.AppendLine("Position:");	info.AppendLine(player.centerView.x.ToString() + ", " + player.centerView.y.ToString());
+					headers.AppendLine("Position:");	info.AppendLine(resData.centerView.x.ToString() + ", " + resData.centerView.y.ToString());
 				
 					m_txtHeaders.text = headers.ToString();
 					m_txtInfo.text = info.ToString();
@@ -188,9 +190,11 @@ namespace OP2MissionEditor.UserInterface
 		private UnitData GetUnitOnTile(int tileX, int tileY)
 		{
 			// Search for a unit on this tile
-			foreach (PlayerData player in UserData.current.mission.players)
+			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				foreach (UnitData unit in player.units)
+				PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+
+				foreach (UnitData unit in resData.units)
 				{
 					if (unit.position.x == tileX && unit.position.y == tileY)
 						return unit;

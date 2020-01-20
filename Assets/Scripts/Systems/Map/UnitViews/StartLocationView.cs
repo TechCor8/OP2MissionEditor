@@ -17,13 +17,14 @@ namespace OP2MissionEditor.Systems.Map
 		public void Initialize(PlayerData player)
 		{
 			this.player = player;
-
+			
 			UserData.current.onChangedValuesCB += OnChanged_MissionData;
 
 			m_ColorOverlay.color = GetPlayerColor();
 
 			// Add to minimap
-			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(player.centerView.x, player.centerView.y)), 4);
+			PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(resData.centerView.x, resData.centerView.y)), 4);
 
 			RefreshOverlay();
 		}
@@ -32,7 +33,7 @@ namespace OP2MissionEditor.Systems.Map
 		{
 			// Check if player was destroyed
 			bool foundPlayer = false;
-			foreach (PlayerData pData in UserData.current.mission.players)
+			foreach (PlayerData pData in UserData.current.selectedVariant.players)
 			{
 				if (pData == player)
 				{
@@ -50,7 +51,9 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Update player color
 			m_ColorOverlay.color = GetPlayerColor();
-			m_UnitMinimap.MoveUnit(this, GetMapCoordinates(new Vector2Int(player.centerView.x, player.centerView.y)));
+
+			PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+			m_UnitMinimap.MoveUnit(this, GetMapCoordinates(new Vector2Int(resData.centerView.x, resData.centerView.y)));
 		}
 
 		public override Color GetMinimapColor()

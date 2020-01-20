@@ -58,33 +58,10 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Create minimap texture
 			unitMinimap.CreateMinimap();
-			
-			// Create beacons
-			foreach (GameData.Beacon beacon in UserData.current.mission.tethysGame.beacons)
-				AddUnit(beacon);
 
-			// Create markers
-			foreach (GameData.Marker marker in UserData.current.mission.tethysGame.markers)
-				AddUnit(marker);
-
-			// Create wreckage
-			foreach (GameData.Wreckage wreck in UserData.current.mission.tethysGame.wreckage)
-				AddUnit(wreck);
-
-			// Create walls and tubes
-
-			// Player data
-			for (int i=0; i < UserData.current.mission.players.Length; ++i)
-			{
-				PlayerData player = UserData.current.mission.players[i];
-
-				// Set start location
-				SetStartLocation(i, player);
-
-				// Create units
-				foreach (UnitData unit in player.units)
-					AddUnit(player, unit);
-			}
+			// Create units for master and selected variants
+			CreateUnitsForVariant(UserData.current.mission.missionVariants[0]);
+			CreateUnitsForVariant(UserData.current.selectedVariant);
 
 			yield return 0;
 			
@@ -92,6 +69,36 @@ namespace OP2MissionEditor.Systems.Map
 			// Inform listeners that we are done
 			onCompleteCB?.Invoke();
 			onRefreshedCB?.Invoke();
+		}
+
+		private void CreateUnitsForVariant(MissionVariant variant)
+		{
+			// Create beacons
+			foreach (GameData.Beacon beacon in variant.tethysGame.beacons)
+				AddUnit(beacon);
+
+			// Create markers
+			foreach (GameData.Marker marker in variant.tethysGame.markers)
+				AddUnit(marker);
+
+			// Create wreckage
+			foreach (GameData.Wreckage wreck in variant.tethysGame.wreckage)
+				AddUnit(wreck);
+
+			// Create walls and tubes
+
+			// Player data
+			for (int i=0; i < variant.players.Count; ++i)
+			{
+				PlayerData player = variant.players[i];
+
+				// Set start location
+				SetStartLocation(i, player);
+
+				// Create units
+				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
+					AddUnit(player, unit);
+			}
 		}
 
 		public void SetStartLocation(int playerIndex, PlayerData player)
@@ -103,7 +110,8 @@ namespace OP2MissionEditor.Systems.Map
 				Destroy(view.gameObject);
 
 			// Create new start location
-			GameObject goUnit = CreateUnit("StartLocation", m_StartContainer, 0, new Vector2Int(player.centerView.x, player.centerView.y));
+			DataLocation centerView = player.difficulties[UserData.current.selectedDifficultyIndex].centerView;
+			GameObject goUnit = CreateUnit("StartLocation", m_StartContainer, 0, new Vector2Int(centerView.x, centerView.y));
 			view = goUnit.GetComponent<StartLocationView>();
 			view.Initialize(player);
 		}
