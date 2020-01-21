@@ -183,7 +183,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			// Add structure to tile
 			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
-			player.difficulties[UserData.current.selectedDifficultyIndex].units.Add(structure);
+			UserData.current.GetPlayerResourceData(player.id).units.Add(structure);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(player, structure);
@@ -435,9 +435,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private bool AreUnitsInArea(RectInt area)
 		{
-			foreach (PlayerData player in UserData.current.selectedVariant.players)
+			MissionVariant variant = UserData.current.GetCombinedVariant();
+
+			foreach (PlayerData player in variant.players)
 			{
-				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
+				foreach (UnitData unit in UserData.current.GetCombinedResourceData(player).units)
 				{
 					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 

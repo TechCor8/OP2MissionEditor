@@ -60,8 +60,13 @@ namespace OP2MissionEditor.Systems.Map
 			unitMinimap.CreateMinimap();
 
 			// Create units for master and selected variants
-			CreateUnitsForVariant(UserData.current.mission.missionVariants[0]);
-			CreateUnitsForVariant(UserData.current.selectedVariant);
+			if (UserData.current.selectedVariantIndex < 0)
+				CreateUnitsForVariant(UserData.current.mission.masterVariant, true);
+			else
+			{
+				CreateUnitsForVariant(UserData.current.mission.masterVariant, false);
+				CreateUnitsForVariant(UserData.current.selectedVariant, true);
+			}
 
 			yield return 0;
 			
@@ -71,21 +76,33 @@ namespace OP2MissionEditor.Systems.Map
 			onRefreshedCB?.Invoke();
 		}
 
-		private void CreateUnitsForVariant(MissionVariant variant)
+		private void CreateUnitsForVariant(MissionVariant variant, bool isActiveVariant)
 		{
-			// Create beacons
-			foreach (GameData.Beacon beacon in variant.tethysGame.beacons)
-				AddUnit(beacon);
+			bool isDifficultySelected = UserData.current.selectedDifficultyIndex >= 0;
 
-			// Create markers
-			foreach (GameData.Marker marker in variant.tethysGame.markers)
-				AddUnit(marker);
+			// Get gaia unit tint
+			Color multiplier = new Color(0.7f, 0.7f, 0.7f, 1.0f);
+			Color variantColor = Color.white;
+			if (!isActiveVariant) variantColor = multiplier;
+			if (isDifficultySelected) variantColor = multiplier;
 
-			// Create wreckage
-			foreach (GameData.Wreckage wreck in variant.tethysGame.wreckage)
-				AddUnit(wreck);
+			Color difficultyColor = Color.white;
+			if (!isActiveVariant) difficultyColor = multiplier;
 
-			// Create walls and tubes
+			// Create variant master gaia units
+			CreateGameData(variant.tethysGame, variantColor);
+
+			// Create variant difficulty gaia units
+			if (isDifficultySelected) CreateGameData(variant.tethysDifficulties[UserData.current.selectedDifficultyIndex], difficultyColor);
+
+			// Get player unit tint
+			multiplier = new Color(0.49f, 0.49f, 0.49f);
+			variantColor = Color.white;
+			if (!isActiveVariant) variantColor = multiplier;
+			if (isDifficultySelected) variantColor = multiplier;
+
+			difficultyColor = Color.white;
+			if (!isActiveVariant) difficultyColor = multiplier;
 
 			// Player data
 			for (int i=0; i < variant.players.Count; ++i)
@@ -95,10 +112,34 @@ namespace OP2MissionEditor.Systems.Map
 				// Set start location
 				SetStartLocation(i, player);
 
-				// Create units
-				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
-					AddUnit(player, unit);
+				// Create units (difficulty invariant)
+				foreach (UnitData unit in player.resources.units)
+					AddUnit(player, unit, variantColor);
+
+				// Create units for selected difficulty
+				if (isDifficultySelected)
+				{
+					foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
+						AddUnit(player, unit, difficultyColor);
+				}
+
+				// Create walls and tubes
 			}
+		}
+
+		private void CreateGameData(GameData tethysGame, Color tint)
+		{
+			// Create beacons
+			foreach (GameData.Beacon beacon in tethysGame.beacons)
+				AddUnit(beacon, tint);
+
+			// Create markers
+			foreach (GameData.Marker marker in tethysGame.markers)
+				AddUnit(marker, tint);
+
+			// Create wreckage
+			foreach (GameData.Wreckage wreck in tethysGame.wreckage)
+				AddUnit(wreck, tint);
 		}
 
 		public void SetStartLocation(int playerIndex, PlayerData player)
@@ -110,13 +151,14 @@ namespace OP2MissionEditor.Systems.Map
 				Destroy(view.gameObject);
 
 			// Create new start location
-			DataLocation centerView = player.difficulties[UserData.current.selectedDifficultyIndex].centerView;
+			DataLocation centerView = UserData.current.GetPlayerResourceData(player).centerView;
 			GameObject goUnit = CreateUnit("StartLocation", m_StartContainer, 0, new Vector2Int(centerView.x, centerView.y));
 			view = goUnit.GetComponent<StartLocationView>();
 			view.Initialize(player);
 		}
 
-		public UnitView AddUnit(GameData.Beacon beacon)
+		public UnitView AddUnit(GameData.Beacon beacon)				{ return AddUnit(beacon, Color.white);			}
+		public UnitView AddUnit(GameData.Beacon beacon, Color tint)
 		{
 			string prefabPath = null;
 
@@ -132,27 +174,30 @@ namespace OP2MissionEditor.Systems.Map
 
 			GameObject goUnit = CreateUnit(prefabPath, m_ResourceContainer, beacon.id, new Vector2Int(beacon.position.x,beacon.position.y));
 			BeaconView view = goUnit.GetComponent<BeaconView>();
-			view.Initialize(beacon);
+			view.Initialize(beacon, tint);
 			return view;
 		}
 
-		public UnitView AddUnit(GameData.Marker marker)
+		public UnitView AddUnit(GameData.Marker marker)				{ return AddUnit(marker, Color.white);			}
+		public UnitView AddUnit(GameData.Marker marker, Color tint)
 		{
 			GameObject goUnit = CreateUnit("Resource/" + marker.markerType.ToString(), m_MarkerContainer, marker.id, new Vector2Int(marker.position.x,marker.position.y));
 			MarkerView view = goUnit.GetComponent<MarkerView>();
-			view.Initialize(marker);
+			view.Initialize(marker, tint);
 			return view;
 		}
 
-		public UnitView AddUnit(GameData.Wreckage wreck)
+		public UnitView AddUnit(GameData.Wreckage wreck)			{ return AddUnit(wreck, Color.white);			}
+		public UnitView AddUnit(GameData.Wreckage wreck, Color tint)
 		{
 			GameObject goUnit = CreateUnit("Wreckage", m_ResourceContainer, wreck.id, new Vector2Int(wreck.position.x,wreck.position.y));
 			WreckageView view = goUnit.GetComponent<WreckageView>();
-			view.Initialize(wreck);
+			view.Initialize(wreck, tint);
 			return view;
 		}
 
-		public UnitView AddUnit(PlayerData player, UnitData unit)
+		public UnitView AddUnit(PlayerData player, UnitData unit)	{ return AddUnit(player, unit, Color.white);	}
+		public UnitView AddUnit(PlayerData player, UnitData unit, Color tint)
 		{
 			string edenPath = player.isEden ? "Eden/" : "Plymouth/";
 			string weaponType = "";
@@ -177,7 +222,7 @@ namespace OP2MissionEditor.Systems.Map
 				// Add structure
 				GameObject goUnit = CreateUnit("Structures/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
 				StructureView view = goUnit.GetComponent<StructureView>();
-				view.Initialize(player, unit);
+				view.Initialize(player, unit, tint);
 				return view;
 			}
 			else
@@ -185,7 +230,7 @@ namespace OP2MissionEditor.Systems.Map
 				// Add vehicle
 				GameObject goUnit = CreateUnit("Vehicles/" + edenPath + unit.typeID.ToString() + weaponType, m_UnitContainer, unit.id, new Vector2Int(unit.position.x, unit.position.y));
 				VehicleView view = goUnit.GetComponent<VehicleView>();
-				view.Initialize(player, unit);
+				view.Initialize(player, unit, tint);
 				return view;
 			}
 		}

@@ -24,11 +24,12 @@ namespace OP2MissionEditor
 		public MissionRoot mission				{ get; private set; }
 
 		// Mission Variants
-		public int selectedVariantIndex			{ get; private set; }
-		public MissionVariant selectedVariant	{ get { return mission.missionVariants[selectedVariantIndex]; } }
-
+		public int selectedVariantIndex			{ get; private set; } = -1;
+		public MissionVariant selectedVariant	{ get { return selectedVariantIndex < 0 ? mission.masterVariant : mission.missionVariants[selectedVariantIndex];					} }
+		
 		// Selected Difficulty (all players)
-		public int selectedDifficultyIndex		{ get; private set; }
+		public int selectedDifficultyIndex		{ get; private set; } = -1;
+		public GameData selectedTethysGame		{ get { return selectedDifficultyIndex < 0 ? selectedVariant.tethysGame : selectedVariant.tethysDifficulties[selectedDifficultyIndex];} }
 
 		// Events
 		public delegate void OnUserDataCallback(UserData src);
@@ -42,7 +43,7 @@ namespace OP2MissionEditor
 		/// </summary>
 		public void SetSelectedVariant(int index)
 		{
-			if (index < 0 || index >= mission.missionVariants.Count)
+			if (index < -1 || index >= mission.missionVariants.Count)
 				throw new System.IndexOutOfRangeException("index: " + index);
 
 			selectedVariantIndex = index;
@@ -61,29 +62,33 @@ namespace OP2MissionEditor
 			SetUnsaved();
 		}
 
+		/// <summary>
+		/// Add new mission variant based on master variant.
+		/// </summary>
 		public void AddMissionVariant()
 		{
-			MissionVariant srcVariant = new MissionVariant(mission.missionVariants[0]);
+			MissionVariant srcVariant = new MissionVariant(mission.masterVariant);
 			srcVariant.layouts.Clear();
 			srcVariant.name = "Variant " + mission.missionVariants.Count;
 			srcVariant.tethysGame.beacons.Clear();
 			srcVariant.tethysGame.markers.Clear();
 			srcVariant.tethysGame.wallTubes.Clear();
 			srcVariant.tethysGame.wreckage.Clear();
+
+			foreach (GameData tethysGame in srcVariant.tethysDifficulties)
+			{
+				tethysGame.beacons.Clear();
+				tethysGame.markers.Clear();
+				tethysGame.wallTubes.Clear();
+				tethysGame.wreckage.Clear();
+			}
+
 			foreach (PlayerData player in srcVariant.players)
 			{
+				ClearPlayerResourceData(player.resources);
+
 				foreach (PlayerData.ResourceData resData in player.difficulties)
-				{
-					resData.commonOre = 0;
-					resData.completedResearch = new int[0];
-					resData.food = 0;
-					resData.kids = 0;
-					resData.rareOre = 0;
-					resData.scientists = 0;
-					resData.solarSatellites = 0;
-					resData.workers = 0;
-					resData.units.Clear();
-				}
+					ClearPlayerResourceData(resData);
 			}
 
 			mission.missionVariants.Add(srcVariant);
@@ -96,11 +101,11 @@ namespace OP2MissionEditor
 			mission.missionVariants.RemoveAt(index);
 
 			// Keep selected index in range
-			index = selectedVariantIndex;
-			if (index >= mission.missionVariants.Count)
-				--index;
+			int selectedIndex = selectedVariantIndex;
+			if (selectedIndex >= mission.missionVariants.Count)
+				--selectedIndex;
 
-			SetSelectedVariant(index);
+			SetSelectedVariant(selectedIndex);
 		}
 
 		/// <summary>
@@ -108,10 +113,23 @@ namespace OP2MissionEditor
 		/// </summary>
 		public MissionVariant GetCombinedVariant()
 		{
-			if (selectedVariantIndex == 0)
-				return selectedVariant;
+			if (selectedVariantIndex < 0)
+				return new MissionVariant(mission.masterVariant);
 
-			return MissionVariant.Concat(mission.missionVariants[0], selectedVariant);
+			return MissionVariant.Concat(mission.masterVariant, selectedVariant);
+		}
+
+		public GameData GetCombinedTethysGame()
+		{
+			MissionVariant variant = GetCombinedVariant();
+
+			// If no difficulty selected, return base data
+			if (selectedDifficultyIndex < 0)
+				return variant.tethysGame;
+
+			// Return combined base and difficulty data
+			variant.tethysGame.Concat(variant.tethysDifficulties[selectedDifficultyIndex]);
+			return variant.tethysGame;
 		}
 
 		/// <summary>
@@ -119,7 +137,7 @@ namespace OP2MissionEditor
 		/// </summary>
 		public void SetSelectedDifficulty(int index)
 		{
-			if (index < 0 || index >= selectedVariant.players[0].difficulties.Count)
+			if (index < -1 || index >= selectedVariant.players[0].difficulties.Count)
 				throw new System.IndexOutOfRangeException("index: " + index);
 
 			selectedDifficultyIndex = index;
@@ -135,8 +153,22 @@ namespace OP2MissionEditor
 			if (cloneIndex < 0 || cloneIndex >= selectedVariant.players[0].difficulties.Count)
 				throw new System.IndexOutOfRangeException("index: " + cloneIndex);
 
+			// Add to master
+			GameData tethysGame = mission.masterVariant.tethysDifficulties[cloneIndex];
+			mission.masterVariant.tethysDifficulties.Add(new GameData(tethysGame));
+			
+			for (int i=0; i < mission.masterVariant.players.Count; ++i)
+			{
+				PlayerData.ResourceData resData = mission.masterVariant.players[i].difficulties[cloneIndex];
+				mission.masterVariant.players[i].difficulties.Add(new PlayerData.ResourceData(resData));
+			}
+
+			// Add to variants
 			foreach (MissionVariant variant in mission.missionVariants)
 			{
+				tethysGame = variant.tethysDifficulties[cloneIndex];
+				variant.tethysDifficulties.Add(new GameData(tethysGame));
+
 				for (int i=0; i < variant.players.Count; ++i)
 				{
 					PlayerData.ResourceData resData = variant.players[i].difficulties[cloneIndex];
@@ -148,16 +180,59 @@ namespace OP2MissionEditor
 		}
 
 		/// <summary>
+		/// Add new difficulty based on master resource data.
+		/// </summary>
+		public void AddDifficulty()
+		{
+			// Add to master
+			GameData tethysGame = new GameData(mission.masterVariant.tethysGame);
+			tethysGame.beacons.Clear();
+			tethysGame.markers.Clear();
+			tethysGame.wallTubes.Clear();
+			tethysGame.wreckage.Clear();
+			mission.masterVariant.tethysDifficulties.Add(tethysGame);
+
+			foreach (PlayerData player in mission.masterVariant.players)
+			{
+				PlayerData.ResourceData resData = new PlayerData.ResourceData(player.resources);
+				ClearPlayerResourceData(resData);
+
+				player.difficulties.Add(resData);
+			}
+
+			// Add to variants
+			foreach (MissionVariant variant in mission.missionVariants)
+			{
+				variant.tethysDifficulties.Add(new GameData(mission.masterVariant.tethysGame));
+
+				foreach (PlayerData player in variant.players)
+				{
+					PlayerData.ResourceData resData = new PlayerData.ResourceData(player.resources);
+					ClearPlayerResourceData(resData);
+
+					player.difficulties.Add(resData);
+				}
+			}
+
+			SetUnsaved();
+		}
+
+		/// <summary>
 		/// Removes a difficulty from all players and all mission variants.
 		/// </summary>
 		public void RemoveDifficulty(int index)
 		{
-			if (selectedVariant.players[0].difficulties.Count <= 1)
+			if (selectedVariant.players[0].difficulties.Count < 1)
 				throw new System.Exception("Difficulty count is at minimum size!");
 
 			if (index < 0 || index >= selectedVariant.players[0].difficulties.Count)
 				throw new System.IndexOutOfRangeException("index: " + index);
 
+			// Remove from master
+			for (int i=0; i < mission.masterVariant.players.Count; ++i)
+				mission.masterVariant.players[i].difficulties.RemoveAt(index);
+
+			// Remove from variants
 			foreach (MissionVariant variant in mission.missionVariants)
 			{
 				for (int i=0; i < variant.players.Count; ++i)
@@ -167,43 +242,58 @@ namespace OP2MissionEditor
 			SetUnsaved();
 
 			// Keep selected index in range
-			index = selectedDifficultyIndex;
-			if (index >= selectedVariant.players[0].difficulties.Count)
-				--index;
+			int selectedIndex = selectedDifficultyIndex;
+			if (selectedIndex >= selectedVariant.players[0].difficulties.Count)
+				--selectedIndex;
 
-			SetSelectedDifficulty(index);
+			SetSelectedDifficulty(selectedIndex);
 		}
 
-		public void AddPlayer(PlayerData player)
+		public void AddPlayer()
 		{
+			PlayerData player = new PlayerData(mission.masterVariant.players.Count);
+
+			// Make sure difficulty count is sync'd to other players
+			player.difficulties.Clear();
+			foreach (PlayerData.ResourceData resData in mission.masterVariant.players[0].difficulties)
+				player.difficulties.Add(new PlayerData.ResourceData());
+
+			// Clear difficulty resources
+			foreach (PlayerData.ResourceData resData in player.difficulties)
+				ClearPlayerResourceData(resData);
+
 			// Add to master variant
-			mission.missionVariants[0].players.Add(player);
+			mission.masterVariant.players.Add(player);
 
 			// Clear concat data
 			player = new PlayerData(player);
 
-			foreach (PlayerData.ResourceData resData in player.difficulties)
-			{
-				resData.commonOre = 0;
-				resData.completedResearch = new int[0];
-				resData.food = 0;
-				resData.kids = 0;
-				resData.rareOre = 0;
-				resData.scientists = 0;
-				resData.solarSatellites = 0;
-				resData.workers = 0;
-				resData.units.Clear();
-			}
+			ClearPlayerResourceData(player.resources);
 
 			// Add player to remaining variants
-			for (int i=1; i < mission.missionVariants.Count; ++i)
+			for (int i=0; i < mission.missionVariants.Count; ++i)
 				mission.missionVariants[i].players.Add(new PlayerData(player));
 
 			SetUnsaved();
 		}
 
+		private void ClearPlayerResourceData(PlayerData.ResourceData resData)
+		{
+			resData.commonOre = 0;
+			resData.completedResearch = new int[0];
+			resData.food = 0;
+			resData.kids = 0;
+			resData.rareOre = 0;
+			resData.scientists = 0;
+			resData.solarSatellites = 0;
+			resData.workers = 0;
+			resData.units.Clear();
+		}
+
 		public void RemovePlayer(int index)
 		{
+			mission.masterVariant.players.RemoveAt(index);
+
 			foreach (MissionVariant variant in mission.missionVariants)
 				variant.players.RemoveAt(index);
 
@@ -215,7 +305,25 @@ namespace OP2MissionEditor
 		/// </summary>
 		public PlayerData.ResourceData GetPlayerResourceData(int playerIndex)
 		{
-			return selectedVariant.players[playerIndex].difficulties[selectedDifficultyIndex];
+			return selectedDifficultyIndex < 0 ? selectedVariant.players[playerIndex].resources : selectedVariant.players[playerIndex].difficulties[selectedDifficultyIndex];
+		}
+
+		/// <summary>
+		/// Gets the player's resource data for the currently selected difficulty.
+		/// </summary>
+		public PlayerData.ResourceData GetPlayerResourceData(PlayerData player)
+		{
+			return selectedDifficultyIndex < 0 ? player.resources : player.difficulties[selectedDifficultyIndex];
+		}
+
+		public PlayerData.ResourceData GetCombinedResourceData(PlayerData player)
+		{
+			// If no difficulty selected, return base data
+			if (selectedDifficultyIndex < 0)
+				return new PlayerData.ResourceData(player.resources);
+
+			// Return combined base and difficulty data
+			return PlayerData.ResourceData.Concat(player.resources, player.difficulties[selectedDifficultyIndex]);
 		}
 
 
@@ -255,8 +363,8 @@ namespace OP2MissionEditor
 
 			try
 			{
-				selectedVariantIndex = 0;
-				selectedDifficultyIndex = 0;
+				selectedVariantIndex = -1;
+				selectedDifficultyIndex = -1;
 			}
 			catch (System.IndexOutOfRangeException ex)
 			{
@@ -328,8 +436,8 @@ namespace OP2MissionEditor
 
 			try
 			{
-				selectedVariantIndex = 0;
-				selectedDifficultyIndex = 0;
+				selectedVariantIndex = -1;
+				selectedDifficultyIndex = -1;
 			}
 			catch (System.IndexOutOfRangeException ex)
 			{

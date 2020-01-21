@@ -23,7 +23,7 @@ namespace OP2MissionEditor.Systems.Map
 			m_ColorOverlay.color = GetPlayerColor();
 
 			// Add to minimap
-			PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+			PlayerData.ResourceData resData = UserData.current.GetPlayerResourceData(player);
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(resData.centerView.x, resData.centerView.y)), 4);
 
 			RefreshOverlay();
@@ -52,7 +52,7 @@ namespace OP2MissionEditor.Systems.Map
 			// Update player color
 			m_ColorOverlay.color = GetPlayerColor();
 
-			PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+			PlayerData.ResourceData resData = UserData.current.GetPlayerResourceData(player);
 			m_UnitMinimap.MoveUnit(this, GetMapCoordinates(new Vector2Int(resData.centerView.x, resData.centerView.y)));
 		}
 

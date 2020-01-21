@@ -250,7 +250,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 				DataLocation centerView = new DataLocation();
 				centerView.x = tileXY.x;
 				centerView.y = tileXY.y;
-				player1.difficulties[UserData.current.selectedDifficultyIndex].centerView = centerView;
+				UserData.current.GetPlayerResourceData(player1).centerView = centerView;
 				UserData.current.SetUnsaved();
 
 				m_UnitRenderer.SetStartLocation(m_DropdownPlayer.value, player1);
@@ -270,7 +270,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 			// Add vehicle to tile
 			PlayerData player = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
-			player.difficulties[UserData.current.selectedDifficultyIndex].units.Add(vehicle);
+			UserData.current.GetPlayerResourceData(player).units.Add(vehicle);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(player, vehicle);
@@ -699,9 +699,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private bool AreUnitsOnTile(Vector2Int tileXY)
 		{
-			foreach (PlayerData player in UserData.current.selectedVariant.players)
+			MissionVariant variant = UserData.current.GetCombinedVariant();
+
+			foreach (PlayerData player in variant.players)
 			{
-				foreach (UnitData unit in player.difficulties[UserData.current.selectedDifficultyIndex].units)
+				foreach (UnitData unit in UserData.current.GetCombinedResourceData(player).units)
 				{
 					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 					if (otherArea.Contains(tileXY))

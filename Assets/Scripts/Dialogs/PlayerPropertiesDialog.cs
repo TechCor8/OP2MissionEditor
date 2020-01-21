@@ -128,14 +128,7 @@ namespace OP2MissionEditor.Dialogs
 
 		public void OnClick_AddPlayer()
 		{
-			PlayerData player = new PlayerData(UserData.current.selectedVariant.players.Count);
-
-			// Make sure difficulty count is sync'd to other players
-			player.difficulties.Clear();
-			foreach (PlayerData.ResourceData resData in UserData.current.selectedVariant.players[0].difficulties)
-				player.difficulties.Add(new PlayerData.ResourceData());
-
-			UserData.current.AddPlayer(player);
+			UserData.current.AddPlayer();
 			Save();
 
 			PopulatePlayerList();
@@ -154,7 +147,7 @@ namespace OP2MissionEditor.Dialogs
 		private void OnSelect_Player(ListBoxItem item)
 		{
 			PlayerData player = (PlayerData)item.userData;
-			PlayerData.ResourceData playerResData = player.difficulties[UserData.current.selectedDifficultyIndex];
+			PlayerData.ResourceData playerResData = UserData.current.GetPlayerResourceData(player);
 
 			m_CanSave = false;
 
@@ -317,7 +310,7 @@ namespace OP2MissionEditor.Dialogs
 				return;
 			}
 
-			PlayerData.ResourceData playerResData = m_SelectedPlayer.difficulties[UserData.current.selectedDifficultyIndex];
+			PlayerData.ResourceData playerResData = UserData.current.GetPlayerResourceData(m_SelectedPlayer);
 
 			m_SelectedPlayer.isEden					= m_DropdownColonyType.value == 0;
 			m_SelectedPlayer.color					= (PlayerColor)m_DropdownColor.value;

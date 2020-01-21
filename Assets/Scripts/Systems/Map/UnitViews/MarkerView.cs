@@ -13,9 +13,11 @@ namespace OP2MissionEditor.Systems.Map
 		public GameData.Marker marker { get; private set; }
 
 
-		public void Initialize(GameData.Marker marker)
+		public void Initialize(GameData.Marker marker, Color tint)
 		{
 			this.marker = marker;
+
+			GetComponent<SpriteRenderer>().color = tint;
 
 			// Add to minimap
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(marker.position.x, marker.position.y)), 3);

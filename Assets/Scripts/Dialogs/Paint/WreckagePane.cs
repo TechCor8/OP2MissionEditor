@@ -100,7 +100,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			tileXY += Vector2Int.one;
 
 			// If tile already contains wreckage, cancel
-			if (UserData.current.selectedVariant.tethysGame.wreckage.Find((w) => w.position.x == tileXY.x && w.position.y == tileXY.y) != null)
+			if (UserData.current.GetCombinedTethysGame().wreckage.Find((w) => w.position.x == tileXY.x && w.position.y == tileXY.y) != null)
 				return;
 
 			// Create wreckage data
@@ -108,7 +108,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			wreck.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add wreckage to tile
-			UserData.current.selectedVariant.tethysGame.wreckage.Add(wreck);
+			UserData.current.selectedTethysGame.wreckage.Add(wreck);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(wreck);
@@ -135,14 +135,14 @@ namespace OP2MissionEditor.Dialogs.Paint
 			tileXY += Vector2Int.one;
 
 			// Find wreckage on tile
-			int index = UserData.current.selectedVariant.tethysGame.wreckage.FindIndex((w) => w.position.x == tileXY.x && w.position.y == tileXY.y);
+			int index = UserData.current.selectedTethysGame.wreckage.FindIndex((w) => w.position.x == tileXY.x && w.position.y == tileXY.y);
 			if (index < 0)
 				return;
 
-			GameData.Wreckage wreckToRemove = UserData.current.selectedVariant.tethysGame.wreckage[index];
+			GameData.Wreckage wreckToRemove = UserData.current.selectedTethysGame.wreckage[index];
 
 			// Remove wreckage from tile
-			UserData.current.selectedVariant.tethysGame.wreckage.RemoveAt(index);
+			UserData.current.selectedTethysGame.wreckage.RemoveAt(index);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(wreckToRemove);

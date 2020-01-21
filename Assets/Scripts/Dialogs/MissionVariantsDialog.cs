@@ -24,9 +24,7 @@ namespace OP2MissionEditor.Dialogs
 
 		private UnitRenderer m_UnitRenderer;
 
-		private bool m_ShouldSave;
 		
-
 		private void Initialize(UnitRenderer unitRenderer)
 		{
 			m_UnitRenderer = unitRenderer;
@@ -34,31 +32,25 @@ namespace OP2MissionEditor.Dialogs
 			UserData.current.onChangedValuesCB += OnChanged_UserData;
 
 			// Initialize display
-			m_DropdownMissionVariant.value	= UserData.current.selectedVariantIndex;
-			m_InputVariantName.text			= UserData.current.selectedVariant.name;
-			m_InputVariantName.interactable = UserData.current.selectedVariantIndex > 0;
+			m_DropdownMissionVariant.value	= UserData.current.selectedVariantIndex >= 0 ? UserData.current.selectedVariantIndex+1 : 0;
+			m_InputVariantName.SetTextWithoutNotify(UserData.current.selectedVariant.name);
+			m_InputVariantName.interactable = UserData.current.selectedVariantIndex >= 0;
 
-			m_DropdownDifficulty.value		= UserData.current.selectedDifficultyIndex;
+			m_DropdownDifficulty.value		= UserData.current.selectedDifficultyIndex >= 0 ? UserData.current.selectedDifficultyIndex+1 : 0;
 
 			RefreshVariantDropdown();
 			RefreshDifficultyDropdown();
-
-			m_ShouldSave = true;
 		}
 
 		private void OnChanged_UserData(UserData src)
 		{
-			m_ShouldSave = false;
-
 			RefreshVariantDropdown();
 			RefreshDifficultyDropdown();
-
-			m_ShouldSave = true;
 		}
 
 		private void RefreshVariantDropdown()
 		{
-			int selectedIndex = UserData.current.selectedVariantIndex;
+			int selectedIndex = m_DropdownMissionVariant.value;
 
 			// Populate mission variant options
 			List<string> variantOptions = new List<string>();
@@ -66,7 +58,7 @@ namespace OP2MissionEditor.Dialogs
 			foreach (MissionVariant variant in UserData.current.mission.missionVariants)
 				variantOptions.Add(variant.name);
 
-			variantOptions[0] = "All Variants";
+			variantOptions.Insert(0, "All Variants");
 
 			m_DropdownMissionVariant.ClearOptions();
 			m_DropdownMissionVariant.AddOptions(variantOptions);
@@ -75,18 +67,20 @@ namespace OP2MissionEditor.Dialogs
 			if (selectedIndex >= variantOptions.Count)
 				selectedIndex = variantOptions.Count-1;
 
-			m_DropdownMissionVariant.value = selectedIndex;
+			m_DropdownMissionVariant.SetValueWithoutNotify(selectedIndex);
+			OnSelect_Variant();
 			
 			m_BtnAddVariant.interactable = UserData.current.mission.missionVariants.Count < 8;
-			m_BtnRemoveVariant.interactable = UserData.current.mission.missionVariants.Count >= 2 && m_DropdownMissionVariant.value > 0;
+			m_BtnRemoveVariant.interactable = UserData.current.mission.missionVariants.Count > 0 && m_DropdownMissionVariant.value > 0;
 		}
 
 		private void RefreshDifficultyDropdown()
 		{
-			int selectedIndex = UserData.current.selectedDifficultyIndex;
+			int selectedIndex = m_DropdownDifficulty.value;
 
 			// Populate difficulty options
 			List<string> difficultyOptions = new List<string>();
+			difficultyOptions.Add("All Difficulties");
 
 			for (int i=0; i < UserData.current.selectedVariant.players[0].difficulties.Count; ++i)
 			{
@@ -105,16 +99,17 @@ namespace OP2MissionEditor.Dialogs
 			if (selectedIndex >= difficultyOptions.Count)
 				selectedIndex = difficultyOptions.Count-1;
 
-			m_DropdownDifficulty.value = selectedIndex;
+			m_DropdownDifficulty.SetValueWithoutNotify(selectedIndex);
+			OnSelect_Difficulty();
 			
-			m_BtnAddDifficulty.interactable = difficultyOptions.Count < 3;
+			m_BtnAddDifficulty.interactable = difficultyOptions.Count < 4;
 			m_BtnRemoveDifficulty.interactable = difficultyOptions.Count > 1;
 		}
 
 		public void OnClick_AddVariant()
 		{
 			// Clone selected index unless it is the "all variants" index.
-			if (UserData.current.selectedVariantIndex > 0)
+			if (UserData.current.selectedVariantIndex >= 0)
 				UserData.current.AddMissionVariant(UserData.current.selectedVariantIndex);
 			else
 				UserData.current.AddMissionVariant();
@@ -122,26 +117,22 @@ namespace OP2MissionEditor.Dialogs
 			RefreshVariantDropdown();
 
 			// Select the newly added variant
-			m_DropdownMissionVariant.value = UserData.current.mission.missionVariants.Count-1;
+			m_DropdownMissionVariant.value = UserData.current.mission.missionVariants.Count;
 		}
 
 		public void OnClick_RemoveVariant()
 		{
-			if (UserData.current.selectedVariantIndex == 0)
+			if (UserData.current.selectedVariantIndex < 0)
 				return;
 
 			UserData.current.RemoveMissionVariant(UserData.current.selectedVariantIndex);
 
 			RefreshVariantDropdown();
-
-			// Select the last variant
-			//m_DropdownMissionVariant.value = UserData.current.mission.missionVariants.Count-1;
 		}
 
 		public void OnChanged_VariantName()
 		{
-			if (!m_ShouldSave) return;
-			if (UserData.current.selectedVariantIndex == 0) return;
+			if (UserData.current.selectedVariantIndex < 0) return;
 
 			UserData.current.selectedVariant.name = m_InputVariantName.text;
 			UserData.current.SetUnsaved();
@@ -151,41 +142,45 @@ namespace OP2MissionEditor.Dialogs
 
 		public void OnSelect_Variant()
 		{
-			UserData.current.SetSelectedVariant(m_DropdownMissionVariant.value);
+			UserData.current.SetSelectedVariant(m_DropdownMissionVariant.value-1);
 
-			m_ShouldSave = false;
-			m_InputVariantName.text = UserData.current.selectedVariant.name;
-			m_ShouldSave = true;
-
-			m_InputVariantName.interactable = UserData.current.selectedVariantIndex > 0;
-			m_BtnRemoveVariant.interactable = UserData.current.mission.missionVariants.Count >= 2 && m_DropdownMissionVariant.value > 0;
+			m_InputVariantName.SetTextWithoutNotify(UserData.current.selectedVariant.name);
+			
+			m_InputVariantName.interactable = UserData.current.selectedVariantIndex >= 0;
+			m_BtnRemoveVariant.interactable = UserData.current.mission.missionVariants.Count > 0 && m_DropdownMissionVariant.value > 0;
 
 			m_UnitRenderer.Refresh();
 		}
 
 		public void OnClick_AddDifficulty()
 		{
-			UserData.current.AddDifficulty(UserData.current.selectedDifficultyIndex);
+			// Clone selected index unless it is the "all difficulties" index.
+			if (UserData.current.selectedDifficultyIndex >= 0)
+				UserData.current.AddDifficulty(UserData.current.selectedDifficultyIndex);
+			else
+				UserData.current.AddDifficulty();
 
 			RefreshDifficultyDropdown();
 
 			// Select the newly added difficulty
-			m_DropdownDifficulty.value = UserData.current.selectedVariant.players[0].difficulties.Count-1;
+			m_DropdownDifficulty.value = UserData.current.selectedVariant.players[0].difficulties.Count;
 		}
 
 		public void OnClick_RemoveDifficulty()
 		{
-			UserData.current.RemoveDifficulty(UserData.current.selectedVariantIndex);
+			if (UserData.current.selectedDifficultyIndex < 0)
+				return;
+
+			UserData.current.RemoveDifficulty(UserData.current.selectedDifficultyIndex);
 
 			RefreshDifficultyDropdown();
-
-			// Select the last variant
-			//m_DropdownMissionVariant.value = UserData.current.mission.missionVariants.Count-1;
 		}
 
 		public void OnSelect_Difficulty()
 		{
-			UserData.current.SetSelectedDifficulty(m_DropdownDifficulty.value);
+			UserData.current.SetSelectedDifficulty(m_DropdownDifficulty.value-1);
+
+			m_BtnRemoveDifficulty.interactable = m_DropdownDifficulty.options.Count > 1 && m_DropdownDifficulty.value > 0;
 
 			m_UnitRenderer.Refresh();
 		}

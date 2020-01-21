@@ -16,9 +16,11 @@ namespace OP2MissionEditor.Systems.Map
 		public GameData.Wreckage wreck { get; private set; }
 
 
-		public void Initialize(GameData.Wreckage wreck)
+		public void Initialize(GameData.Wreckage wreck, Color tint)
 		{
 			this.wreck = wreck;
+
+			GetComponent<SpriteRenderer>().color = tint;
 
 			// Add to minimap
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(wreck.position.x, wreck.position.y)), 1);

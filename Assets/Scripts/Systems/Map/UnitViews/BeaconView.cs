@@ -14,9 +14,11 @@ namespace OP2MissionEditor.Systems.Map
 		public GameData.Beacon beacon { get; private set; }
 
 
-		public void Initialize(GameData.Beacon beacon)
+		public void Initialize(GameData.Beacon beacon, Color tint)
 		{
 			this.beacon = beacon;
+
+			GetComponent<SpriteRenderer>().color = tint;
 
 			// Add to minimap
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(beacon.position.x, beacon.position.y)), 1);

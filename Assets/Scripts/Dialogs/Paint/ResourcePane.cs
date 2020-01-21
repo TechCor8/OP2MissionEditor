@@ -69,7 +69,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void AddMarker(Vector2Int tileXY)
 		{
 			// If tile already contains marker, cancel
-			if (UserData.current.selectedVariant.tethysGame.markers.Find((m) => m.position.x == tileXY.x && m.position.y == tileXY.y) != null)
+			if (UserData.current.GetCombinedTethysGame().markers.Find((m) => m.position.x == tileXY.x && m.position.y == tileXY.y) != null)
 				return;
 
 			// Create marker data
@@ -77,7 +77,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			marker.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add marker to tile
-			UserData.current.selectedVariant.tethysGame.markers.Add(marker);
+			UserData.current.selectedTethysGame.markers.Add(marker);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(marker);
@@ -101,7 +101,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void AddBeacon(Vector2Int tileXY)
 		{
 			// If tile already contains beacon, cancel
-			if (UserData.current.selectedVariant.tethysGame.beacons.Find((b) => b.position.x == tileXY.x && b.position.y == tileXY.y) != null)
+			if (UserData.current.GetCombinedTethysGame().beacons.Find((b) => b.position.x == tileXY.x && b.position.y == tileXY.y) != null)
 				return;
 
 			// Create beacon data
@@ -109,7 +109,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			beacon.position = new LOCATION(tileXY.x, tileXY.y);
 
 			// Add beacon to tile
-			UserData.current.selectedVariant.tethysGame.beacons.Add(beacon);
+			UserData.current.selectedTethysGame.beacons.Add(beacon);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(beacon);
@@ -145,14 +145,14 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void RemoveMarker(Vector2Int tileXY)
 		{
 			// Find marker on tile
-			int index = UserData.current.selectedVariant.tethysGame.markers.FindIndex((m) => m.position.x == tileXY.x && m.position.y == tileXY.y);
+			int index = UserData.current.selectedTethysGame.markers.FindIndex((m) => m.position.x == tileXY.x && m.position.y == tileXY.y);
 			if (index < 0)
 				return;
 
-			GameData.Marker markerToRemove = UserData.current.selectedVariant.tethysGame.markers[index];
+			GameData.Marker markerToRemove = UserData.current.selectedTethysGame.markers[index];
 
 			// Remove marker from tile
-			UserData.current.selectedVariant.tethysGame.markers.RemoveAt(index);
+			UserData.current.selectedTethysGame.markers.RemoveAt(index);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(markerToRemove);
@@ -161,14 +161,14 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void RemoveBeacon(Vector2Int tileXY)
 		{
 			// Find beacon on tile
-			int index = UserData.current.selectedVariant.tethysGame.beacons.FindIndex((b) => b.position.x == tileXY.x && b.position.y == tileXY.y);
+			int index = UserData.current.selectedTethysGame.beacons.FindIndex((b) => b.position.x == tileXY.x && b.position.y == tileXY.y);
 			if (index < 0)
 				return;
 
-			GameData.Beacon beaconToRemove = UserData.current.selectedVariant.tethysGame.beacons[index];
+			GameData.Beacon beaconToRemove = UserData.current.selectedTethysGame.beacons[index];
 
 			// Remove beacon from tile
-			UserData.current.selectedVariant.tethysGame.beacons.RemoveAt(index);
+			UserData.current.selectedTethysGame.beacons.RemoveAt(index);
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(beaconToRemove);

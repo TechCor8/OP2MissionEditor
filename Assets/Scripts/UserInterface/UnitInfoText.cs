@@ -168,7 +168,7 @@ namespace OP2MissionEditor.UserInterface
 			// Get start location on tile
 			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+				PlayerData.ResourceData resData = UserData.current.GetPlayerResourceData(player);
 
 				if (resData.centerView.x == cell.x && resData.centerView.y == cell.y)
 				{
@@ -192,7 +192,7 @@ namespace OP2MissionEditor.UserInterface
 			// Search for a unit on this tile
 			foreach (PlayerData player in UserData.current.selectedVariant.players)
 			{
-				PlayerData.ResourceData resData = player.difficulties[UserData.current.selectedDifficultyIndex];
+				PlayerData.ResourceData resData = UserData.current.GetPlayerResourceData(player);
 
 				foreach (UnitData unit in resData.units)
 				{

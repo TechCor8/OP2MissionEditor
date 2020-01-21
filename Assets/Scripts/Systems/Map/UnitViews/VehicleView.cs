@@ -25,7 +25,7 @@ namespace OP2MissionEditor.Systems.Map
 		public UnitData unit		{ get; private set; }
 
 
-		public void Initialize(PlayerData player, UnitData unit)
+		public void Initialize(PlayerData player, UnitData unit, Color tint)
 		{
 			this.player = player;
 			this.unit = unit;
@@ -51,6 +51,9 @@ namespace OP2MissionEditor.Systems.Map
 			m_WeaponRenderer.material.SetInt("_PaletteIndex", (int)player.color);
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
 
+			m_Renderer.material.SetColor("_Color", tint);
+			m_WeaponRenderer.material.SetColor("_Color", tint);
+			
 			// Add to minimap
 			m_UnitMinimap.AddUnit(this, GetMapCoordinates(new Vector2Int(unit.position.x, unit.position.y)), 2);
 

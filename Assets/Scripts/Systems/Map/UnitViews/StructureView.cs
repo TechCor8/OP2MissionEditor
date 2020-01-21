@@ -25,7 +25,7 @@ namespace OP2MissionEditor.Systems.Map
 		public UnitData unit		{ get; private set; }
 
 
-		public void Initialize(PlayerData player, UnitData unit)
+		public void Initialize(PlayerData player, UnitData unit, Color tint)
 		{
 			this.player = player;
 			this.unit = unit;
@@ -52,6 +52,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			m_Renderer.material.SetInt("_PaletteIndex", (int)player.color);
 			m_HealthBar.transform.localScale = new Vector3(unit.health, 1, 1);
+
+			m_Renderer.material.SetColor("_Color", tint);
 
 			// Set mine bar yield
 			if (unit.typeID == map_id.CommonOreMine || unit.typeID == map_id.RareOreMine)

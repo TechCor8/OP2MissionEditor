@@ -3,6 +3,8 @@
 	Properties
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
+		_Color ("Tint", Color) = (1,1,1,1)
+
 		_ColorPalette ("Color Palette", 2D) = "white" {}
 		_PaletteSize ("Palette Size", Int) = 24
 		_PaletteIndex ("Palette Index", Int) = 1
@@ -46,13 +48,15 @@
 				fixed4 color    : COLOR;
 				float2 texcoord  : TEXCOORD0;
 			};
+
+			fixed4 _Color;
 			
 			v2f vert(appdata_t IN)
 			{
 				v2f OUT;
 				OUT.vertex = UnityObjectToClipPos(IN.vertex);
 				OUT.texcoord = IN.texcoord;
-				OUT.color = IN.color;
+				OUT.color = IN.color * _Color;
 				#ifdef PIXELSNAP_ON
 				OUT.vertex = UnityPixelSnap (OUT.vertex);
 				#endif
