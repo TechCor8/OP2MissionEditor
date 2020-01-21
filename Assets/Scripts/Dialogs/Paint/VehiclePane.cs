@@ -172,6 +172,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		public void RefreshOverlay()
 		{
+			if (!gameObject.activeSelf) return;
+
 			if (m_SelectedButtonName == null)
 				return;
 

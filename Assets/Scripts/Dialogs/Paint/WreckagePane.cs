@@ -91,6 +91,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void RefreshOverlay()
 		{
+			if (!gameObject.activeSelf) return;
+
 			m_OverlayRenderer.SetOverlay(m_UnitRenderer.AddUnit(GetWreckageData()), Vector2Int.zero, Vector2.zero);
 		}
 

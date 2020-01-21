@@ -144,6 +144,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void RefreshOverlay()
 		{
+			if (!gameObject.activeSelf) return;
+
 			if (m_SelectedMappingIndex < 0 || m_SelectedMappingIndex >= UserData.current.map.GetTileMappingCount())
 				return;
 
