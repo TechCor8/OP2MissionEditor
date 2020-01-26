@@ -7,6 +7,7 @@ namespace OP2MissionEditor.Dialogs
 	/// <summary>
 	/// Sorts a window to top when window is focused.
 	/// </summary>
+	[RequireComponent(typeof(Canvas))]
 	public class SortableWindow : MonoBehaviour, IPointerDownHandler
 	{
 		private static List<SortableWindow> m_SortableWindows = new List<SortableWindow>();
