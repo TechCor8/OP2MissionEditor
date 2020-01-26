@@ -988,6 +988,7 @@ GameObject:
   - component: {fileID: 1469346310923588657}
   - component: {fileID: 1349504247502553552}
   - component: {fileID: 1985623331942204420}
+  - component: {fileID: -7712638838802508451}
   m_Layer: 5
   m_Name: PreferencesDialog
   m_TagString: Untagged
@@ -1107,6 +1108,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_WindowType: {fileID: 1349504247502553552}
+--- !u!114 &-7712638838802508451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469346310923588656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d31211e3e7d47244bcc43f353b14c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1469346311577893047
 GameObject:
   m_ObjectHideFlags: 0

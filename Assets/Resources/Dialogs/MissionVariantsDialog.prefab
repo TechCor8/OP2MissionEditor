@@ -737,6 +737,7 @@ GameObject:
   - component: {fileID: 1469346310923588657}
   - component: {fileID: 2198621554886584985}
   - component: {fileID: 6494911503142095359}
+  - component: {fileID: 6973434295683962420}
   m_Layer: 5
   m_Name: MissionVariantsDialog
   m_TagString: Untagged
@@ -856,6 +857,18 @@ MonoBehaviour:
   m_DropdownDifficulty: {fileID: 8080311838717410936}
   m_BtnAddDifficulty: {fileID: 8667824866012658471}
   m_BtnRemoveDifficulty: {fileID: 7738474288203176176}
+--- !u!114 &6973434295683962420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469346310923588656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d31211e3e7d47244bcc43f353b14c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1469346311577893047
 GameObject:
   m_ObjectHideFlags: 0
