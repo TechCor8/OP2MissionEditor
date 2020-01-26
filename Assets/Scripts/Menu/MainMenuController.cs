@@ -651,6 +651,29 @@ namespace OP2MissionEditor.Menu
 		}
 
 		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		// Help Menu
+		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+		public void OnClick_OutpostUniverseHome()
+		{
+			Application.OpenURL("https://outpost2.net/");
+		}
+
+		public void OnClick_OutpostUniverseForum()
+		{
+			Application.OpenURL("https://forum.outpost2.net/");
+		}
+
+		public void OnClick_GitHubRepository()
+		{
+			Application.OpenURL("https://github.com/TechCor8/OP2MissionEditor");
+		}
+
+		public void OnClick_AboutMissionEditor()
+		{
+			AboutDialog.Create();
+		}
+
+		// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		// Menu Shortcuts
 		// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		private void InitializeMenuShortcuts()
