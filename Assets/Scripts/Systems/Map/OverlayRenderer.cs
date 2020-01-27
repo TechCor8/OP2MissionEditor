@@ -29,7 +29,13 @@ namespace OP2MissionEditor.Systems.Map
 			// Enable sprite overlay
 			m_SpriteOverlay.enabled = true;
 
+			m_SpriteOverlay.color = Color.white;
 			m_SpriteOverlay.sprite = overlaySprite;
+		}
+
+		public void SetOverlayColor(Color color)
+		{
+			m_SpriteOverlay.color = color;
 		}
 
 		/// <summary>

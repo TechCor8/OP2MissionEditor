@@ -72,14 +72,12 @@ namespace OP2MissionEditor
 			srcVariant.name = "Variant " + mission.missionVariants.Count;
 			srcVariant.tethysGame.beacons.Clear();
 			srcVariant.tethysGame.markers.Clear();
-			srcVariant.tethysGame.wallTubes.Clear();
 			srcVariant.tethysGame.wreckage.Clear();
 
 			foreach (GameData tethysGame in srcVariant.tethysDifficulties)
 			{
 				tethysGame.beacons.Clear();
 				tethysGame.markers.Clear();
-				tethysGame.wallTubes.Clear();
 				tethysGame.wreckage.Clear();
 			}
 
@@ -188,7 +186,6 @@ namespace OP2MissionEditor
 			GameData tethysGame = new GameData(mission.masterVariant.tethysGame);
 			tethysGame.beacons.Clear();
 			tethysGame.markers.Clear();
-			tethysGame.wallTubes.Clear();
 			tethysGame.wreckage.Clear();
 			mission.masterVariant.tethysDifficulties.Add(tethysGame);
 
@@ -288,6 +285,7 @@ namespace OP2MissionEditor
 			resData.solarSatellites = 0;
 			resData.workers = 0;
 			resData.units.Clear();
+			resData.wallTubes.Clear();
 		}
 
 		public void RemovePlayer(int index)
