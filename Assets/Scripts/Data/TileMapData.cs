@@ -32,5 +32,19 @@ namespace OP2MissionEditor.Data
 
 			return false;
 		}
+
+		public static bool IsAreaPassable(RectInt area)
+		{
+			for (int x=area.xMin; x < area.xMax; ++x)
+			{
+				for (int y=area.yMin; y < area.yMax; ++y)
+				{
+					if (!IsTilePassable(new Vector2Int(x,y)))
+						return false;
+				}
+			}
+
+			return true;
+		}
 	}
 }

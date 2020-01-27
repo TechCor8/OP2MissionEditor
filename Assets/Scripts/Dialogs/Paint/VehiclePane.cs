@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK;
 using DotNetMissionSDK.Json;
+using OP2MissionEditor.Data;
 using OP2MissionEditor.Systems.Map;
 using System.Collections.Generic;
 using UnityEngine;
@@ -242,11 +243,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		protected override void OnPaintTile(Vector2Int tileXY)
 		{
-			// Add game coordinates
-			tileXY += Vector2Int.one;
-
 			if (m_SelectedButtonName == "StartLocation")
 			{
+				// Add game coordinates
+				tileXY += Vector2Int.one;
+
 				// Set player start location
 				PlayerData player1 = UserData.current.selectedVariant.players[m_DropdownPlayer.value];
 				DataLocation centerView = new DataLocation();
@@ -260,12 +261,19 @@ namespace OP2MissionEditor.Dialogs.Paint
 			}
 
 			// Check if tile is passable
-			if (!IsTilePassable(tileXY))
+			if (!TileMapData.IsTilePassable(tileXY))
 				return;
 
 			// Check if area is blocked by units or structures
 			if (AreUnitsOnTile(tileXY))
 				return;
+
+			// Check if area is blocked by wall
+			if (IsWallOnTile(tileXY))
+				return;
+
+			// Add game coordinates
+			tileXY += Vector2Int.one;
 
 			UnitData vehicle = GetVehicleData();
 			vehicle.position = new LOCATION(tileXY.x, tileXY.y);
@@ -378,12 +386,9 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			base.OnOverTile(tileXY);
 
-			// Add game coordinates
-			tileXY += Vector2Int.one;
-
 			if (m_SelectedButtonName != "StartLocation")
 			{
-				bool canPlace = IsTilePassable(tileXY) && !AreUnitsOnTile(tileXY);
+				bool canPlace = TileMapData.IsTilePassable(tileXY) && !AreUnitsOnTile(tileXY) && !IsWallOnTile(tileXY);
 				m_OverlayRenderer.SetTileStatus(Vector2Int.zero, canPlace ? Color.green : Color.red);
 			}
 		}
@@ -639,75 +644,18 @@ namespace OP2MissionEditor.Dialogs.Paint
 			m_DropdownCargoSubtype.AddOptions(options);
 		}
 
-		private Vector2Int GetStructureSize(map_id type)
-		{
-			switch (type)
-			{
-				case map_id.CommonOreMine:			return new Vector2Int(2,1);
-				case map_id.RareOreMine:			return new Vector2Int(2,1);
-				case map_id.GuardPost:				return new Vector2Int(1,1);
-				case map_id.LightTower:				return new Vector2Int(1,1);
-				case map_id.CommonStorage:			return new Vector2Int(1,2);
-				case map_id.RareStorage:			return new Vector2Int(1,2);
-				case map_id.Forum:					return new Vector2Int(2,2);
-				case map_id.CommandCenter:			return new Vector2Int(3,2);
-				case map_id.MHDGenerator:			return new Vector2Int(2,2);
-				case map_id.Residence:				return new Vector2Int(2,2);
-				case map_id.RobotCommand:			return new Vector2Int(2,2);
-				case map_id.TradeCenter:			return new Vector2Int(2,2);
-				case map_id.BasicLab:				return new Vector2Int(2,2);
-				case map_id.MedicalCenter:			return new Vector2Int(2,2);
-				case map_id.Nursery:				return new Vector2Int(2,2);
-				case map_id.SolarPowerArray:		return new Vector2Int(3,2);
-				case map_id.RecreationFacility:		return new Vector2Int(2,2);
-				case map_id.University:				return new Vector2Int(2,2);
-				case map_id.Agridome:				return new Vector2Int(3,2);
-				case map_id.DIRT:					return new Vector2Int(3,2);
-				case map_id.Garage:					return new Vector2Int(3,2);
-				case map_id.MagmaWell:				return new Vector2Int(2,1);
-				case map_id.MeteorDefense:			return new Vector2Int(2,2);
-				case map_id.GeothermalPlant:		return new Vector2Int(2,1);
-				case map_id.ArachnidFactory:		return new Vector2Int(2,2);
-				case map_id.ConsumerFactory:		return new Vector2Int(3,3);
-				case map_id.StructureFactory:		return new Vector2Int(4,3);
-				case map_id.VehicleFactory:			return new Vector2Int(4,3);
-				case map_id.StandardLab:			return new Vector2Int(3,2);
-				case map_id.AdvancedLab:			return new Vector2Int(3,3);
-				case map_id.Observatory:			return new Vector2Int(2,2);
-				case map_id.ReinforcedResidence:	return new Vector2Int(3,2);
-				case map_id.AdvancedResidence:		return new Vector2Int(3,3);
-				case map_id.CommonOreSmelter:		return new Vector2Int(4,3);
-				case map_id.Spaceport:				return new Vector2Int(5,4);
-				case map_id.RareOreSmelter:			return new Vector2Int(4,3);
-				case map_id.GORF:					return new Vector2Int(3,2);
-				case map_id.Tokamak:				return new Vector2Int(2,2);
-			}
-
-			return new Vector2Int(1,1);
-		}
-
-		private RectInt GetStructureArea(Vector2Int position, map_id unitType)
-		{
-			Vector2Int size = GetStructureSize(unitType);
-
-			RectInt rect = new RectInt();
-			rect.xMin = position.x - size.x / 2;
-			rect.yMin = position.y - size.y / 2;
-			rect.xMax = position.x + (size.x-1) / 2 + 1;
-			rect.yMax = position.y + (size.y-1) / 2 + 1;
-
-			return rect;
-		}
-
 		private bool AreUnitsOnTile(Vector2Int tileXY)
 		{
+			// Add game coordinates
+			tileXY += Vector2Int.one;
+
 			MissionVariant variant = UserData.current.GetCombinedVariant();
 
 			foreach (PlayerData player in variant.players)
 			{
 				foreach (UnitData unit in UserData.current.GetCombinedResourceData(player).units)
 				{
-					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
+					RectInt otherArea = StructureData.GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 					if (otherArea.Contains(tileXY))
 						return true;
 				}
@@ -716,29 +664,23 @@ namespace OP2MissionEditor.Dialogs.Paint
 			return false;
 		}
 
-		private bool IsTilePassable(Vector2Int tileXY)
+		private bool IsWallOnTile(Vector2Int tileXY)
 		{
-			// Remove game coordinates
-			tileXY -= Vector2Int.one;
+			// Add game coordinates
+			tileXY += Vector2Int.one;
 
-			// Out of bounds is not passable
-			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.GetWidthInTiles() || tileXY.y >= UserData.current.map.GetHeightInTiles())
-				return false;
+			MissionVariant variant = UserData.current.GetCombinedVariant();
 
-			// Check for passable tile types
-			CellType type = (CellType)UserData.current.map.GetCellType((ulong)tileXY.x, (ulong)tileXY.y);
-			switch (type)
+			foreach (PlayerData player in variant.players)
 			{
-				case CellType.FastPassible1:
-				case CellType.SlowPassible1:
-				case CellType.SlowPassible2:
-				case CellType.MediumPassible1:
-				case CellType.MediumPassible2:
-				case CellType.FastPassible2:
-				case CellType.DozedArea:
-				case CellType.Rubble:
-				case CellType.Tube0:
-					return true;
+				foreach (WallTubeData wallTube in UserData.current.GetCombinedResourceData(player).wallTubes)
+				{
+					if (wallTube.typeID != map_id.Wall && wallTube.typeID != map_id.LavaWall && wallTube.typeID != map_id.MicrobeWall)
+						continue;
+
+					if (wallTube.position.x == tileXY.x && wallTube.position.y == tileXY.y)
+						return true;
+				}
 			}
 
 			return false;

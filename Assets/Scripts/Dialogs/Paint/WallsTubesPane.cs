@@ -91,11 +91,12 @@ namespace OP2MissionEditor.Dialogs.Paint
 			if (AreUnitsOnTile(tileXY))
 				return;
 
-			if (IsWallOnTile(tileXY))
-				return;
+			// Remove wall or tube from tile. We are going to replace it.
+			int playerIndex;
+			int wallTubeIndex;
 
-			if (IsTubeOnTile(tileXY))
-				return;
+			while (GetWallTubeOnTile(tileXY, out playerIndex, out wallTubeIndex))
+				UserData.current.GetPlayerResourceData(playerIndex).wallTubes.RemoveAt(wallTubeIndex);
 
 			// Add game coordinates
 			tileXY += Vector2Int.one;
@@ -118,12 +119,26 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		protected override void OnEraseTile(Vector2Int tileXY)
 		{
+			// Find wall or tube on tile
+			int playerIndex;
+			int wallTubeIndex;
+
+			if (!GetWallTubeOnTile(tileXY, out playerIndex, out wallTubeIndex))
+				return;
+			
+			// Remove wall or tube from tile
+			UserData.current.GetPlayerResourceData(playerIndex).wallTubes.RemoveAt(wallTubeIndex);
+			UserData.current.SetUnsaved();
+
+			m_MapRenderer.RefreshTile(tileXY);
+		}
+
+		private bool GetWallTubeOnTile(Vector2Int tileXY, out int playerIndex, out int wallTubeIndex)
+		{
 			// Add game coordinates
 			tileXY += Vector2Int.one;
 
-			// Find wall or tube on tile
-			int playerIndex = 0;
-			int wallTubeIndex = -1;
+			wallTubeIndex = -1;
 
 			for (playerIndex=0; playerIndex < UserData.current.selectedVariant.players.Count; ++playerIndex)
 			{
@@ -136,25 +151,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 					if (wallTube.position.x == tileXY.x && wallTube.position.y == tileXY.y)
 					{
 						wallTubeIndex = i;
-						break;
+						return true;
 					}
 				}
-
-				if (wallTubeIndex >= 0)
-					break;
 			}
 
-			if (wallTubeIndex < 0)
-				return;
-			
-			// Remove wall or tube from tile
-			UserData.current.GetPlayerResourceData(playerIndex).wallTubes.RemoveAt(wallTubeIndex);
-			UserData.current.SetUnsaved();
-
-			// Remove game coordinates
-			tileXY -= Vector2Int.one;
-
-			m_MapRenderer.RefreshTile(tileXY);
+			playerIndex = -1;
+			return false;
 		}
 
 		protected override void OnOverTile(Vector2Int tileXY)
@@ -219,7 +222,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			{
 				foreach (WallTubeData wallTube in UserData.current.GetCombinedResourceData(player).wallTubes)
 				{
-					if (wallTube.typeID != map_id.Wall || wallTube.typeID != map_id.LavaWall || wallTube.typeID != map_id.MicrobeWall)
+					if (wallTube.typeID != map_id.Wall && wallTube.typeID != map_id.LavaWall && wallTube.typeID != map_id.MicrobeWall)
 						continue;
 
 					if (wallTube.position.x == tileXY.x && wallTube.position.y == tileXY.y)

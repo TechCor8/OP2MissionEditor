@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK;
 using DotNetMissionSDK.Json;
+using OP2MissionEditor.Data;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -153,7 +154,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 				return;
 
 			UnitData structure = GetStructureData();
-			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			Vector2Int structureSize = StructureData.GetStructureSize(structure.typeID);
 			structureSize += new Vector2Int(2, 2); // Bulldozed area
 			Vector2 offset = new Vector2(-structureSize.x / 2, -structureSize.y / 2);
 			offset *= m_Tilemap.cellSize;
@@ -164,23 +165,24 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		protected override void OnPaintTile(Vector2Int tileXY)
 		{
-			// Add game coordinates
-			tileXY += Vector2Int.one;
-
 			UnitData structure = GetStructureData();
-			structure.position = new LOCATION(tileXY.x, tileXY.y);
+			structure.position = new LOCATION(tileXY.x + 1, tileXY.y + 1); // Add game coordinates
 
-			RectInt structureArea = GetStructureArea(tileXY, structure.typeID);
+			RectInt structureArea = StructureData.GetStructureArea(tileXY, structure.typeID);
 			RectInt bulldozedArea = structureArea;
 			bulldozedArea.min -= Vector2Int.one;
 			bulldozedArea.max += Vector2Int.one;
 
 			// Check if area is not buildable
-			if (!IsAreaPassable(bulldozedArea))
+			if (!TileMapData.IsAreaPassable(bulldozedArea))
 				return;
 
 			// Check if area is blocked by units or structures
 			if (AreUnitsInArea(structureArea))
+				return;
+
+			// Check if area is blocked by walls
+			if (AreWallsInArea(structureArea))
 				return;
 
 			// Add structure to tile
@@ -235,7 +237,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 				{
 					UnitData unit = resData.units[i];
 
-					RectInt structureArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
+					RectInt structureArea = StructureData.GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
 					if (structureArea.Contains(tileXY))
 					{
 						unitIndex = i;
@@ -265,11 +267,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			base.OnOverTile(tileXY);
 
-			// Add game coordinates
-			tileXY += Vector2Int.one;
-
 			UnitData structure = GetStructureData();
-			Vector2Int structureSize = GetStructureSize(structure.typeID);
+			Vector2Int structureSize = StructureData.GetStructureSize(structure.typeID);
 			structureSize += new Vector2Int(2,2); // Bulldozed area
 			Vector2Int minOffset = new Vector2Int(-structureSize.x / 2, -structureSize.y / 2);
 
@@ -284,11 +283,15 @@ namespace OP2MissionEditor.Dialogs.Paint
 					bool isInBulldozedArea = x == 0 || y ==0 || x == structureSize.x-1 || y == structureSize.y-1;
 
 					// Structures can't be placed on impassable terrain, including bulldozed area
-					bool canPlace = IsTilePassable(curTileXY);
+					bool canPlace = TileMapData.IsTilePassable(curTileXY);
 
 					// Structures can have units in bulldozed area, but not in building area
 					if (canPlace && !isInBulldozedArea)
 						canPlace = !AreUnitsInArea(new RectInt(curTileXY, Vector2Int.one));
+
+					// Structures can have walls in bulldozed area, but not in building area
+					if (canPlace && !isInBulldozedArea)
+						canPlace = !AreWallsInArea(new RectInt(curTileXY, Vector2Int.one));
 
 					Color color = Color.red;
 					if (canPlace)
@@ -375,66 +378,6 @@ namespace OP2MissionEditor.Dialogs.Paint
 			return Variant.Random;
 		}
 
-		private Vector2Int GetStructureSize(map_id type)
-		{
-			switch (type)
-			{
-				case map_id.CommonOreMine:			return new Vector2Int(2,1);
-				case map_id.RareOreMine:			return new Vector2Int(2,1);
-				case map_id.GuardPost:				return new Vector2Int(1,1);
-				case map_id.LightTower:				return new Vector2Int(1,1);
-				case map_id.CommonStorage:			return new Vector2Int(1,2);
-				case map_id.RareStorage:			return new Vector2Int(1,2);
-				case map_id.Forum:					return new Vector2Int(2,2);
-				case map_id.CommandCenter:			return new Vector2Int(3,2);
-				case map_id.MHDGenerator:			return new Vector2Int(2,2);
-				case map_id.Residence:				return new Vector2Int(2,2);
-				case map_id.RobotCommand:			return new Vector2Int(2,2);
-				case map_id.TradeCenter:			return new Vector2Int(2,2);
-				case map_id.BasicLab:				return new Vector2Int(2,2);
-				case map_id.MedicalCenter:			return new Vector2Int(2,2);
-				case map_id.Nursery:				return new Vector2Int(2,2);
-				case map_id.SolarPowerArray:		return new Vector2Int(3,2);
-				case map_id.RecreationFacility:		return new Vector2Int(2,2);
-				case map_id.University:				return new Vector2Int(2,2);
-				case map_id.Agridome:				return new Vector2Int(3,2);
-				case map_id.DIRT:					return new Vector2Int(3,2);
-				case map_id.Garage:					return new Vector2Int(3,2);
-				case map_id.MagmaWell:				return new Vector2Int(2,1);
-				case map_id.MeteorDefense:			return new Vector2Int(2,2);
-				case map_id.GeothermalPlant:		return new Vector2Int(2,1);
-				case map_id.ArachnidFactory:		return new Vector2Int(2,2);
-				case map_id.ConsumerFactory:		return new Vector2Int(3,3);
-				case map_id.StructureFactory:		return new Vector2Int(4,3);
-				case map_id.VehicleFactory:			return new Vector2Int(4,3);
-				case map_id.StandardLab:			return new Vector2Int(3,2);
-				case map_id.AdvancedLab:			return new Vector2Int(3,3);
-				case map_id.Observatory:			return new Vector2Int(2,2);
-				case map_id.ReinforcedResidence:	return new Vector2Int(3,2);
-				case map_id.AdvancedResidence:		return new Vector2Int(3,3);
-				case map_id.CommonOreSmelter:		return new Vector2Int(4,3);
-				case map_id.Spaceport:				return new Vector2Int(5,4);
-				case map_id.RareOreSmelter:			return new Vector2Int(4,3);
-				case map_id.GORF:					return new Vector2Int(3,2);
-				case map_id.Tokamak:				return new Vector2Int(2,2);
-			}
-
-			return new Vector2Int(1,1);
-		}
-
-		private RectInt GetStructureArea(Vector2Int position, map_id unitType)
-		{
-			Vector2Int size = GetStructureSize(unitType);
-
-			RectInt rect = new RectInt();
-			rect.xMin = position.x - size.x / 2;
-			rect.yMin = position.y - size.y / 2;
-			rect.xMax = position.x + (size.x-1) / 2 + 1;
-			rect.yMax = position.y + (size.y-1) / 2 + 1;
-
-			return rect;
-		}
-
 		private bool AreUnitsInArea(RectInt area)
 		{
 			MissionVariant variant = UserData.current.GetCombinedVariant();
@@ -443,7 +386,8 @@ namespace OP2MissionEditor.Dialogs.Paint
 			{
 				foreach (UnitData unit in UserData.current.GetCombinedResourceData(player).units)
 				{
-					RectInt otherArea = GetStructureArea(new Vector2Int(unit.position.x, unit.position.y), unit.typeID);
+					// Subtract game coordinates
+					RectInt otherArea = StructureData.GetStructureArea(new Vector2Int(unit.position.x-1, unit.position.y-1), unit.typeID);
 
 					if (RectIntersect(area, otherArea))
 						return true;
@@ -458,13 +402,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 			return !(a1.xMin >= a2.xMax || a1.xMax <= a2.xMin || a1.yMin >= a2.yMax || a1.yMax <= a2.yMin);
 		}
 
-		private bool IsAreaPassable(RectInt area)
+		private bool AreWallsInArea(RectInt area)
 		{
 			for (int x=area.xMin; x < area.xMax; ++x)
 			{
 				for (int y=area.yMin; y < area.yMax; ++y)
 				{
-					if (!IsTilePassable(new Vector2Int(x,y)))
+					if (!IsWallOnTile(new Vector2Int(x,y)))
 						return false;
 				}
 			}
@@ -472,29 +416,23 @@ namespace OP2MissionEditor.Dialogs.Paint
 			return true;
 		}
 
-		private bool IsTilePassable(Vector2Int tileXY)
+		private bool IsWallOnTile(Vector2Int tileXY)
 		{
-			// Remove game coordinates
-			tileXY -= Vector2Int.one;
+			// Add game coordinates
+			tileXY += Vector2Int.one;
 
-			// Out of bounds is not passable
-			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.GetWidthInTiles() || tileXY.y >= UserData.current.map.GetHeightInTiles())
-				return false;
+			MissionVariant variant = UserData.current.GetCombinedVariant();
 
-			// Check for passable tile types
-			CellType type = (CellType)UserData.current.map.GetCellType((ulong)tileXY.x, (ulong)tileXY.y);
-			switch (type)
+			foreach (PlayerData player in variant.players)
 			{
-				case CellType.FastPassible1:
-				case CellType.SlowPassible1:
-				case CellType.SlowPassible2:
-				case CellType.MediumPassible1:
-				case CellType.MediumPassible2:
-				case CellType.FastPassible2:
-				case CellType.DozedArea:
-				case CellType.Rubble:
-				case CellType.Tube0:
-					return true;
+				foreach (WallTubeData wallTube in UserData.current.GetCombinedResourceData(player).wallTubes)
+				{
+					if (wallTube.typeID != map_id.Wall && wallTube.typeID != map_id.LavaWall && wallTube.typeID != map_id.MicrobeWall)
+						continue;
+
+					if (wallTube.position.x == tileXY.x && wallTube.position.y == tileXY.y)
+						return true;
+				}
 			}
 
 			return false;
