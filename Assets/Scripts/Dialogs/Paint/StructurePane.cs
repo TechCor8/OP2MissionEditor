@@ -191,6 +191,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.AddUnit(player, structure);
+			m_MapRenderer.RefreshTiles(bulldozedArea);
 		}
 
 		private UnitData GetStructureData()
@@ -261,6 +262,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.SetUnsaved();
 
 			m_UnitRenderer.RemoveUnit(structureToRemove);
+			m_MapRenderer.RefreshTiles(StructureData.GetBulldozedStructureArea(new Vector2Int(structureToRemove.position.x-1, structureToRemove.position.y-1), structureToRemove.typeID));
 		}
 
 		protected override void OnOverTile(Vector2Int tileXY)

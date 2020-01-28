@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using OP2MissionEditor.Data;
+using OP2UtilityDotNet;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -119,9 +121,11 @@ namespace OP2MissionEditor.Systems.Map
 
 				for (uint y=0; y < mapHeight; ++y)
 				{
-					ulong tileSetIndex = UserData.current.map.GetTilesetIndex(x, y);
-					//ulong tileMappingIndex = UserData.current.map.GetTileMappingIndex(x, y);
-					int tileImageIndex = (int)UserData.current.map.GetImageIndex(x, y);
+					ulong tileMappingIndex = GetTileMappingIndex(new Vector2Int((int)x,(int)y));
+					TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
+			
+					ulong tileSetIndex = mapping.tilesetIndex;
+					int tileImageIndex = mapping.tileGraphicIndex;
 
 					string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
 					int tileSetNumTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
@@ -205,13 +209,25 @@ namespace OP2MissionEditor.Systems.Map
 			});
 		}
 
+		public void RefreshTiles(RectInt area)
+		{
+			for (int x=area.xMin; x < area.xMax; ++x)
+			{
+				for (int y=area.yMin; y < area.yMax; ++y)
+					RefreshTile(new Vector2Int(x,y));
+			}
+		}
+
 		public void RefreshTile(Vector2Int tileXY)
 		{
 			ulong x = (ulong)tileXY.x;
 			ulong y = (ulong)tileXY.y;
-			ulong tileSetIndex = UserData.current.map.GetTilesetIndex(x, y);
-			//ulong tileMappingIndex = UserData.current.map.GetTileMappingIndex(x, y);
-			int tileImageIndex = (int)UserData.current.map.GetImageIndex(x, y);
+
+			ulong tileMappingIndex = GetTileMappingIndex(tileXY);
+			TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
+			
+			ulong tileSetIndex = mapping.tilesetIndex;
+			int tileImageIndex = mapping.tileGraphicIndex;
 
 			string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
 			int tileSetNumTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
@@ -239,6 +255,59 @@ namespace OP2MissionEditor.Systems.Map
 			m_Tilemap.SetTile(cellPosition, tile);
 			m_CellTypeMap.SetTile(cellPosition, m_CellTypeCache[UserData.current.map.GetCellType(x, y)]);
 			minimapTexture.Apply();
+		}
+
+		private ulong GetTileMappingIndex(Vector2Int tileXY)
+		{
+			ulong x = (ulong)tileXY.x;
+			ulong y = (ulong)tileXY.y;
+
+			// Get default mapping index
+			ulong mappingIndex = UserData.current.map.GetTileMappingIndex(x,y);
+
+			// Get TerrainType for mapping index, if available
+			TerrainType terrainType;
+			if (!GetTerrainTypeForMappingIndex(mappingIndex, out terrainType))
+				return mappingIndex;
+
+			// Predict starting CellType and remap to terrain type
+			int wallTubeIndex;
+			switch (TileMapData.GetWallTubeIndexForTile(tileXY, out wallTubeIndex))
+			{
+				case CellType.DozedArea:		mappingIndex = terrainType.bulldozedTileMappingIndex;						break;
+				case CellType.NormalWall:		mappingIndex = terrainType.wallTileMappingIndexes[2*16+wallTubeIndex];		break;
+				case CellType.LavaWall:			mappingIndex = terrainType.wallTileMappingIndexes[wallTubeIndex];			break;
+				case CellType.MicrobeWall:		mappingIndex = terrainType.wallTileMappingIndexes[1*16+wallTubeIndex];		break;
+				case CellType.Tube0:
+				case CellType.Tube1:
+				case CellType.Tube2:
+				case CellType.Tube3:
+				case CellType.Tube4:
+				case CellType.Tube5:
+					mappingIndex = terrainType.tubeTileMappingIndexes[wallTubeIndex];
+					break;
+			}
+
+			return mappingIndex;
+		}
+
+		private bool GetTerrainTypeForMappingIndex(ulong mappingIndex, out TerrainType terrainType)
+		{
+			ulong count = UserData.current.map.GetTerrainTypeCount();
+
+			// Search terrain types for associated mapping index
+			for (ulong i=0; i < count; ++i)
+			{
+				TerrainType type = UserData.current.map.GetTerrainType(i);
+				if (type.tileMappingRange.start <= mappingIndex && mappingIndex <= type.tileMappingRange.end)
+				{
+					terrainType = type;
+					return true;
+				}
+			}
+
+			terrainType = new TerrainType();
+			return false;
 		}
 
 		private TileBase LoadTile(string tileSetPath, int texOffset)

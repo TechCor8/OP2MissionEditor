@@ -114,7 +114,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			// Remove game coordinates
 			tileXY -= Vector2Int.one;
 
-			m_MapRenderer.RefreshTile(tileXY);
+			m_MapRenderer.RefreshTiles(new RectInt(tileXY.x-1, tileXY.y-1, 3,3));
 		}
 
 		protected override void OnEraseTile(Vector2Int tileXY)
@@ -130,7 +130,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 			UserData.current.GetPlayerResourceData(playerIndex).wallTubes.RemoveAt(wallTubeIndex);
 			UserData.current.SetUnsaved();
 
-			m_MapRenderer.RefreshTile(tileXY);
+			m_MapRenderer.RefreshTiles(new RectInt(tileXY.x-1, tileXY.y-1, 3,3));
 		}
 
 		private bool GetWallTubeOnTile(Vector2Int tileXY, out int playerIndex, out int wallTubeIndex)
