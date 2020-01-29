@@ -99,6 +99,12 @@ namespace OP2MissionEditor.Systems.Map
 
 			m_TileCache.Clear();
 
+			// Cache calculated CellTypes
+			onMapRefreshProgressCB?.Invoke(this, "Calculating Cell Types", 0.0f);
+			yield return null;
+
+			CellTypeMap cellTypeMap = new CellTypeMap(UserData.current.map, UserData.current.GetCombinedMission());
+
 			uint mapWidth = UserData.current.map.GetWidthInTiles();
 			uint mapHeight = UserData.current.map.GetHeightInTiles();
 
@@ -121,7 +127,7 @@ namespace OP2MissionEditor.Systems.Map
 
 				for (uint y=0; y < mapHeight; ++y)
 				{
-					ulong tileMappingIndex = GetTileMappingIndex(new Vector2Int((int)x,(int)y));
+					ulong tileMappingIndex = GetTileMappingIndex(cellTypeMap, new Vector2Int((int)x,(int)y));
 					TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
 			
 					ulong tileSetIndex = mapping.tilesetIndex;
@@ -211,19 +217,30 @@ namespace OP2MissionEditor.Systems.Map
 
 		public void RefreshTiles(RectInt area)
 		{
+			// Cache calculated CellTypes
+			CellTypeMap cellTypeMap = new CellTypeMap(UserData.current.map, UserData.current.GetCombinedMission());
+
 			for (int x=area.xMin; x < area.xMax; ++x)
 			{
 				for (int y=area.yMin; y < area.yMax; ++y)
-					RefreshTile(new Vector2Int(x,y));
+					RefreshTile(cellTypeMap, new Vector2Int(x,y));
 			}
 		}
 
 		public void RefreshTile(Vector2Int tileXY)
 		{
+			// Cache calculated CellTypes
+			CellTypeMap cellTypeMap = new CellTypeMap(UserData.current.map, UserData.current.GetCombinedMission());
+
+			RefreshTile(cellTypeMap, tileXY);
+		}
+
+		private void RefreshTile(CellTypeMap cellTypeMap, Vector2Int tileXY)
+		{
 			ulong x = (ulong)tileXY.x;
 			ulong y = (ulong)tileXY.y;
 
-			ulong tileMappingIndex = GetTileMappingIndex(tileXY);
+			ulong tileMappingIndex = GetTileMappingIndex(cellTypeMap, tileXY);
 			TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
 			
 			ulong tileSetIndex = mapping.tilesetIndex;
@@ -257,7 +274,7 @@ namespace OP2MissionEditor.Systems.Map
 			minimapTexture.Apply();
 		}
 
-		private ulong GetTileMappingIndex(Vector2Int tileXY)
+		private ulong GetTileMappingIndex(CellTypeMap cellTypeMap, Vector2Int tileXY)
 		{
 			ulong x = (ulong)tileXY.x;
 			ulong y = (ulong)tileXY.y;
@@ -272,7 +289,7 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Predict starting CellType and remap to terrain type
 			int wallTubeIndex;
-			switch (TileMapData.GetWallTubeIndexForTile(tileXY, out wallTubeIndex))
+			switch (TileMapData.GetWallTubeIndexForTile(cellTypeMap, tileXY, out wallTubeIndex))
 			{
 				case CellType.DozedArea:		mappingIndex = terrainType.bulldozedTileMappingIndex;						break;
 				case CellType.NormalWall:		mappingIndex = terrainType.wallTileMappingIndexes[2*16+wallTubeIndex];		break;

@@ -96,6 +96,24 @@ namespace OP2MissionEditor.Data
 			return IsStructure(type);
 		}
 
+		public static bool HasTubes(map_id type)
+		{
+			switch (type)
+			{
+				case map_id.LightTower:
+				case map_id.CommonOreMine:
+				case map_id.RareOreMine:
+				case map_id.MagmaWell:
+				case map_id.Tokamak:
+				case map_id.SolarPowerArray:
+				case map_id.MHDGenerator:
+				case map_id.GeothermalPlant:
+					return false;
+			}
+
+			return IsStructure(type);
+		}
+
 		public static bool IsStructure(map_id type)
 		{
 			return (int)type >= 21 && (int)type <= 58;

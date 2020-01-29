@@ -117,10 +117,28 @@ namespace OP2MissionEditor
 			return MissionVariant.Concat(mission.masterVariant, selectedVariant);
 		}
 
-		public GameData GetCombinedTethysGame()
+		/// <summary>
+		/// Gets the combined master variant and difficulties
+		/// </summary>
+		/// <returns></returns>
+		public MissionVariant GetCombinedMission()
 		{
 			MissionVariant variant = GetCombinedVariant();
 
+			variant.tethysGame = GetCombinedTethysGame(variant);
+
+			foreach (PlayerData player in variant.players)
+				player.resources = GetCombinedResourceData(player);
+
+			return variant;
+		}
+
+		public GameData GetCombinedTethysGame()
+		{
+			return GetCombinedTethysGame(GetCombinedVariant());
+		}
+		public GameData GetCombinedTethysGame(MissionVariant variant)
+		{
 			// If no difficulty selected, return base data
 			if (selectedDifficultyIndex < 0)
 				return variant.tethysGame;
