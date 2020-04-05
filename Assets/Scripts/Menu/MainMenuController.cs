@@ -1,5 +1,6 @@
 ﻿using DotNetMissionSDK.Json;
 using OP2MissionEditor.Dialogs;
+using OP2MissionEditor.Dialogs.Generic;
 using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
@@ -102,6 +103,7 @@ namespace OP2MissionEditor.Menu
 			{
 				interactable = true;
 				Debug.Log("Opened mission \"" + Path.GetFileName(path) + "\".");
+				CheckSDKVersion();
 			});
 		}
 
@@ -208,6 +210,60 @@ namespace OP2MissionEditor.Menu
 			}
 
 			Debug.Log("Import mission complete.");
+			CheckSDKVersion();
+		}
+
+		private void CheckSDKVersion()
+		{
+			int versionCompare = CompareVersion(UserData.current.mission.sdkVersion, MissionRoot.SDKVersion);
+			if (versionCompare > 0)
+			{
+				string body = "This mission was created with a newer version of the editor and may no longer work correctly if you save over it.";
+				body += "\n\nDo you want to set this mission's version to the current editor version?";
+				ConfirmDialog.Create(OnConfirmChangeSDKVersion, "Newer Mission", body, "Downgrade");
+			}
+			else if (versionCompare < 0)
+			{
+				string body = "This mission was created with an older version of the editor and may no longer work correctly if you save over it.";
+				body += "\n\nDo you want to set this mission's version to the current editor version?";
+				ConfirmDialog.Create(OnConfirmChangeSDKVersion, "Outdated Mission", body, "Upgrade");
+			}
+		}
+
+		private void OnConfirmChangeSDKVersion(bool didConfirm)
+		{
+			if (!didConfirm)
+				return;
+
+			UserData.current.mission.sdkVersion = MissionRoot.SDKVersion;
+		}
+
+		private static int CompareVersion(string missionVersion, string editorVersion)
+		{
+			List<string> missionDots = new List<string>(missionVersion.Split('.'));
+			List<string> editorDots = new List<string>(editorVersion.Split('.'));
+
+			// Make sure number of version components is the same
+			while (missionDots.Count < editorDots.Count)
+				missionDots.Add("0");
+			while (editorDots.Count < missionDots.Count)
+				editorDots.Add("0");
+
+			for (int i=0; i < missionDots.Count; ++i)
+			{
+				int missionDot;
+				int editorDot;
+				if (!int.TryParse(missionDots[i], out missionDot))	missionDot = 0;
+				if (!int.TryParse(editorDots[i], out editorDot))	editorDot = 0;
+
+				if (missionDot > editorDot)
+					return 1;
+				else if (missionDot < editorDot)
+					return -1;
+			}
+
+			// Versions are the same
+			return 0;
 		}
 
 		public void OnClick_Save()
