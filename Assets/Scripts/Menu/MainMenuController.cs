@@ -1,4 +1,5 @@
-﻿using OP2MissionEditor.Dialogs;
+﻿using DotNetMissionSDK.Json;
+using OP2MissionEditor.Dialogs;
 using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
@@ -311,7 +312,7 @@ namespace OP2MissionEditor.Menu
 				return;
 			}
 
-			PluginExporter.ExportPlugin(path, UserData.current.mission.levelDetails);
+			PluginExporter.ExportPlugin(path, UserData.current.mission.sdkVersion, UserData.current.mission.levelDetails);
 
 			Debug.Log("Plugin exported to \"" + path + "\".");
 		}
@@ -639,7 +640,7 @@ namespace OP2MissionEditor.Menu
 		{
 			// Copy SDK from streaming assets to the game directory
 			string interopPath = Path.Combine(Application.streamingAssetsPath, "DotNetInterop.dll");
-			string sdkPath = Path.Combine(Application.streamingAssetsPath, "DotNetMissionSDK.dll");
+			string sdkPath = Path.Combine(Application.streamingAssetsPath, "DotNetMissionSDK_v" + MissionRoot.SDKVersion.Replace('.', '_') + ".dll");
 
 			string interopOutputPath = Path.Combine(UserPrefs.gameDirectory, Path.GetFileName(interopPath));
 			string sdkOutputPath = Path.Combine(UserPrefs.gameDirectory, Path.GetFileName(sdkPath));

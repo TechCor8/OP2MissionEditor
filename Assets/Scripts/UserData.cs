@@ -503,7 +503,7 @@ namespace OP2MissionEditor
 			map.Write(Path.Combine(dirPath, mission.levelDetails.mapName));
 
 			// Save plugin file
-			PluginExporter.ExportPlugin(Path.Combine(dirPath, missionName + ".dll"), mission.levelDetails);
+			PluginExporter.ExportPlugin(Path.Combine(dirPath, missionName + ".dll"), mission.sdkVersion, mission.levelDetails);
 		}
 
 		public void ExportMap(string path)

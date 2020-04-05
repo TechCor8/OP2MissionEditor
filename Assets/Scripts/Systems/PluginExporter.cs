@@ -19,7 +19,7 @@ namespace OP2MissionEditor.Systems
 		};
 
 
-		public static void ExportPlugin(string path, LevelDetails details)
+		public static void ExportPlugin(string path, string sdkVersion, LevelDetails details)
 		{
 			string templatePath = Path.Combine(Application.streamingAssetsPath, "PluginTemplate.dll");
 
@@ -46,6 +46,7 @@ namespace OP2MissionEditor.Systems
 					ReplaceSection(templateReader, writer, "TechFile", details.techTreeName);
 					ReplaceSection(templateReader, writer, modDescTemplateValues, newModDesc);
 					ReplaceSection(templateReader, writer, "LevelDesc", details.description);
+					ReplaceSection(templateReader, writer, "DotNetMissionSDK", "DotNetMissionSDK_v" + sdkVersion.Replace(".", "_") + ".dll");
 
 					// Write rest of file
 					writer.Write(templateReader.ReadBytes((int)(templateReader.BaseStream.Length - templateReader.BaseStream.Position)));
