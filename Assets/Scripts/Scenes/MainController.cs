@@ -1,6 +1,7 @@
 ﻿using OP2MissionEditor.Dialogs;
 using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
+using System.IO;
 using UnityEngine;
 
 namespace OP2MissionEditor.Scenes
@@ -14,6 +15,14 @@ namespace OP2MissionEditor.Scenes
 
 		private void Awake()
 		{
+			// Make sure game directory is valid
+			if (!string.IsNullOrEmpty(UserPrefs.gameDirectory))
+			{
+				// If directory does not exist, reset it so we can ask again.
+				if (!Directory.Exists(UserPrefs.gameDirectory))
+					UserPrefs.gameDirectory = null;
+			}
+
 			ConsoleLog.Initialize();
 			TextureManager.Initialize();
 
