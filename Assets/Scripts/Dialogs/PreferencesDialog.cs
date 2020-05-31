@@ -1,4 +1,5 @@
 ﻿using SimpleFileBrowser;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -82,6 +83,13 @@ namespace OP2MissionEditor.Dialogs
 
 		private void OnCancel_GameDirectory()
 		{
+			StartCoroutine(WaitToDisplayLocateGameDialog());
+		}
+
+		private IEnumerator WaitToDisplayLocateGameDialog()
+		{
+			yield return null;
+
 			// If user does not have a game directory and they try to cancel, force them to select one
 			if (string.IsNullOrEmpty(UserPrefs.gameDirectory))
 				OnClick_LocateGameDirectory();
