@@ -1,5 +1,4 @@
-﻿using DotNetMissionSDK.Json;
-using OP2UtilityDotNet;
+﻿using OP2UtilityDotNet.OP2Map;
 using UnityEngine;
 
 namespace OP2MissionEditor.Data
@@ -12,11 +11,11 @@ namespace OP2MissionEditor.Data
 		public static bool IsTilePassable(Vector2Int tileXY)
 		{
 			// Out of bounds is not passable
-			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.GetWidthInTiles() || tileXY.y >= UserData.current.map.GetHeightInTiles())
+			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.WidthInTiles() || tileXY.y >= UserData.current.map.HeightInTiles())
 				return false;
 
 			// Check for passable tile types
-			CellType type = (CellType)UserData.current.map.GetCellType((ulong)tileXY.x, (ulong)tileXY.y);
+			CellType type = (CellType)UserData.current.map.GetCellType(tileXY.x, tileXY.y);
 			switch (type)
 			{
 				case CellType.FastPassible1:
@@ -55,7 +54,7 @@ namespace OP2MissionEditor.Data
 		public static CellType GetMissionCellType(CellTypeMap cellTypeMap, Vector2Int tileXY, bool structuresAsTubes=false)
 		{
 			// Out of bounds is not passable
-			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.GetWidthInTiles() || tileXY.y >= UserData.current.map.GetHeightInTiles())
+			if (tileXY.x < 0 || tileXY.y < 0 || tileXY.x >= UserData.current.map.WidthInTiles() || tileXY.y >= UserData.current.map.HeightInTiles())
 				return CellType.Impassible1;
 
 			if (structuresAsTubes && cellTypeMap.IsStructureTile(tileXY))

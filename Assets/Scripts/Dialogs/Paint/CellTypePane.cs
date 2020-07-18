@@ -1,4 +1,4 @@
-﻿using OP2UtilityDotNet;
+﻿using OP2UtilityDotNet.OP2Map;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +34,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		protected override void OnPaintTile(Vector2Int tileXY)
 		{
 			// Paint tile with cell type
-			UserData.current.map.SetCellType((ulong)tileXY.x, (ulong)tileXY.y, (CellType)m_DropdownCellType.value);
+			UserData.current.map.SetCellType((CellType)m_DropdownCellType.value, tileXY.x, tileXY.y);
 			UserData.current.SetUnsaved();
 
 			m_MapRenderer.RefreshTile(tileXY);

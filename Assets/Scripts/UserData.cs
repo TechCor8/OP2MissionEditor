@@ -2,6 +2,7 @@
 using DotNetMissionSDK.Json;
 using OP2MissionEditor.Systems;
 using OP2UtilityDotNet;
+using OP2UtilityDotNet.OP2Map;
 using System.IO;
 using UnityEngine;
 
@@ -363,18 +364,20 @@ namespace OP2MissionEditor
 			// Load map
 			using (ResourceManager resourceManager = new ResourceManager(UserPrefs.gameDirectory))
 			{
-				byte[] mapData = resourceManager.GetResource(missionRoot.levelDetails.mapName, true);
-				if (mapData == null)
-					return false;
+				using (Stream mapStream = resourceManager.GetResourceStream(missionRoot.levelDetails.mapName, true))
+				{
+					if (mapStream == null)
+						return false;
 
-				Map tempMap = Map.ReadMap(mapData);
-				if (tempMap == null)
-					return false;
+					Map tempMap = Map.ReadMap(mapStream);
+					if (tempMap == null)
+						return false;
 
-				// Replace current mission with the loaded mission
-				Dispose();
-				mission = missionRoot;
-				map = tempMap;
+					// Replace current mission with the loaded mission
+					Dispose();
+					mission = missionRoot;
+					map = tempMap;
+				}
 			}
 
 			try
@@ -415,7 +418,6 @@ namespace OP2MissionEditor
 				return false;
 
 			// Replace current map with the imported map
-			map?.Dispose();
 			map = tempMap;
 
 			// Import successful. Inform listeners.
@@ -424,15 +426,14 @@ namespace OP2MissionEditor
 			return true;
 		}
 
-		public bool ImportMap(byte[] data)
+		public bool ImportMap(Stream mapStream)
 		{
 			// Read map
-			Map tempMap = Map.ReadMap(data);
+			Map tempMap = Map.ReadMap(mapStream);
 			if (tempMap == null)
 				return false;
 
 			// Replace current map with the imported map
-			map?.Dispose();
 			map = tempMap;
 
 			// Import successful. Inform listeners.
@@ -535,7 +536,6 @@ namespace OP2MissionEditor
 
 		public void Dispose()
 		{
-			map?.Dispose();
 			map = null;
 		}
 	}

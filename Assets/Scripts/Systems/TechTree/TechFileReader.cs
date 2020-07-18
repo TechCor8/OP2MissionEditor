@@ -36,34 +36,35 @@ namespace OP2MissionEditor.Systems.TechTree
 
 			using (ResourceManager resourceManager = new ResourceManager(archiveDirectory))
 			{
-				byte[] techSheet = resourceManager.GetResource(techFileName, true);
-				if (techSheet == null)
-					return new TechData[0];
-
-				using (MemoryStream stream = new MemoryStream(techSheet))
-				using (StreamReader reader = new StreamReader(stream))
+				using (Stream techSheet = resourceManager.GetResourceStream(techFileName, true))
 				{
-					while (!reader.EndOfStream)
+					if (techSheet == null)
+						return new TechData[0];
+
+					using (StreamReader reader = new StreamReader(techSheet))
 					{
-						string line = reader.ReadLine();
-
-						if (!line.StartsWith("BEGIN_TECH"))
-							continue;
-
-						int firstIndexOfQuote = line.IndexOf('"');
-						int secondIndexOfQuote = line.IndexOf('"', firstIndexOfQuote+1);
-
-						string techName = line.Substring(firstIndexOfQuote+1, secondIndexOfQuote-firstIndexOfQuote-1);
-						string szTechId = line.Substring(secondIndexOfQuote+2);
-						int techId;
-
-						if (!int.TryParse(szTechId, out techId))
+						while (!reader.EndOfStream)
 						{
-							Debug.LogWarning("Failed to parse tech id: " + szTechId);
-							continue;
-						}
+							string line = reader.ReadLine();
 
-						technologies.Add(new TechData(techId, techName));
+							if (!line.StartsWith("BEGIN_TECH"))
+								continue;
+
+							int firstIndexOfQuote = line.IndexOf('"');
+							int secondIndexOfQuote = line.IndexOf('"', firstIndexOfQuote+1);
+
+							string techName = line.Substring(firstIndexOfQuote+1, secondIndexOfQuote-firstIndexOfQuote-1);
+							string szTechId = line.Substring(secondIndexOfQuote+2);
+							int techId;
+
+							if (!int.TryParse(szTechId, out techId))
+							{
+								Debug.LogWarning("Failed to parse tech id: " + szTechId);
+								continue;
+							}
+
+							technologies.Add(new TechData(techId, techName));
+						}
 					}
 				}
 			}

@@ -4,6 +4,7 @@ using OP2MissionEditor.Dialogs.Generic;
 using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
+using OP2UtilityDotNet.Archive;
 using SimpleFileBrowser;
 using System.Collections;
 using System.Collections.Generic;
@@ -132,7 +133,7 @@ namespace OP2MissionEditor.Menu
 
 					// Get list of map names from the archive
 					VolFile vol = new VolFile(path);
-					for (ulong i=0; i < vol.GetCount(); ++i)
+					for (int i=0; i < vol.GetCount(); ++i)
 					{
 						string name = vol.GetName(i);
 						if (Path.GetExtension(name).ToLower() == ".map")
@@ -174,14 +175,16 @@ namespace OP2MissionEditor.Menu
 
 		private void OnImportMapSelected(VolFile volFile, string mapName)
 		{
-			byte[] mapData = volFile.ReadFileByName(mapName);
-			volFile.Dispose();
-
-			if (!UserData.current.ImportMap(mapData))
+			Stream mapStream = volFile.OpenStream(mapName);
+			
+			if (!UserData.current.ImportMap(mapStream))
 			{
 				Debug.LogError("Failed to read map: " + mapName);
+				volFile.Dispose();
 				return;
 			}
+
+			volFile.Dispose();
 
 			m_MapRenderer.Refresh(() =>
 			{
@@ -528,7 +531,7 @@ namespace OP2MissionEditor.Menu
 		{
 			// Get the appropriate archive type
 			string extension = Path.GetExtension(path);
-			Archive archive;
+			ArchiveFile archive;
 
 			switch (extension.ToLower())
 			{
@@ -543,14 +546,14 @@ namespace OP2MissionEditor.Menu
 			// Get list of files from the archive
 			List<string> fileNames = new List<string>();
 
-			for (ulong i=0; i < archive.GetCount(); ++i)
+			for (int i=0; i < archive.GetCount(); ++i)
 				fileNames.Add(archive.GetName(i));
 
 			// Open list of file names for selection
 			ListSelectDialog.Create(fileNames, "Extract File", "Select", (string fileName) => OnExtractFileSelected(archive, fileName), () => OnExtractFileCanceled(archive));
 		}
 
-		private void OnExtractFileSelected(Archive archive, string fileName)
+		private void OnExtractFileSelected(ArchiveFile archive, string fileName)
 		{
 			// User needs to choose where to save the extracted file
 			FileBrowser.SetFilters(false, Path.GetExtension(fileName));
@@ -558,16 +561,16 @@ namespace OP2MissionEditor.Menu
 				() => OnExtractFileCanceled(archive), false, UserPrefs.gameDirectory, "Destination File Path", "Extract");
 		}
 
-		private void OnExtractFileSavePathSelected(Archive archive, string fileName, string destPath)
+		private void OnExtractFileSavePathSelected(ArchiveFile archive, string fileName, string destPath)
 		{
 			interactable = true;
-			archive.ExtractFileByName(fileName, destPath);
+			archive.ExtractFile(fileName, destPath);
 			archive.Dispose();
 
 			Debug.Log(Path.GetFileName(destPath) + " extracted successfully.");
 		}
 
-		private void OnExtractFileCanceled(Archive archive)
+		private void OnExtractFileCanceled(ArchiveFile archive)
 		{
 			interactable = true;
 			archive.Dispose();
@@ -603,7 +606,7 @@ namespace OP2MissionEditor.Menu
 
 			// Get the appropriate archive type
 			string extension = Path.GetExtension(archivePath);
-			Archive archive;
+			ArchiveFile archive;
 
 			switch (extension.ToLower())
 			{
@@ -664,8 +667,8 @@ namespace OP2MissionEditor.Menu
 
 			switch (extension)
 			{
-				case ".vol":	VolFile.WriteVolFile(archivePath, culledFiles.ToArray());	break;
-				case ".clm":	ClmFile.WriteClmFile(archivePath, culledFiles.ToArray());	break;
+				case ".vol":	VolFile.CreateArchive(archivePath, culledFiles);	break;
+				case ".clm":	ClmFile.CreateArchive(archivePath, culledFiles);	break;
 				default:
 					Debug.Log("Invalid archive type selected.");
 					return;

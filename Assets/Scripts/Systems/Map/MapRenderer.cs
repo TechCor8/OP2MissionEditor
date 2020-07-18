@@ -48,13 +48,13 @@ namespace OP2MissionEditor.Systems.Map
 		private TileBase GetCellTypeTile(int cellType)
 		{
 			Tile tile = ScriptableObject.CreateInstance<Tile>();
-			tile.sprite = GetCellTypeSprite((OP2UtilityDotNet.CellType)cellType);
+			tile.sprite = GetCellTypeSprite((OP2UtilityDotNet.OP2Map.CellType)cellType);
 			tile.color = Color.white;
 
 			return tile;
 		}
 
-		public Sprite GetCellTypeSprite(OP2UtilityDotNet.CellType cellType)
+		public Sprite GetCellTypeSprite(OP2UtilityDotNet.OP2Map.CellType cellType)
 		{
 			return Resources.Load<Sprite>("CellTypes/" + cellType.ToString());
 		}
@@ -105,8 +105,8 @@ namespace OP2MissionEditor.Systems.Map
 
 			CellTypeMap cellTypeMap = new CellTypeMap(UserData.current.map, UserData.current.GetCombinedMission());
 
-			uint mapWidth = UserData.current.map.GetWidthInTiles();
-			uint mapHeight = UserData.current.map.GetHeightInTiles();
+			int mapWidth = (int)UserData.current.map.WidthInTiles();
+			int mapHeight = (int)UserData.current.map.HeightInTiles();
 
 			minimapTexture = new Texture2D((int)mapWidth*TextureManager.minimapScale, (int)mapHeight*TextureManager.minimapScale, TextureFormat.ARGB32, false);
 
@@ -117,7 +117,7 @@ namespace OP2MissionEditor.Systems.Map
 
 			int updateFrequency = 5;
 
-			for (uint x=0; x < mapWidth; ++x)
+			for (int x=0; x < mapWidth; ++x)
 			{
 				if (index % updateFrequency == 0)
 				{
@@ -125,16 +125,16 @@ namespace OP2MissionEditor.Systems.Map
 					yield return null;
 				}
 
-				for (uint y=0; y < mapHeight; ++y)
+				for (int y=0; y < mapHeight; ++y)
 				{
-					ulong tileMappingIndex = GetTileMappingIndex(cellTypeMap, new Vector2Int((int)x,(int)y));
-					TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
+					int tileMappingIndex = GetTileMappingIndex(cellTypeMap, new Vector2Int(x,y));
+					OP2UtilityDotNet.OP2Map.TileMapping mapping = UserData.current.map.tileMappings[tileMappingIndex];
 			
-					ulong tileSetIndex = mapping.tilesetIndex;
+					int tileSetIndex = mapping.tilesetIndex;
 					int tileImageIndex = mapping.tileGraphicIndex;
 
-					string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
-					int tileSetNumTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
+					string tileSetPath = UserData.current.map.tilesetSources[tileSetIndex].tilesetFilename;
+					int tileSetNumTiles = (int)UserData.current.map.tilesetSources[tileSetIndex].numTiles;
 
 					// Get tile texture
 					Texture2D texture = TextureManager.LoadTileset(tileSetPath);
@@ -156,7 +156,7 @@ namespace OP2MissionEditor.Systems.Map
 
 					cellPositions[index] = cellPosition;
 					cellTiles[index] = tile;
-					cellTypes[index] = m_CellTypeCache[UserData.current.map.GetCellType(x, y)];
+					cellTypes[index] = m_CellTypeCache[(int)UserData.current.map.GetCellType(x, y)];
 
 					++cellPosition.y;
 
@@ -237,17 +237,17 @@ namespace OP2MissionEditor.Systems.Map
 
 		private void RefreshTile(CellTypeMap cellTypeMap, Vector2Int tileXY)
 		{
-			ulong x = (ulong)tileXY.x;
-			ulong y = (ulong)tileXY.y;
+			int x = tileXY.x;
+			int y = tileXY.y;
 
-			ulong tileMappingIndex = GetTileMappingIndex(cellTypeMap, tileXY);
-			TileMapping mapping = UserData.current.map.GetTileMapping(tileMappingIndex);
+			int tileMappingIndex = GetTileMappingIndex(cellTypeMap, tileXY);
+			OP2UtilityDotNet.OP2Map.TileMapping mapping = UserData.current.map.tileMappings[tileMappingIndex];
 			
-			ulong tileSetIndex = mapping.tilesetIndex;
+			int tileSetIndex = mapping.tilesetIndex;
 			int tileImageIndex = mapping.tileGraphicIndex;
 
-			string tileSetPath = UserData.current.map.GetTilesetSourceFilename(tileSetIndex);
-			int tileSetNumTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tileSetIndex);
+			string tileSetPath = UserData.current.map.tilesetSources[tileSetIndex].tilesetFilename;
+			int tileSetNumTiles = (int)UserData.current.map.tilesetSources[tileSetIndex].numTiles;
 
 			// Get tile texture
 			Texture2D texture = TextureManager.LoadTileset(tileSetPath);
@@ -270,20 +270,20 @@ namespace OP2MissionEditor.Systems.Map
 
 			// Set tiles
 			m_Tilemap.SetTile(cellPosition, tile);
-			m_CellTypeMap.SetTile(cellPosition, m_CellTypeCache[UserData.current.map.GetCellType(x, y)]);
+			m_CellTypeMap.SetTile(cellPosition, m_CellTypeCache[(int)UserData.current.map.GetCellType(x, y)]);
 			minimapTexture.Apply();
 		}
 
-		private ulong GetTileMappingIndex(CellTypeMap cellTypeMap, Vector2Int tileXY)
+		private int GetTileMappingIndex(CellTypeMap cellTypeMap, Vector2Int tileXY)
 		{
-			ulong x = (ulong)tileXY.x;
-			ulong y = (ulong)tileXY.y;
+			int x = tileXY.x;
+			int y = tileXY.y;
 
 			// Get default mapping index
-			ulong mappingIndex = UserData.current.map.GetTileMappingIndex(x,y);
+			int mappingIndex = UserData.current.map.GetTileMappingIndex(x,y);
 
 			// Get TerrainType for mapping index, if available
-			TerrainType terrainType;
+			OP2UtilityDotNet.OP2Map.TerrainType terrainType;
 			if (!GetTerrainTypeForMappingIndex(mappingIndex, out terrainType))
 				return mappingIndex;
 
@@ -291,16 +291,16 @@ namespace OP2MissionEditor.Systems.Map
 			int wallTubeIndex;
 			switch (TileMapData.GetWallTubeIndexForTile(cellTypeMap, tileXY, out wallTubeIndex))
 			{
-				case CellType.DozedArea:		mappingIndex = terrainType.bulldozedTileMappingIndex;						break;
-				case CellType.NormalWall:		mappingIndex = terrainType.wallTileMappingIndexes[2*16+wallTubeIndex];		break;
-				case CellType.LavaWall:			mappingIndex = terrainType.wallTileMappingIndexes[wallTubeIndex];			break;
-				case CellType.MicrobeWall:		mappingIndex = terrainType.wallTileMappingIndexes[1*16+wallTubeIndex];		break;
-				case CellType.Tube0:
-				case CellType.Tube1:
-				case CellType.Tube2:
-				case CellType.Tube3:
-				case CellType.Tube4:
-				case CellType.Tube5:
+				case OP2UtilityDotNet.OP2Map.CellType.DozedArea:			mappingIndex = terrainType.bulldozedTileMappingIndex;						break;
+				case OP2UtilityDotNet.OP2Map.CellType.NormalWall:			mappingIndex = terrainType.wallTileMappingIndexes[2, wallTubeIndex];		break;
+				case OP2UtilityDotNet.OP2Map.CellType.LavaWall:				mappingIndex = terrainType.wallTileMappingIndexes[0, wallTubeIndex];		break;
+				case OP2UtilityDotNet.OP2Map.CellType.MicrobeWall:			mappingIndex = terrainType.wallTileMappingIndexes[1, wallTubeIndex];		break;
+				case OP2UtilityDotNet.OP2Map.CellType.Tube0:
+				case OP2UtilityDotNet.OP2Map.CellType.Tube1:
+				case OP2UtilityDotNet.OP2Map.CellType.Tube2:
+				case OP2UtilityDotNet.OP2Map.CellType.Tube3:
+				case OP2UtilityDotNet.OP2Map.CellType.Tube4:
+				case OP2UtilityDotNet.OP2Map.CellType.Tube5:
 					mappingIndex = terrainType.tubeTileMappingIndexes[wallTubeIndex];
 					break;
 			}
@@ -308,14 +308,14 @@ namespace OP2MissionEditor.Systems.Map
 			return mappingIndex;
 		}
 
-		private bool GetTerrainTypeForMappingIndex(ulong mappingIndex, out TerrainType terrainType)
+		private bool GetTerrainTypeForMappingIndex(int mappingIndex, out OP2UtilityDotNet.OP2Map.TerrainType terrainType)
 		{
-			ulong count = UserData.current.map.GetTerrainTypeCount();
+			int count = UserData.current.map.terrainTypes.Count;
 
 			// Search terrain types for associated mapping index
-			for (ulong i=0; i < count; ++i)
+			for (int i=0; i < count; ++i)
 			{
-				TerrainType type = UserData.current.map.GetTerrainType(i);
+				OP2UtilityDotNet.OP2Map.TerrainType type = UserData.current.map.terrainTypes[i];
 				if (type.tileMappingRange.start <= mappingIndex && mappingIndex <= type.tileMappingRange.end)
 				{
 					terrainType = type;
@@ -323,7 +323,7 @@ namespace OP2MissionEditor.Systems.Map
 				}
 			}
 
-			terrainType = new TerrainType();
+			terrainType = new OP2UtilityDotNet.OP2Map.TerrainType();
 			return false;
 		}
 
@@ -347,7 +347,7 @@ namespace OP2MissionEditor.Systems.Map
 			if (!tileCache.TryGetValue(texOffset, out tile))
 			{
 				// Create new tile
-				Sprite tileSprite = Sprite.Create(texture, new Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+				Sprite tileSprite = Sprite.Create(texture, new UnityEngine.Rect(0,texOffset, texture.width,texture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
 				Tile tile2 = ScriptableObject.CreateInstance<Tile>();
 				tile2.sprite = tileSprite;
 				tile2.color = Color.white;

@@ -27,7 +27,8 @@ namespace OP2MissionEditor.Systems
 			UserPrefs.onChangedPrefsCB += OnChangedPrefs;
 
 			m_ArchiveDirectory = UserPrefs.gameDirectory;
-			m_ResourceManager = new ResourceManager(m_ArchiveDirectory);
+			if (!string.IsNullOrEmpty(m_ArchiveDirectory))
+				m_ResourceManager = new ResourceManager(m_ArchiveDirectory);
 		}
 
 		private static void OnChangedPrefs()
@@ -85,6 +86,8 @@ namespace OP2MissionEditor.Systems
 			}
 
 			texture = GetTextureFromBMP(tileImageData);
+			texture.filterMode = FilterMode.Point;
+			texture.wrapMode = TextureWrapMode.Clamp;
 			m_Tilesets.Add(tilesetFileName, texture);
 
 			return texture;
@@ -159,7 +162,7 @@ namespace OP2MissionEditor.Systems
 			int texOffset = inverseTileIndex * tileSize;
 
 			// Create sprite
-			return Sprite.Create(tilesetTexture, new Rect(0,texOffset, tilesetTexture.width,tilesetTexture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+			return Sprite.Create(tilesetTexture, new UnityEngine.Rect(0,texOffset, tilesetTexture.width,tilesetTexture.width), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
 		}
 
 		/// <summary>

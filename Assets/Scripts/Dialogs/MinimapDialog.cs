@@ -50,7 +50,7 @@ namespace OP2MissionEditor.Dialogs
 			// Update minimap texture
 			m_MinimapImage.texture = m_MapRenderer.minimapTexture;
 			m_MinimapUnitImage.texture = m_UnitRenderer.unitMinimap.minimapTexture;
-			m_MapSize = new Vector2Int((int)UserData.current.map.GetWidthInTiles(), (int)UserData.current.map.GetHeightInTiles());
+			m_MapSize = new Vector2Int((int)UserData.current.map.WidthInTiles(), (int)UserData.current.map.HeightInTiles());
 
 			// Don't change aspect if map has not yet been initialized
 			if (m_MapSize.y == 0)

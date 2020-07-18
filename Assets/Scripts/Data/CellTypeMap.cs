@@ -1,5 +1,5 @@
 ﻿using DotNetMissionSDK.Json;
-using OP2UtilityDotNet;
+using OP2UtilityDotNet.OP2Map;
 using System;
 using UnityEngine;
 
@@ -24,15 +24,15 @@ namespace OP2MissionEditor.Data
 		/// </summary>
 		public CellTypeMap(Map map, MissionVariant variant)
 		{
-			uint mapWidth = map.GetWidthInTiles();
-			uint mapHeight = map.GetHeightInTiles();
+			uint mapWidth = map.WidthInTiles();
+			uint mapHeight = map.HeightInTiles();
 
 			m_Grid = new Tile[mapWidth, mapHeight];
 
 			// Default CellTypes to map CellTypes
-			for (uint x=0; x < mapWidth; ++x)
+			for (int x=0; x < mapWidth; ++x)
 			{
-				for (uint y=0; y < mapHeight; ++y)
+				for (int y=0; y < mapHeight; ++y)
 				{
 					m_Grid[x,y].cellType = (CellType)map.GetCellType(x,y);
 				}

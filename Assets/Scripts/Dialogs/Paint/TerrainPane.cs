@@ -1,4 +1,5 @@
 ﻿using OP2MissionEditor.Systems;
+using OP2UtilityDotNet.OP2Map;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 		[SerializeField] private GameObject	m_TileButtonPrefab			= default;
 
 		private bool m_IsPainting;
-		private ulong m_SelectedMappingIndex;
+		private int m_SelectedMappingIndex;
 
 		
 		protected override void Awake()
@@ -42,12 +43,12 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			List<string> tilesetNames = new List<string>();
 
-			ulong tilesetSourceCount = UserData.current.map.GetTilesetSourceCount();
+			int tilesetSourceCount = UserData.current.map.tilesetSources.Count;
 
 			// Load all tilesets in map
-			for (ulong i=0; i < tilesetSourceCount; ++i)
+			for (int i=0; i < tilesetSourceCount; ++i)
 			{
-				string tilesetFileName = UserData.current.map.GetTilesetSourceFilename(i);
+				string tilesetFileName = UserData.current.map.tilesetSources[i].tilesetFilename;
 
 				if (string.IsNullOrEmpty(tilesetFileName))
 					continue;
@@ -85,14 +86,14 @@ namespace OP2MissionEditor.Dialogs.Paint
 		private void SetTileset(string tilesetName)
 		{
 			// Get tileset index
-			ulong tilesetIndex = GetTilesetIndex(tilesetName);
-			if (tilesetIndex == UserData.current.map.GetTilesetSourceCount())
+			int tilesetIndex = GetTilesetIndex(tilesetName);
+			if (tilesetIndex == UserData.current.map.tilesetSources.Count)
 			{
 				Debug.LogError("Could not find tileset: " + tilesetName);
 				return;
 			}
 
-			int numTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(tilesetIndex);
+			int numTiles = (int)UserData.current.map.tilesetSources[tilesetIndex].numTiles;
 
 			// Get tileset texture
 			Texture2D tileset = TextureManager.GetTileset(tilesetName);
@@ -103,11 +104,11 @@ namespace OP2MissionEditor.Dialogs.Paint
 			}
 
 			// Get all mappings for tileset
-			ulong mappingCount = UserData.current.map.GetTileMappingCount();
+			int mappingCount = UserData.current.map.tileMappings.Count;
 
-			for (ulong i=0; i < mappingCount; ++i)
+			for (int i=0; i < mappingCount; ++i)
 			{
-				OP2UtilityDotNet.TileMapping mapping = UserData.current.map.GetTileMapping(i);
+				TileMapping mapping = UserData.current.map.tileMappings[i];
 
 				if (mapping.tilesetIndex != tilesetIndex)
 					continue;
@@ -121,13 +122,13 @@ namespace OP2MissionEditor.Dialogs.Paint
 			}
 		}
 
-		private ulong GetTilesetIndex(string tilesetName)
+		private int GetTilesetIndex(string tilesetName)
 		{
-			ulong tilesetSourceCount = UserData.current.map.GetTilesetSourceCount();
+			int tilesetSourceCount = UserData.current.map.tilesetSources.Count;
 			
-			for (ulong i=0; i < tilesetSourceCount; ++i)
+			for (int i=0; i < tilesetSourceCount; ++i)
 			{
-				if (UserData.current.map.GetTilesetSourceFilename(i) == tilesetName)
+				if (UserData.current.map.tilesetSources[i].tilesetFilename == tilesetName)
 					return i;
 			}
 
@@ -136,7 +137,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 
 		private void OnClick_Button(object data)
 		{
-			m_SelectedMappingIndex = (ulong)data;
+			m_SelectedMappingIndex = (int)data;
 			m_IsPainting = true;
 
 			RefreshOverlay();
@@ -146,14 +147,14 @@ namespace OP2MissionEditor.Dialogs.Paint
 		{
 			if (!gameObject.activeSelf) return;
 
-			if (m_SelectedMappingIndex < 0 || m_SelectedMappingIndex >= UserData.current.map.GetTileMappingCount())
+			if (m_SelectedMappingIndex < 0 || m_SelectedMappingIndex >= UserData.current.map.tileMappings.Count)
 				return;
 
 			// Get mapping and tileset data from mapping index
-			OP2UtilityDotNet.TileMapping mapping = UserData.current.map.GetTileMapping(m_SelectedMappingIndex);
-			string tilesetName = UserData.current.map.GetTilesetSourceFilename(mapping.tilesetIndex);
+			TileMapping mapping = UserData.current.map.tileMappings[m_SelectedMappingIndex];
+			string tilesetName = UserData.current.map.tilesetSources[mapping.tilesetIndex].tilesetFilename;
 			Texture2D tileset = TextureManager.GetTileset(tilesetName);
-			int numTiles = (int)UserData.current.map.GetTilesetSourceNumTiles(mapping.tilesetIndex);
+			int numTiles = (int)UserData.current.map.tilesetSources[mapping.tilesetIndex].numTiles;
 
 			// Set overlay sprite to mapping
 			m_OverlayRenderer.SetOverlay(TextureManager.GetTileSprite(tileset, numTiles, mapping.tileGraphicIndex));
@@ -165,7 +166,7 @@ namespace OP2MissionEditor.Dialogs.Paint
 				return;
 
 			// Paint tile with mapping index
-			UserData.current.map.SetTileMappingIndex((ulong)tileXY.x, (ulong)tileXY.y, m_SelectedMappingIndex);
+			UserData.current.map.SetTileMappingIndex(tileXY.x, tileXY.y, (uint)m_SelectedMappingIndex);
 			UserData.current.SetUnsaved();
 
 			m_MapRenderer.RefreshTile(tileXY);
