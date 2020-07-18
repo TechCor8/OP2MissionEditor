@@ -15,3 +15,9 @@ If the editor will not run, you may need the Visual C++ 2019 redistributable.
 If you can create missions just fine, but the game crashes when you try to start it in the game, you may need the .NET Framework Runtime.
 
 [.NET Framework 4.7.2 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net472)
+
+## Linux Users
+
+The editor should work "out of the box". Make sure you turn on the run permission for the .x86_64 file.
+
+You must install the .NET Framework with Wine Tricks to get missions to run in the game.
