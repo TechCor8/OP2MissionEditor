@@ -8,11 +8,7 @@ You can download the mission editor from the release page.
 
 ### Required Redistributables:
 
-If the editor will not run, you may need the Visual C++ 2019 redistributable.
-
-[vc_redist.x86](https://aka.ms/vs/16/release/vc_redist.x86.exe)
-
-If you can create missions just fine, but the game crashes when you try to start it in the game, you may need the .NET Framework Runtime.
+If you can create missions just fine, but the game crashes when you try to start it in Outpost 2, you may need the .NET Framework Runtime.
 
 [.NET Framework 4.7.2 Runtime](https://dotnet.microsoft.com/download/dotnet-framework/net472)
 
