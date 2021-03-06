@@ -5,6 +5,8 @@ using OP2MissionEditor.Systems;
 using OP2MissionEditor.Systems.Map;
 using OP2UtilityDotNet;
 using OP2UtilityDotNet.Archive;
+using OP2UtilityDotNet.Bitmap;
+using OP2UtilityDotNet.Sprite;
 using SimpleFileBrowser;
 using System.Collections;
 using System.Collections.Generic;
@@ -152,8 +154,12 @@ namespace OP2MissionEditor.Menu
 				default:
 					CreateNew_NoRefresh();
 
+					interactable = true;
+
 					if (UserData.current.ImportMap(path))
 					{
+						interactable = false;
+
 						m_MapRenderer.Refresh(() =>
 						{
 							interactable = true;
@@ -163,6 +169,8 @@ namespace OP2MissionEditor.Menu
 					else
 					{
 						// Import failed
+						interactable = false;
+
 						m_MapRenderer.Refresh(() =>
 						{
 							interactable = true;
@@ -175,6 +183,8 @@ namespace OP2MissionEditor.Menu
 
 		private void OnImportMapSelected(VolFile volFile, string mapName)
 		{
+			interactable = true;
+
 			Stream mapStream = volFile.OpenStream(mapName);
 			
 			if (!UserData.current.ImportMap(mapStream))
@@ -185,6 +195,8 @@ namespace OP2MissionEditor.Menu
 			}
 
 			volFile.Dispose();
+
+			interactable = false;
 
 			m_MapRenderer.Refresh(() =>
 			{
@@ -564,8 +576,23 @@ namespace OP2MissionEditor.Menu
 		private void OnExtractFileSavePathSelected(ArchiveFile archive, string fileName, string destPath)
 		{
 			interactable = true;
-			archive.ExtractFile(fileName, destPath);
-			archive.Dispose();
+			try
+			{
+				if (Path.GetExtension(fileName).ToLowerInvariant() == ".bmp")
+				{
+					// Special processing to convert tileset to a standard bmp format
+					BitmapFile bitmapFile = TilesetLoader.ReadTileset(archive.ExtractFileToMemory(fileName));
+					bitmapFile.Serialize(destPath);
+				}
+				else
+				{
+					archive.ExtractFile(fileName, destPath);
+				}
+			}
+			finally
+			{
+				archive.Dispose();
+			}
 
 			Debug.Log(Path.GetFileName(destPath) + " extracted successfully.");
 		}

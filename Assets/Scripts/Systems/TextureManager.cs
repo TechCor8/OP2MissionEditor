@@ -1,6 +1,8 @@
 ﻿using B83.Image.BMP;
 using OP2UtilityDotNet;
+using OP2UtilityDotNet.Sprite;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace OP2MissionEditor.Systems
@@ -78,14 +80,28 @@ namespace OP2MissionEditor.Systems
 				return texture;
 
 			// Image not found in cache. Fetch from archive.
-			byte[] tileImageData = m_ResourceManager.GetResource(tilesetFileName + ".bmp", true);
-			if (tileImageData == null)
+			Stream tileImageStream = m_ResourceManager.GetResourceStream(tilesetFileName + ".bmp", true);
+			if (tileImageStream == null)
 			{
 				Debug.LogError("Could not find resource: " + tilesetFileName);
 				return null;
 			}
 
+			// Convert image into standard bmp byte data
+			byte[] tileImageData;
+			OP2UtilityDotNet.Bitmap.BitmapFile bmpFile = TilesetLoader.ReadTileset(tileImageStream);
+			using (MemoryStream memStream = new MemoryStream())
+			{
+				if (bmpFile.GetScanLineOrientation() == OP2UtilityDotNet.Bitmap.ScanLineOrientation.TopDown)
+				{
+					bmpFile.InvertScanLines();
+				}
+				bmpFile.Serialize(memStream);
+				tileImageData = memStream.ToArray();
+			}
+
 			texture = GetTextureFromBMP(tileImageData);
+			if (texture == null) return null;
 			texture.filterMode = FilterMode.Point;
 			texture.wrapMode = TextureWrapMode.Clamp;
 			m_Tilesets.Add(tilesetFileName, texture);
@@ -97,7 +113,7 @@ namespace OP2MissionEditor.Systems
 		{
 			BMPLoader bmpLoader = new BMPLoader();
 			BMPImage bmpImage = bmpLoader.LoadBMP(bmpData);
-			return bmpImage.ToTexture2D();
+			return bmpImage?.ToTexture2D();
 		}
 
 		/// <summary>
