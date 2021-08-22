@@ -28,11 +28,14 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 1
       enableTightPacking: 1
+    secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: b1903535937b8144da6b434ddf8e6658, type: 3}
     totalSpriteSurfaceArea: 12196
     bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 3a73335068a5d934f9496cbfffcc7449, type: 3}
@@ -62,5 +65,6 @@ SpriteAtlas:
   - frm-139
   - frm-141
   - frm-138
+  m_RenderDataMap: {}
   m_Tag: FumaroleAtlas
   m_IsVariant: 0

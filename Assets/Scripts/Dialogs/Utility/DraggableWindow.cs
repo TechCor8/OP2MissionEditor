@@ -31,6 +31,8 @@ namespace OP2MissionEditor.Dialogs
 		public void OnEndDrag(PointerEventData eventData)
 		{
 			CanvasScaler canvas = m_DraggableWindow.GetComponentInParent<CanvasScaler>();
+			if (canvas == null)
+				return;
 
 			Vector2 refResolution = canvas.referenceResolution / 2;
 			refResolution.x = refResolution.y * (Screen.width / (float)Screen.height);

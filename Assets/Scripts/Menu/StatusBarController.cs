@@ -26,7 +26,10 @@ namespace OP2MissionEditor.Menu
 
 		private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
 		{
-			m_txtStatus.text = condition;
+			if (m_txtStatus != null)
+			{
+				m_txtStatus.text = condition;
+			}
 		}
 
 		private void Update()
